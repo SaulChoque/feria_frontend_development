@@ -1,0 +1,127 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated color palette for modern general marketplace with deep blue, white, and gold/orange accents */
+  --background: #ffffff; /* White background */
+  --foreground: #003366; /* Deep blue text */
+  --card: #f1f5f9; /* Light gray card background */
+  --card-foreground: #003366; /* Deep blue card text */
+  --popover: #ffffff; /* White popover background */
+  --popover-foreground: #003366; /* Deep blue popover text */
+  --primary: #003366; /* Deep blue primary */
+  --primary-foreground: #ffffff; /* White text on primary */
+  --secondary: #ffa500; /* Gold/orange secondary */
+  --secondary-foreground: #ffffff; /* White text on secondary */
+  --muted: #f1f5f9; /* Light gray muted */
+  --muted-foreground: #475569; /* Muted text color */
+  --accent: #ffa500; /* Gold/orange accent */
+  --accent-foreground: #003366; /* Deep blue text on accent */
+  --destructive: #be123c; /* Destructive red */
+  --destructive-foreground: #ffffff; /* White text on destructive */
+  --border: #d1d5db; /* Light border */
+  --input: #ffffff; /* White input background */
+  --ring: rgba(0, 51, 102, 0.2); /* Deep blue focus ring */
+  --chart-1: #ffa500; /* Gold chart color */
+  --chart-2: #003366; /* Deep blue chart color */
+  --chart-3: #f1f5f9; /* Light gray chart color */
+  --chart-4: #475569; /* Muted chart color */
+  --chart-5: #d1d5db; /* Border chart color */
+  --radius: 0.5rem; /* Rounded corners */
+  --sidebar: #f1f5f9; /* Light gray sidebar */
+  --sidebar-foreground: #003366; /* Deep blue sidebar text */
+  --sidebar-primary: #ffffff; /* White sidebar primary */
+  --sidebar-primary-foreground: #003366; /* Deep blue text on sidebar primary */
+  --sidebar-accent: #ffa500; /* Gold sidebar accent */
+  --sidebar-accent-foreground: #ffffff; /* White text on sidebar accent */
+  --sidebar-border: #d1d5db; /* Light sidebar border */
+  --sidebar-ring: rgba(0, 51, 102, 0.2); /* Deep blue sidebar focus ring */
+}
+
+.dark {
+  /* Dark mode colors maintaining the marketplace theme */
+  --background: #0f172a; /* Dark background */
+  --foreground: #f1f5f9; /* Light text */
+  --card: #1e293b; /* Dark card background */
+  --card-foreground: #f1f5f9; /* Light card text */
+  --popover: #0f172a; /* Dark popover background */
+  --popover-foreground: #f1f5f9; /* Light popover text */
+  --primary: #ffa500; /* Gold primary in dark mode */
+  --primary-foreground: #0f172a; /* Dark text on primary */
+  --secondary: #334155; /* Darker secondary */
+  --secondary-foreground: #f1f5f9; /* Light text on secondary */
+  --muted: #334155; /* Darker muted */
+  --muted-foreground: #94a3b8; /* Lighter muted text */
+  --accent: #ffa500; /* Gold accent remains */
+  --accent-foreground: #0f172a; /* Dark text on accent */
+  --destructive: #be123c; /* Destructive red */
+  --destructive-foreground: #f1f5f9; /* Light text on destructive */
+  --border: #334155; /* Darker border */
+  --input: #1e293b; /* Darker input background */
+  --ring: rgba(255, 165, 0, 0.3); /* Gold focus ring */
+  --chart-1: #ffa500; /* Gold chart in dark */
+  --chart-2: #003366; /* Deep blue chart */
+  --chart-3: #334155; /* Dark chart */
+  --chart-4: #94a3b8; /* Medium chart */
+  --chart-5: #475569; /* Muted chart */
+  --sidebar: #1e293b; /* Dark sidebar */
+  --sidebar-foreground: #f1f5f9; /* Light sidebar text */
+  --sidebar-primary: #ffa500; /* Gold sidebar primary */
+  --sidebar-primary-foreground: #0f172a; /* Dark text on sidebar primary */
+  --sidebar-accent: #334155; /* Darker sidebar accent */
+  --sidebar-accent-foreground: #f1f5f9; /* Light text on sidebar accent */
+  --sidebar-border: #334155; /* Darker sidebar border */
+  --sidebar-ring: rgba(255, 165, 0, 0.3); /* Gold sidebar focus ring */
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
