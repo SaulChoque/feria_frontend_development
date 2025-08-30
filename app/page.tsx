@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import { useEffect } from "react"
 import { useState } from "react"
 import {
   Search,
@@ -171,7 +171,10 @@ const locations = [
   "Seattle, WA",
 ]
 
-export default function GeneralMarketplace() {
+type Product = (typeof mockProducts)[number]
+
+export default function Marketplace() {
+  const [products, setProducts] = useState<Product[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All Categories")
   const [selectedCondition, setSelectedCondition] = useState("All Conditions")
@@ -196,7 +199,23 @@ export default function GeneralMarketplace() {
     image: "",
   })
 
-  const filteredProducts = mockProducts.filter((product) => {
+  useEffect(() => {
+    const savedProducts = localStorage.getItem("marketplace-products")
+    if (savedProducts) {
+      setProducts(JSON.parse(savedProducts))
+    } else {
+      setProducts(mockProducts)
+      localStorage.setItem("marketplace-products", JSON.stringify(mockProducts))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (products.length > 0) {
+      localStorage.setItem("marketplace-products", JSON.stringify(products))
+    }
+  }, [products])
+
+  const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -233,7 +252,7 @@ export default function GeneralMarketplace() {
 
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {
-      const product = mockProducts.find((p) => p.id === item.productId)
+      const product = products.find((p) => p.id === item.productId)
       return total + (product?.price || 0) * item.quantity
     }, 0)
   }
@@ -266,9 +285,27 @@ export default function GeneralMarketplace() {
 
   const handleSubmitProduct = (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock product submission - in real app would send to backend
-    console.log("New product submitted:", newProduct)
-    // Reset form
+
+    const productToAdd = {
+      id: Date.now(),
+      name: newProduct.name,
+      price: Number.parseFloat(newProduct.price),
+      originalPrice: newProduct.originalPrice
+        ? Number.parseFloat(newProduct.originalPrice)
+        : Number.parseFloat(newProduct.price),
+      image: newProduct.image || "/diverse-products-still-life.png",
+      rating: 4.5,
+      reviews: 0,
+      category: newProduct.category,
+      location: newProduct.location,
+      condition: newProduct.condition as "new" | "used" | "refurbished",
+      seller: walletConnected ? `User ${walletAddress.slice(0, 6)}...` : "Anonymous Seller",
+      inStock: true,
+      featured: false,
+    }
+
+    setProducts((prev) => [productToAdd, ...prev])
+
     setNewProduct({
       name: "",
       price: "",
@@ -279,9 +316,10 @@ export default function GeneralMarketplace() {
       description: "",
       image: "",
     })
+
     setIsSellerDashboardOpen(false)
-    // Show success message (could add toast notification)
-    alert("Product listed successfully!")
+
+    alert(`Product "${productToAdd.name}" listed successfully! It now appears in the marketplace.`)
   }
 
   const FloatingCart = () => (
@@ -312,7 +350,7 @@ export default function GeneralMarketplace() {
             ) : (
               <div className="space-y-4">
                 {cartItems.map((item) => {
-                  const product = mockProducts.find((p) => p.id === item.productId)
+                  const product = products.find((p) => p.id === item.productId)
                   if (!product) return null
 
                   return (
@@ -397,7 +435,7 @@ export default function GeneralMarketplace() {
     </Sheet>
   )
 
-  const ProductCard = ({ product }: { product: (typeof mockProducts)[0] }) => (
+  const ProductCard = ({ product }: { product: Product }) => (
     <Card className="group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-gradient-to-br from-card via-card to-card/50 border-2 border-transparent hover:border-gradient-to-r hover:from-purple-500/20 hover:via-pink-500/20 hover:to-orange-500/20 overflow-hidden relative">
       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -527,7 +565,6 @@ export default function GeneralMarketplace() {
         style={{ animationDuration: "8s" }}
       />
 
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 border-b-2 border-gradient-to-r from-purple-200 via-pink-200 to-orange-200 shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -544,7 +581,6 @@ export default function GeneralMarketplace() {
               </Badge>
             </div>
 
-            {/* Search Bar - Desktop */}
             <div className="hidden md:flex flex-1 max-w-2xl mx-8">
               <div className="relative w-full">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 h-5 w-5" />
@@ -573,7 +609,6 @@ export default function GeneralMarketplace() {
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex items-center space-x-3">
               <Sheet open={isSellerDashboardOpen} onOpenChange={setIsSellerDashboardOpen}>
                 <SheetTrigger asChild>
@@ -588,7 +623,6 @@ export default function GeneralMarketplace() {
                   </SheetHeader>
 
                   <form onSubmit={handleSubmitProduct} className="space-y-6 py-6">
-                    {/* Product Images */}
                     <div className="space-y-2">
                       <Label htmlFor="image">Product Images</Label>
                       <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
@@ -628,7 +662,6 @@ export default function GeneralMarketplace() {
                       </div>
                     </div>
 
-                    {/* Product Name */}
                     <div className="space-y-2">
                       <Label htmlFor="name">Product Name *</Label>
                       <Input
@@ -640,28 +673,6 @@ export default function GeneralMarketplace() {
                       />
                     </div>
 
-                    {/* Category */}
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Category *</Label>
-                      <Select
-                        value={newProduct.category}
-                        onValueChange={(value) => setNewProduct((prev) => ({ ...prev, category: value }))}
-                        required
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Price */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="price">Price *</Label>
@@ -686,7 +697,6 @@ export default function GeneralMarketplace() {
                       </div>
                     </div>
 
-                    {/* Condition */}
                     <div className="space-y-2">
                       <Label htmlFor="condition">Condition *</Label>
                       <Select
@@ -707,7 +717,6 @@ export default function GeneralMarketplace() {
                       </Select>
                     </div>
 
-                    {/* Location */}
                     <div className="space-y-2">
                       <Label htmlFor="location">Location *</Label>
                       <Select
@@ -728,7 +737,6 @@ export default function GeneralMarketplace() {
                       </Select>
                     </div>
 
-                    {/* Description */}
                     <div className="space-y-2">
                       <Label htmlFor="description">Description</Label>
                       <Textarea
@@ -740,7 +748,6 @@ export default function GeneralMarketplace() {
                       />
                     </div>
 
-                    {/* Submit Buttons */}
                     <div className="flex gap-4 pt-4">
                       <Button type="submit" className="flex-1">
                         List Product
@@ -807,7 +814,6 @@ export default function GeneralMarketplace() {
             </div>
           </div>
 
-          {/* Mobile Search */}
           <div className="md:hidden mt-4">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 h-4 w-4" />
@@ -822,7 +828,6 @@ export default function GeneralMarketplace() {
         </div>
       </header>
 
-      {/* Navigation */}
       <nav className="bg-white/70 backdrop-blur-xl border-b-2 border-purple-100 shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center space-x-6 py-4 overflow-x-auto">
@@ -861,7 +866,6 @@ export default function GeneralMarketplace() {
                   Filters
                 </h3>
 
-                {/* ... existing filter content with enhanced styling ... */}
                 <div className="space-y-2 mb-6">
                   <h4 className="text-sm font-bold text-purple-700">Category</h4>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -934,9 +938,7 @@ export default function GeneralMarketplace() {
             </Card>
           </aside>
 
-          {/* Main Content */}
           <main className="flex-1">
-            {/* Featured Products */}
             {featuredProducts.length > 0 && (
               <section className="mb-12">
                 <div className="flex items-center gap-3 mb-6">
@@ -956,7 +958,6 @@ export default function GeneralMarketplace() {
               </section>
             )}
 
-            {/* All Products */}
             <section>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">

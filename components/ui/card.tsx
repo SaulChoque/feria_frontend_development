@@ -75,7 +75,9 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-footer"
-      className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
+  // Use column layout by default so footers (like product action buttons)
+  // naturally stack vertically. Consumers can override with row classes.
+  className={cn("flex flex-col items-center px-6 [.border-t]:pt-6", className)}
       {...props}
     />
   )

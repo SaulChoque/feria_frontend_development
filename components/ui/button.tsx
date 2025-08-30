@@ -47,11 +47,15 @@ function Button({
   }) {
   const Comp = asChild ? Slot : "button"
 
+  // If the consumer didn't provide a type, default to type="button" to
+  // prevent buttons inside forms from acting as submit buttons.
+  const propsWithType = { type: "button", ...props }
+
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
+      {...(propsWithType as any)}
     />
   )
 }
