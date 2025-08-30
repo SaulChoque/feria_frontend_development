@@ -1,89 +1,105 @@
-# Frontend Marketplace — Project README
+# 🚀 Frontend Marketplace — Project README
 
-This repository contains a proof-of-concept front-end for a marketplace built with Next.js, TypeScript and TailwindCSS.
-
-Main contents:
-
-- `app/`: routes and pages (main page is `app/page.tsx`).
-- `components/ui/`: reusable UI components (Card, Button, Input, etc.).
-- `public/`: static images and assets.
-
-Purpose of this README
-
-- Explain how to run the project locally.
-- Summarize the review performed and the recommended fixes.
-- Describe next steps and how to request changes.
-
-## Requirements
-
-- Node.js (v18+ recommended)
-- npm (or pnpm/yarn)
-
-## Install and run
-
-```powershell
-# install dependencies
-npm install
-
-# run development server
-npm run dev
-
-# build for production
-npm run build
-
-# start in production
-npm run start
-```
-
-Open http://localhost:3000 in your browser.
-
-## What I reviewed and recommendations
-
-You asked: review the `app` folder, fix visible/functional issues and correct a button that appears next to "Add to Cart" (see screenshot). I inspected `app/page.tsx` and the UI components:
-
-- The main `ProductCard` lives in `app/page.tsx`. The cart logic (`addToCart`, `updateCartQuantity`, `removeFromCart`) is implemented as local state and works in memory.
-- The visual issue is caused by footer layout styles. If the card footer uses horizontal layout or spacing utilities, the secondary button ("Contact Seller") can appear beside the primary CTA.
-
-Immediate recommendations (I can apply them on request):
-
-1. Force vertical stacking in `CardFooter` (e.g. `className="p-4 pt-0 flex-col space-y-3"`) so the secondary button no longer sits beside the Add to Cart button.
-2. Ensure non-form buttons use `type="button"` to avoid accidental form submission.
-3. Keep the Add to Cart handler client-side (it already updates `cartItems` state). For persistence, use localStorage or connect to a backend.
-
-## Changes applied (or suggested)
-
-- Suggested/applicable changes: stack footer buttons vertically, add `type="button"` to secondary buttons, and wire the Contact Seller button to a simple handler (placeholder alert).
-- Note: I attempted to apply some edits earlier; if any edits were reverted, tell me and I will re-apply them.
-
-## Quick overview of cart behavior
-
-- `cartItems` is an array of `{ productId, quantity }` stored in React state.
-- `addToCart(productId)` adds or increments a product.
-- `updateCartQuantity` changes quantity and removes the item if quantity <= 0.
-- Cart content is shown in a floating Sheet component and is client-only (no persistence by default).
-
-## Known issues and next steps
-
-- Visual: secondary button placement next to Add to Cart (fix by forcing vertical layout in `CardFooter`).
-- Persistence: cart does not persist across reloads (suggest localStorage or backend).
-- Accessibility: add appropriate ARIA attributes and labels where missing.
-- Tests: there are no unit tests for core UI components yet.
-
-Priority next steps:
-
-1. Apply layout fixes in `components/ui/card.tsx` and `app/page.tsx` to guarantee vertical stacking of footer buttons.
-2. Make secondary buttons `type="button"` to avoid unintended submits.
-3. Add localStorage persistence for the cart.
-4. Add unit tests for `Card` and `Button`.
-
-## Want me to apply the fixes now?
-
-Reply "Apply changes" and I will:
-
-- Update `components/ui/card.tsx` and `components/ui/button.tsx` as needed.
-- Update `app/page.tsx` to ensure `ProductCard` footer stacks vertically and secondary buttons have `type="button"`.
-- Run a quick build (`npm run build`) and report any errors.
+A clean, modern front-end proof-of-concept for a general marketplace built with Next.js, TypeScript and TailwindCSS.
 
 ---
 
-If you prefer, I can make the changes and open a small PR-style patch here. Tell me how you want to proceed.
+## 📌 Quick plan (what I will do next)
+
+- Make the README clear, visual and actionable.
+- Document what was reviewed, what was fixed, and what to do next.
+- Provide copy/paste commands for development.
+
+---
+
+## ✨ At-a-glance
+
+- Tech: Next.js (app router), React, TypeScript, TailwindCSS
+- UI: Reusable components under `components/ui/` (Cards, Buttons, Inputs, etc.)
+- Main page: `app/page.tsx` (marketplace UI, filters, product cards, cart, sell modal)
+
+---
+
+## ▶️ Run locally
+
+```powershell
+# install
+npm install
+
+# dev server (PowerShell)
+npm run dev
+
+# build & start for production
+npm run build
+npm run start
+```
+
+Open: http://localhost:3000
+
+---
+
+## 🧩 What I reviewed & fixed
+
+- Reviewed the whole `app/` folder (page layout, product listing, modal forms, cart logic).
+- Fixed the sell-product form so it is controlled and newly listed products appear immediately on the page (stored in local state + localStorage).
+- Ensured the ProductCard footer stacks actions vertically so the secondary CTA (Contact Seller) no longer overlaps the Add to Cart button.
+- Added small UX fixes (button types for non-submit actions, image preview flow, modal close behavior).
+
+Status: core fixes applied to `app/page.tsx` and documented here. If you want I can also normalize `components/ui/*` to make the layout stricter.
+
+---
+
+## ✅ Features implemented (client-side)
+
+- Search, category, condition and location filters
+- Grid / list view toggles
+- Product cards with badges, wishlist and Add to Cart action
+- Floating cart (Sheet) with quantity controls
+- Sell Product modal with controlled form, image upload preview
+- Contact Seller sheet with product and seller details
+- Dark / Light mode persisted to localStorage
+- Products persisted to localStorage (newly listed items persist)
+
+---
+
+## ⚠️ Known issues & recommendations
+
+- Cart is client-only. If you need persistence across devices, connect to a backend or sync via user account.
+- Accessibility improvements: add ARIA attributes and keyboard focus flows for all interactive widgets.
+- Add unit tests for `Card` and `Button` to prevent regressions in layout.
+
+---
+
+## 🛠 Development notes
+
+- Where to look:
+  - `app/page.tsx` — main application scaffold and product card UI
+  - `components/ui/` — primitives used across the UI
+  - `lib/utils.ts` — small helpers
+
+- Quick editing loop:
+  1. Edit code (VS Code)
+  2. npm run dev
+  3. Test in browser and refresh
+
+---
+
+## 📌 Next steps I can do for you (pick any)
+
+- Apply permanent layout fixes to `components/ui/card.tsx` and `components/ui/button.tsx` to prevent overlapping in all screen sizes
+- Add localStorage sync for the cart
+- Add 2–3 unit tests (Jest + React Testing Library) for Card and Button
+- Create a tiny e2e smoke test for the sell flow (Cypress)
+
+Reply with the option you want (for example: "Fix components and run build").
+
+---
+
+## 🤝 Contribute
+
+- Create a branch, make changes, run `npm run build` and open a PR.
+- If you'd like I can prepare a small patch/PR here with the requested follow-ups.
+
+---
+
+Thanks — tell me which of the next steps you want me to implement and I’ll apply them and run a build to validate.
