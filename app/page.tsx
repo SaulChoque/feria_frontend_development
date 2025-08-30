@@ -167,7 +167,7 @@ const mockProducts = [
 ]
 
 const categories = ["Electronics", "Furniture", "Clothing", "Vehicles", "Others"]
-const conditions = ["new", "used", "refurbished"]
+// conditions removed because it's unused; explicit condition values are in the UI
 const locations = [
   "New York, NY",
   "Los Angeles, CA",
@@ -195,7 +195,8 @@ export default function Marketplace() {
   const [walletAddress, setWalletAddress] = useState("")
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  // Only the current view mode is required; the setter wasn't used anywhere.
+  const [viewMode] = useState<"grid" | "list">("grid")
   const [isSellerDashboardOpen, setIsSellerDashboardOpen] = useState(false)
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -212,7 +213,7 @@ export default function Marketplace() {
   const [selectedSeller, setSelectedSeller] = useState<Product | null>(null)
 
   const [imagePreview, setImagePreview] = useState<string>("")
-  const [showSellModal, setShowSellModal] = useState(false)
+  // showSellModal removed; we use the seller dashboard state (`isSellerDashboardOpen`) instead.
 
   useEffect(() => {
     const savedDarkMode = localStorage.getItem("marketplace-dark-mode")
@@ -261,7 +262,7 @@ export default function Marketplace() {
     return matchesSearch && matchesCategory && matchesCondition && matchesLocation && matchesPrice
   })
 
-  const featuredProducts = filteredProducts.filter((product) => product.featured)
+  // featuredProducts removed because it's not used in the UI currently
 
   const addToCart = (productId: number) => {
     setCartItems((prev) => {
@@ -362,8 +363,9 @@ export default function Marketplace() {
       image: "",
     })
 
-    setImagePreview("") // Clear image preview when form is submitted
-    setShowSellModal(false) // Close the modal after successful submission
+  setImagePreview("") // Clear image preview when form is submitted
+  // Close the seller sheet after successful submission
+  setIsSellerDashboardOpen(false)
 
     alert("¡Producto agregado exitosamente!")
   }

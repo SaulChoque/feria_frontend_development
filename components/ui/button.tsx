@@ -45,18 +45,25 @@ function Button({
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
   }) {
-  const Comp = asChild ? Slot : "button"
+  const classNameValue = cn(buttonVariants({ variant, size, className }))
 
   // If the consumer didn't provide a type, default to type="button" to
   // prevent buttons inside forms from acting as submit buttons.
-  const propsWithType = { type: "button", ...props }
+  const propsWithType: React.ComponentProps<"button"> = {
+    type: "button",
+    ...(props as React.ComponentProps<"button">),
+  }
+
+  if (asChild) {
+    // Render Radix Slot when asChild=true. Slot accepts generic element props,
+    // so we cast props to Slot's prop type without using `any`.
+    return (
+      <Slot data-slot="button" className={classNameValue} {...(props as React.ComponentProps<typeof Slot>)} />
+    )
+  }
 
   return (
-    <Comp
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...(propsWithType as any)}
-    />
+    <button data-slot="button" className={classNameValue} {...propsWithType} />
   )
 }
 
