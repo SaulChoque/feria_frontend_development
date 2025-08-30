@@ -26,6 +26,10 @@ import {
   DollarSign,
   Tag,
   FileText,
+  User,
+  MessageCircle,
+  Phone,
+  Upload,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -204,6 +208,12 @@ export default function Marketplace() {
     image: "",
   })
 
+  const [contactSellerOpen, setContactSellerOpen] = useState(false)
+  const [selectedSeller, setSelectedSeller] = useState<Product | null>(null)
+
+  const [imagePreview, setImagePreview] = useState<string>("")
+  const [showSellModal, setShowSellModal] = useState(false)
+
   useEffect(() => {
     const savedDarkMode = localStorage.getItem("marketplace-dark-mode")
     if (savedDarkMode) {
@@ -310,7 +320,9 @@ export default function Marketplace() {
     if (file) {
       const reader = new FileReader()
       reader.onload = (e) => {
-        setNewProduct((prev) => ({ ...prev, image: e.target?.result as string }))
+        const result = e.target?.result as string
+        setNewProduct((prev) => ({ ...prev, image: result }))
+        setImagePreview(result) // Set preview for uploaded image
       }
       reader.readAsDataURL(file)
     }
@@ -350,9 +362,15 @@ export default function Marketplace() {
       image: "",
     })
 
-    setIsSellerDashboardOpen(false)
+    setImagePreview("") // Clear image preview when form is submitted
+    setShowSellModal(false) // Close the modal after successful submission
 
-    alert(`Product "${productToAdd.name}" listed successfully! It now appears in the marketplace.`)
+    alert("¡Producto agregado exitosamente!")
+  }
+
+  const contactSeller = (product: Product) => {
+    setSelectedSeller(product)
+    setContactSellerOpen(true)
   }
 
   const FloatingCart = () => (
@@ -608,11 +626,11 @@ export default function Marketplace() {
                 isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
               }`}
             >
-              ${product.price.toLocaleString()}
+              ${(product.price || 0).toLocaleString()}
             </span>
-            {product.originalPrice > product.price && (
+            {product.originalPrice && product.originalPrice > product.price && (
               <span className={`text-sm line-through ${isDarkMode ? "text-gray-400" : "text-muted-foreground"}`}>
-                ${product.originalPrice.toLocaleString()}
+                ${(product.originalPrice || 0).toLocaleString()}
               </span>
             )}
           </div>
@@ -644,6 +662,7 @@ export default function Marketplace() {
               ? "bg-gradient-to-r from-amber-900/30 to-orange-900/30 border-2 border-amber-600 hover:border-amber-500 text-amber-300 hover:text-orange-300"
               : "bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-300 text-amber-700 hover:text-orange-700"
           }`}
+          onClick={() => contactSeller(product)}
         >
           <Zap className="h-4 w-4 mr-2" />
           Contact Seller
@@ -761,9 +780,7 @@ export default function Marketplace() {
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                          isDarkMode
-                            ? "bg-gradient-to-r from-cyan-500 to-blue-500"
-                            : "bg-gradient-to-r from-blue-500 to-cyan-500"
+                          isDarkMode ? "bg-gradient-to-r from-cyan-500 to-blue-500" : "bg-gradient-to-r from-blue-500 to-cyan-500"
                         } shadow-lg`}
                       >
                         <Plus className="h-6 w-6 text-white" />
@@ -797,6 +814,8 @@ export default function Marketplace() {
                             name="title"
                             placeholder="Enter product name..."
                             required
+                            value={newProduct.name}
+                            onChange={(e) => setNewProduct((prev) => ({ ...prev, name: e.target.value }))}
                             className={`border-2 rounded-xl transition-all duration-300 focus:scale-[1.02] ${
                               isDarkMode
                                 ? "border-slate-600 focus:border-cyan-500 bg-slate-800 text-white placeholder:text-slate-400"
@@ -822,6 +841,8 @@ export default function Marketplace() {
                             step="0.01"
                             placeholder="0.00"
                             required
+                            value={newProduct.price}
+                            onChange={(e) => setNewProduct((prev) => ({ ...prev, price: e.target.value }))}
                             className={`border-2 rounded-xl transition-all duration-300 focus:scale-[1.02] ${
                               isDarkMode
                                 ? "border-slate-600 focus:border-amber-500 bg-slate-800 text-white placeholder:text-slate-400"
@@ -842,7 +863,12 @@ export default function Marketplace() {
                             <Tag className="h-4 w-4" />
                             Category *
                           </Label>
-                          <Select name="category" required>
+                          <Select
+                            name="category"
+                            required
+                            value={newProduct.category}
+                            onValueChange={(v) => setNewProduct((prev) => ({ ...prev, category: v }))}
+                          >
                             <SelectTrigger
                               className={`border-2 rounded-xl transition-all duration-300 focus:scale-[1.02] ${
                                 isDarkMode
@@ -875,7 +901,12 @@ export default function Marketplace() {
                             <Star className="h-4 w-4" />
                             Condition *
                           </Label>
-                          <Select name="condition" required>
+                          <Select
+                            name="condition"
+                            required
+                            value={newProduct.condition}
+                            onValueChange={(v) => setNewProduct((prev) => ({ ...prev, condition: v }))}
+                          >
                             <SelectTrigger
                               className={`border-2 rounded-xl transition-all duration-300 focus:scale-[1.02] ${
                                 isDarkMode
@@ -911,6 +942,8 @@ export default function Marketplace() {
                           name="location"
                           placeholder="City, State or ZIP code..."
                           required
+                          value={newProduct.location}
+                          onChange={(e) => setNewProduct((prev) => ({ ...prev, location: e.target.value }))}
                           className={`border-2 rounded-xl transition-all duration-300 focus:scale-[1.02] ${
                             isDarkMode
                               ? "border-slate-600 focus:border-cyan-500 bg-slate-800 text-white placeholder:text-slate-400"
@@ -935,6 +968,8 @@ export default function Marketplace() {
                           placeholder="Describe your product in detail..."
                           required
                           rows={4}
+                          value={newProduct.description}
+                          onChange={(e) => setNewProduct((prev) => ({ ...prev, description: e.target.value }))}
                           className={`border-2 rounded-xl transition-all duration-300 focus:scale-[1.02] resize-none ${
                             isDarkMode
                               ? "border-slate-600 focus:border-cyan-500 bg-slate-800 text-white placeholder:text-slate-400"
@@ -954,27 +989,103 @@ export default function Marketplace() {
                           Product Image
                         </Label>
                         <div
-                          className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 hover:scale-[1.02] ${
+                          className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-300 hover:scale-[1.01] group ${
                             isDarkMode
-                              ? "border-slate-600 hover:border-cyan-500 bg-slate-800"
-                              : "border-blue-200 hover:border-blue-500 bg-blue-50"
+                              ? "border-slate-600 hover:border-cyan-400 bg-gradient-to-br from-slate-800 to-slate-700"
+                              : "border-blue-300 hover:border-blue-500 bg-gradient-to-br from-blue-50 to-cyan-50"
                           }`}
                         >
-                          <Camera
-                            className={`h-12 w-12 mx-auto mb-4 ${isDarkMode ? "text-slate-400" : "text-blue-400"}`}
-                          />
-                          <Input
-                            id="image"
-                            name="image"
-                            type="url"
-                            placeholder="Paste image URL here..."
-                            className={`border-0 bg-transparent text-center ${
-                              isDarkMode ? "text-white placeholder:text-slate-400" : "placeholder:text-slate-500"
-                            }`}
-                          />
-                          <p className={`text-xs mt-2 ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
-                            Add a photo to get more buyers interested
-                          </p>
+                          {imagePreview ? (
+                            <div className="space-y-4">
+                              <div className="relative inline-block">
+                                <img
+                                  src={imagePreview || "/placeholder.svg"}
+                                  alt="Product preview"
+                                  className="w-40 h-40 object-cover rounded-xl mx-auto shadow-lg border-2 border-white/20"
+                                />
+                                <div className={`absolute inset-0 rounded-xl bg-gradient-to-t from-black/20 to-transparent`} />
+                              </div>
+                              <div className="flex gap-2 justify-center">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setImagePreview("")
+                                    setNewProduct((prev) => ({ ...prev, image: "" }))
+                                  }}
+                                  className={`transition-all duration-200 ${
+                                    isDarkMode
+                                      ? "border-slate-500 text-slate-300 hover:bg-slate-600 hover:border-slate-400"
+                                      : "border-blue-300 text-blue-600 hover:bg-blue-100 hover:border-blue-400"
+                                  }`}
+                                >
+                                  <X className="h-4 w-4 mr-1" />
+                                  Remove
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => document.getElementById("image")?.click()}
+                                  className={`transition-all duration-200 ${
+                                    isDarkMode
+                                      ? "border-cyan-500 text-cyan-300 hover:bg-cyan-600/20 hover:border-cyan-400"
+                                      : "border-blue-500 text-blue-600 hover:bg-blue-100 hover:border-blue-600"
+                                  }`}
+                                >
+                                  <Camera className="h-4 w-4 mr-1" />
+                                  Change
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              <div className={`relative ${isDarkMode ? "text-slate-300" : "text-blue-600"}`}>
+                                <div
+                                  className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110 ${
+                                    isDarkMode
+                                      ? "bg-gradient-to-br from-cyan-600 to-blue-600 shadow-lg shadow-cyan-500/25"
+                                      : "bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/25"
+                                  }`}
+                                >
+                                  <Camera className="h-8 w-8 text-white" />
+                                </div>
+                                <h3 className={`font-semibold text-lg mb-2 ${isDarkMode ? "text-white" : "text-slate-800"}`}>
+                                  Upload Product Image
+                                </h3>
+                                <p className={`text-sm mb-4 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
+                                  Drag and drop your image here, or click to browse
+                                </p>
+                              </div>
+
+                              <Button
+                                type="button"
+                                onClick={() => document.getElementById("image")?.click()}
+                                className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
+                                  isDarkMode
+                                    ? "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/25"
+                                    : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg shadow-blue-500/25"
+                                }`}
+                              >
+                                <Upload className="h-4 w-4 mr-2" />
+                                Choose Image
+                              </Button>
+
+                              <input
+                                id="image"
+                                name="image"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
+                              />
+
+                              <p className={`text-xs ${isDarkMode ? "text-slate-500" : "text-slate-500"}`}>
+                                Supported formats: JPG, PNG, GIF (Max 5MB)
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -984,9 +1095,7 @@ export default function Marketplace() {
                           variant="outline"
                           onClick={() => setIsSellerDashboardOpen(false)}
                           className={`flex-1 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${
-                            isDarkMode
-                              ? "border-slate-600 text-slate-300 hover:bg-slate-700"
-                              : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                            isDarkMode ? "border-slate-600 text-slate-300 hover:bg-slate-700" : "border-slate-300 text-slate-700 hover:bg-slate-50"
                           }`}
                         >
                           Cancel
@@ -994,9 +1103,7 @@ export default function Marketplace() {
                         <Button
                           type="submit"
                           className={`flex-1 rounded-xl transition-all duration-300 hover:scale-105 ${
-                            isDarkMode
-                              ? "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
-                              : "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                            isDarkMode ? "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600" : "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
                           } text-white shadow-lg`}
                         >
                           <Plus className="h-4 w-4 mr-2" />
@@ -1294,6 +1401,166 @@ export default function Marketplace() {
           </div>
         </div>
       </div>
+
+      {/* Contact Seller Modal */}
+      <Sheet open={contactSellerOpen} onOpenChange={setContactSellerOpen}>
+        <SheetContent
+          side="right"
+          className={`w-full sm:max-w-2xl p-0 ${
+            isDarkMode
+              ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-l-2 border-slate-600"
+              : "bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/30 border-l-2 border-blue-200"
+          }`}
+        >
+          <SheetHeader
+            className={`p-8 pb-6 ${
+              isDarkMode
+                ? "bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border-b border-slate-600"
+                : "bg-gradient-to-r from-blue-100/50 to-cyan-100/50 border-b border-blue-200"
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center shadow-lg">
+                <User className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <SheetTitle className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                  Contact Seller
+                </SheetTitle>
+                <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                  Get in touch with the seller about this product
+                </p>
+              </div>
+            </div>
+          </SheetHeader>
+
+          {selectedSeller && (
+            <div className="p-8 space-y-8">
+              {/* Product Info */}
+              <div
+                className={`p-6 rounded-2xl border-2 ${
+                  isDarkMode ? "bg-slate-800/50 border-slate-600" : "bg-white/80 border-blue-200"
+                }`}
+              >
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                  Product Details
+                </h3>
+                <div className="flex gap-4">
+                  <img
+                    src={selectedSeller.image || "/placeholder.svg"}
+                    alt={selectedSeller.name}
+                    className="w-20 h-20 object-cover rounded-xl"
+                  />
+                  <div className="flex-1">
+                    <h4 className={`font-bold text-lg ${isDarkMode ? "text-cyan-300" : "text-blue-700"}`}>
+                      {selectedSeller.name}
+                    </h4>
+                    <p
+                      className={`text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
+                        isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
+                      }`}
+                    >
+                      ${selectedSeller.price.toLocaleString()}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <MapPin className={`h-4 w-4 ${isDarkMode ? "text-cyan-400" : "text-blue-600"}`} />
+                      <span className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                        {selectedSeller.location}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Seller Info */}
+              <div
+                className={`p-6 rounded-2xl border-2 ${
+                  isDarkMode ? "bg-slate-800/50 border-slate-600" : "bg-white/80 border-blue-200"
+                }`}
+              >
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                  Seller Information
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-lg">{selectedSeller.seller.charAt(0)}</span>
+                    </div>
+                    <div>
+                      <p className={`font-bold text-lg ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                        {selectedSeller.seller}
+                      </p>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${i < 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                          />
+                        ))}
+                        <span className={`text-sm ml-2 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                          4.8 (127 reviews)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-slate-700/50" : "bg-blue-50"}`}>
+                      <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Member since</p>
+                      <p className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>March 2023</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-slate-700/50" : "bg-blue-50"}`}>
+                      <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Response time</p>
+                      <p className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Within 2 hours</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Form */}
+              <div
+                className={`p-6 rounded-2xl border-2 ${
+                  isDarkMode ? "bg-slate-800/50 border-slate-600" : "bg-white/80 border-blue-200"
+                }`}
+              >
+                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                  Send Message
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label className={isDarkMode ? "text-gray-300" : "text-gray-700"}>Your Message</Label>
+                    <Textarea
+                      placeholder={`Hi ${selectedSeller.seller}, I'm interested in your ${selectedSeller.name}. Is it still available?`}
+                      className={`mt-2 min-h-[120px] ${
+                        isDarkMode
+                          ? "bg-slate-700 border-slate-600 text-white placeholder:text-gray-400"
+                          : "bg-white border-blue-200"
+                      }`}
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <Button className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold">
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Send Message
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className={`${
+                        isDarkMode
+                          ? "border-amber-600 text-amber-300 hover:bg-amber-900/20"
+                          : "border-amber-300 text-amber-700 hover:bg-amber-50"
+                      }`}
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Call
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }
