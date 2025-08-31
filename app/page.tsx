@@ -1195,31 +1195,31 @@ export default function Marketplace() {
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <ShoppingCart className="h-5 w-5" />
+          <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
           {getCartItemsCount() > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 text-white animate-bounce">
+            <Badge className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 text-white animate-bounce">
               {getCartItemsCount()}
             </Badge>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg bg-gradient-to-br p-4 from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
+      <SheetContent className="w-full sm:max-w-lg bg-gradient-to-br p-3 sm:p-4 from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
         <SheetHeader>
-          <SheetTitle className="text-white">Shopping Cart</SheetTitle>
+          <SheetTitle className="text-white text-lg sm:text-xl">Shopping Cart</SheetTitle>
         </SheetHeader>
 
         <div className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto py-4">
+          <div className="flex-1 overflow-y-auto py-3 sm:py-4">
             {cartItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-center">
-                <ShoppingCart className="h-16 w-16 mb-4 text-white/50" />
-                <p className="text-white/80">Your cart is empty</p>
-                <p className="text-sm mt-2 text-white/60">
+              <div className="flex flex-col items-center justify-center h-48 sm:h-64 text-center">
+                <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 mb-4 text-white/50" />
+                <p className="text-white/80 text-sm sm:text-base">Your cart is empty</p>
+                <p className="text-xs sm:text-sm mt-2 text-white/60">
                   Add some products to get started
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {cartItems.map((item) => {
                   const product = products.find((p) => p.id === item.productId)
                   if (!product) return null
@@ -1227,30 +1227,30 @@ export default function Marketplace() {
                   return (
                     <div
                       key={item.id}
-                      className="flex items-center space-x-4 p-4 border rounded-lg bg-white/10 border-white/20"
+                      className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 border rounded-lg bg-white/10 border-white/20"
                     >
                       <img
                         src={product.image || "/placeholder.svg"}
                         alt={product.name}
-                        className="w-16 h-16 object-cover rounded-md"
+                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-md"
                       />
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-balance leading-tight text-white">
+                        <h4 className="text-xs sm:text-sm font-medium text-balance leading-tight text-white line-clamp-2">
                           {product.name}
                         </h4>
-                        <p className="text-sm text-[#00bcd4]">
+                        <p className="text-xs sm:text-sm text-[#00bcd4] mt-1">
                           ${product.price}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium text-[#ff9800]">${product.price.toFixed(2)}</p>
+                        <p className="text-xs sm:text-sm font-medium text-[#ff9800]">${product.price.toFixed(2)}</p>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-white/60 hover:text-red-400"
+                          className="h-6 w-6 sm:h-8 sm:w-8 text-white/60 hover:text-red-400 mt-1"
                           onClick={() => removeFromCart(item.id)}
                         >
-                          <X className="h-4 w-4" />
+                          <X className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </div>
@@ -1261,28 +1261,28 @@ export default function Marketplace() {
           </div>
 
           {cartItems.length > 0 && (
-            <div className="border-t border-white/20 pt-4 space-y-4">
+            <div className="border-t border-white/20 pt-3 sm:pt-4 space-y-3 sm:space-y-4">
               <div className="space-y-2">
-                <div className="flex justify-between text-sm text-white">
+                <div className="flex justify-between text-xs sm:text-sm text-white">
                   <span>Subtotal ({getCartItemsCount()} items)</span>
                   <span>${getCartTotal().toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm text-white/80">
+                <div className="flex justify-between text-xs sm:text-sm text-white/80">
                   <span>Shipping</span>
                   <span>Free</span>
                 </div>
                 <Separator className="bg-white/20" />
-                <div className="flex justify-between font-semibold text-white">
+                <div className="flex justify-between font-semibold text-sm sm:text-base text-white">
                   <span>Total</span>
                   <span className="text-[#ff9800]">${getCartTotal().toFixed(2)}</span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Button className="w-full bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white" size="lg">
+                <Button className="w-full bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white text-sm sm:text-base py-2.5 sm:py-3" size="lg">
                   Proceed to Checkout
                 </Button>
-                <Button variant="outline" className="w-full bg-transparent border-white/20 text-white hover:bg-white/10" onClick={() => setIsCartOpen(false)}>
+                <Button variant="outline" className="w-full bg-transparent border-white/20 text-white hover:bg-white/10 text-sm" onClick={() => setIsCartOpen(false)}>
                   Continue Shopping
                 </Button>
               </div>
@@ -1310,7 +1310,7 @@ export default function Marketplace() {
       />
 
       <CardContent 
-        className="p-4 relative z-10 cursor-pointer" 
+        className="p-3 sm:p-4 relative z-10 cursor-pointer" 
         onClick={(e) => {
           // Solo abrir detalles si no se hizo click en un botón
           const target = e.target as HTMLElement;
@@ -1322,12 +1322,12 @@ export default function Marketplace() {
           }
         }}
       >
-        <div className="relative mb-4">
+        <div className="relative mb-3 sm:mb-4">
           <div className="relative overflow-hidden rounded-xl">
             <img
               src={product.image || "/placeholder.svg"}
               alt={product.name}
-              className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+              className="w-full h-36 sm:h-48 object-cover transition-transform duration-500 group-hover:scale-110"
             />
             <div
               className={`absolute inset-0 bg-gradient-to-t opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
@@ -1339,19 +1339,19 @@ export default function Marketplace() {
           </div>
 
           {!product.inStock && (
-            <Badge variant="destructive" className="absolute top-3 left-3 animate-pulse">
+            <Badge variant="destructive" className="absolute top-2 sm:top-3 left-2 sm:left-3 animate-pulse text-xs">
               Out of Stock
             </Badge>
           )}
           {product.originalPrice > product.price && (
-            <Badge className="absolute top-3 right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-bounce">
-              <Sparkles className="h-3 w-3 mr-1" />-
+            <Badge className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-bounce text-xs">
+              <Sparkles className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />-
               {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
             </Badge>
           )}
           {product.featured && (
-            <Badge className="absolute top-3 left-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
-              <TrendingUp className="h-3 w-3 mr-1" />
+            <Badge className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs">
+              <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
               Featured
             </Badge>
           )}
@@ -1359,7 +1359,7 @@ export default function Marketplace() {
           <Button
             variant="ghost"
             size="icon"
-            className={`absolute bottom-3 right-3 backdrop-blur-sm transition-all duration-300 hover:scale-110 ${
+            className={`absolute bottom-2 sm:bottom-3 right-2 sm:right-3 backdrop-blur-sm transition-all duration-300 hover:scale-110 w-8 h-8 sm:w-10 sm:h-10 ${
               wishlistItems.includes(product.id)
                 ? "text-red-500 bg-red-500/20"
                 : isDarkMode
@@ -1368,27 +1368,27 @@ export default function Marketplace() {
             }`}
             onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id) }}
           >
-            <Heart className={`h-5 w-5 ${wishlistItems.includes(product.id) ? "fill-current animate-pulse" : ""}`} />
+            <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${wishlistItems.includes(product.id) ? "fill-current animate-pulse" : ""}`} />
           </Button>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           <h3
-            className={`font-bold text-base text-balance leading-tight transition-colors duration-300 ${
+            className={`font-bold text-sm sm:text-base text-balance leading-tight transition-colors duration-300 line-clamp-2 ${
               isDarkMode ? "text-white group-hover:text-cyan-300" : "text-foreground group-hover:text-blue-700"
             }`}
           >
             {product.name}
           </h3>
 
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-1 sm:gap-2 text-xs">
             <div className={`flex items-center gap-1 ${isDarkMode ? "text-cyan-400" : "text-blue-600"}`}>
               <MapPin className="h-3 w-3" />
-              <span className="font-medium">{product.location}</span>
+              <span className="font-medium truncate">{product.location}</span>
             </div>
             <Badge
               variant="outline"
-              className={`text-xs px-2 py-1 font-medium ${
+              className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 font-medium ${
                 product.condition === "new"
                   ? isDarkMode
                     ? "bg-green-900/50 text-green-300 border-green-600"
@@ -1406,12 +1406,12 @@ export default function Marketplace() {
             </Badge>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-4 w-4 transition-colors duration-200 ${
+                  className={`h-3 w-3 sm:h-4 sm:w-4 transition-colors duration-200 ${
                     i < Math.floor(product.rating)
                       ? "fill-yellow-400 text-yellow-400"
                       : isDarkMode
@@ -1421,40 +1421,40 @@ export default function Marketplace() {
                 />
               ))}
             </div>
-            <span className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-muted-foreground"}`}>
+            <span className={`text-xs sm:text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-muted-foreground"}`}>
               ({product.reviews})
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span
-              className={`text-xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
+              className={`text-lg sm:text-xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
                 isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
               }`}
             >
               ${(product.price || 0).toLocaleString()}
             </span>
             {product.originalPrice && product.originalPrice > product.price && (
-              <span className={`text-sm line-through ${isDarkMode ? "text-gray-400" : "text-muted-foreground"}`}>
+              <span className={`text-xs sm:text-sm line-through ${isDarkMode ? "text-gray-400" : "text-muted-foreground"}`}>
                 ${(product.originalPrice || 0).toLocaleString()}
               </span>
             )}
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-xs">{product.seller.charAt(0)}</span>
             </div>
-            <p className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-muted-foreground"}`}>
+            <p className={`text-xs sm:text-sm font-medium truncate ${isDarkMode ? "text-gray-300" : "text-muted-foreground"}`}>
               by {product.seller}
             </p>
           </div>
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 space-y-3 relative z-20">
+      <CardFooter className="p-3 sm:p-4 pt-0 space-y-2 sm:space-y-3 relative z-20">
         <Button
-          className="w-full bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          className="w-full bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm sm:text-base py-2 sm:py-2.5"
           onClick={(e) => { 
             e.stopPropagation(); 
             e.preventDefault();
@@ -1463,12 +1463,12 @@ export default function Marketplace() {
           }}
           disabled={!product.inStock}
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
           {product.inStock ? "Add to Cart" : "Out of Stock"}
         </Button>
         <Button
           variant="outline"
-          className="w-full font-medium transition-all duration-300 hover:scale-105 bg-gradient-to-r from-[#ff9800]/10 to-[#ff9800]/20 border-2 border-[#ff9800] hover:border-[#ff9800]/80 text-[#ff9800] hover:text-[#ff9800]/80"
+          className="w-full font-medium transition-all duration-300 hover:scale-105 bg-gradient-to-r from-[#ff9800]/10 to-[#ff9800]/20 border-2 border-[#ff9800] hover:border-[#ff9800]/80 text-[#ff9800] hover:text-[#ff9800]/80 text-sm sm:text-base py-2 sm:py-2.5"
           onClick={(e) => { 
             e.stopPropagation(); 
             e.preventDefault();
@@ -1476,7 +1476,7 @@ export default function Marketplace() {
             contactSeller(product);
           }}
         >
-          <Zap className="h-4 w-4 mr-2" />
+          <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
           Contact Seller
         </Button>
       </CardFooter>
@@ -1508,28 +1508,28 @@ export default function Marketplace() {
             : "bg-white/80 supports-[backdrop-filter]:bg-white/60 border-gradient-to-r from-blue-200 via-cyan-200 to-amber-200"
         }`}
       >
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <img 
                 src="/koneque.png" 
                 alt="Koñeque Logo" 
-                className="w-16 h-16 object-contain hover:scale-110 transition-transform duration-300"
+                className="w-12 h-12 sm:w-16 sm:h-16 object-contain hover:scale-110 transition-transform duration-300"
               />
               <span
-                className={`text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
+                className={`text-lg sm:text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
                   isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
                 }`}
               >
                 Koñeque
               </span>
-              <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse">
+              <Badge className="hidden sm:inline-flex bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse">
                 <Sparkles className="h-3 w-3 mr-1" />
                 New!
               </Badge>
             </div>
 
-            <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+            <div className="hidden lg:flex flex-1 max-w-2xl mx-8">
               <div className="relative w-full">
                 <Search
                   className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
@@ -1565,7 +1565,7 @@ export default function Marketplace() {
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <Button
                 variant="ghost"
                 size="icon"
@@ -1574,14 +1574,15 @@ export default function Marketplace() {
                   isDarkMode ? "hover:bg-slate-700 text-amber-400" : "hover:bg-amber-100 text-amber-600"
                 }`}
               >
-                {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {isDarkMode ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
               </Button>
 
               <Sheet open={isSellerDashboardOpen} onOpenChange={setIsSellerDashboardOpen}>
                 <SheetTrigger asChild>
-                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Sell Product
+                  <Button className="hidden sm:flex bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-xs sm:text-sm px-2 sm:px-4 py-2">
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Sell Product</span>
+                    <span className="sm:hidden">Sell</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent
@@ -1591,17 +1592,17 @@ export default function Marketplace() {
                       : "bg-gradient-to-br from-white via-blue-50 to-cyan-50 border-blue-200"
                   } backdrop-blur-sm`}
                 >
-                  <SheetHeader className="pb-8 px-6 border-b border-opacity-20">
+                  <SheetHeader className="pb-6 sm:pb-8 px-3 sm:px-6 border-b border-opacity-20">
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${
                           isDarkMode ? "bg-gradient-to-r from-cyan-500 to-blue-500" : "bg-gradient-to-r from-blue-500 to-cyan-500"
                         } shadow-lg`}
                       >
-                        <Plus className="h-6 w-6 text-white" />
+                        <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                       </div>
                       <div>
-                        <SheetTitle className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}>
+                        <SheetTitle className={`text-xl sm:text-2xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}>
                           List a New Product
                         </SheetTitle>
                         <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
@@ -1611,9 +1612,9 @@ export default function Marketplace() {
                     </div>
                   </SheetHeader>
 
-                  <div className="px-6">
-                    <form onSubmit={handleSubmitProduct} className="space-y-8 py-8">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="px-3 sm:px-6">
+                    <form onSubmit={handleSubmitProduct} className="space-y-6 sm:space-y-8 py-6 sm:py-8">
+                      <div className="grid grid-cols-1 gap-4 sm:gap-6">
                         <div className="space-y-2">
                           <Label
                             htmlFor="title"
@@ -1667,7 +1668,7 @@ export default function Marketplace() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div className="space-y-2">
                           <Label
                             htmlFor="category"
@@ -1945,30 +1946,30 @@ export default function Marketplace() {
                     }
                   }}
                 >
-                  <User className="h-5 w-5" />
+                  <User className="h-4 w-4 sm:h-5 sm:w-5" />
                   {walletConnected && (
-                    <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-green-500 animate-pulse" />
+                    <div className="absolute -top-1 -right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500 animate-pulse" />
                   )}
                 </Button>
 
                 {/* Dropdown Menu */}
                 {walletConnected && showUserDropdown && (
                   <div 
-                    className={`absolute right-0 top-12 w-80 max-h-[80vh] overflow-y-auto rounded-xl border-2 shadow-xl z-50 transition-all duration-300 ${
+                    className={`absolute right-0 top-12 w-80 sm:w-80 max-h-[80vh] overflow-y-auto rounded-xl border-2 shadow-xl z-50 transition-all duration-300 ${
                       isDarkMode 
                         ? "bg-slate-900 border-slate-600 text-white" 
                         : "bg-white border-gray-200 text-gray-900"
                     }`}
                   >
                     {/* Header with Account info */}
-                    <div className={`p-4 border-b ${isDarkMode ? "border-slate-600" : "border-gray-200"}`}>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold">M</span>
+                    <div className={`p-3 sm:p-4 border-b ${isDarkMode ? "border-slate-600" : "border-gray-200"}`}>
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">M</span>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold">Account 1</span>
+                            <span className="font-semibold text-sm sm:text-base">Account 1</span>
                             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                           </div>
                           <div className="mt-1">
@@ -1977,7 +1978,7 @@ export default function Marketplace() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className={`h-5 w-5 p-0 rounded transition-all duration-200 ${
+                                className={`h-4 w-4 sm:h-5 sm:w-5 p-0 rounded transition-all duration-200 ${
                                   isDarkMode 
                                     ? "hover:bg-slate-700 text-gray-400 hover:text-white" 
                                     : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
@@ -1992,7 +1993,7 @@ export default function Marketplace() {
                                 )}
                               </Button>
                             </div>
-                            <div className={`text-sm font-mono p-2 rounded-md border ${
+                            <div className={`text-xs sm:text-sm font-mono p-2 rounded-md border ${
                               isDarkMode 
                                 ? "bg-slate-800 border-slate-600 text-gray-300" 
                                 : "bg-gray-50 border-gray-200 text-gray-600"
@@ -2011,7 +2012,7 @@ export default function Marketplace() {
                     </div>
 
                     {/* Balance Section */}
-                    <div className={`p-4 border-b ${isDarkMode ? "border-slate-600" : "border-gray-200"}`}>
+                    <div className={`p-3 sm:p-4 border-b ${isDarkMode ? "border-slate-600" : "border-gray-200"}`}>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -2019,7 +2020,7 @@ export default function Marketplace() {
                               BALANCE TOTAL
                             </span>
                             <button
-                              className={`flex items-center justify-center w-6 h-6 rounded-lg transition-all duration-200 hover:scale-105 ${
+                              className={`flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-lg transition-all duration-200 hover:scale-105 ${
                                 isDarkMode 
                                   ? "hover:bg-slate-700 text-gray-400 hover:text-white" 
                                   : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
@@ -2035,7 +2036,7 @@ export default function Marketplace() {
                             </button>
                           </div>
                           <div className="space-y-1">
-                            <div className="text-2xl font-bold">
+                            <div className="text-xl sm:text-2xl font-bold">
                               {isLoadingBalance ? (
                                 <span className="animate-pulse">Cargando...</span>
                               ) : showBalance ? (
@@ -2049,16 +2050,16 @@ export default function Marketplace() {
                               )}
                             </div>
                             {showBalance && !isLoadingBalance && (
-                              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                              <div className={`text-xs sm:text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
                                 {balance} ETH • Sepolia Testnet
                               </div>
                             )}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-xs">
+                      <div className="flex items-center gap-2 sm:gap-4 text-xs">
                         <button 
-                          className={`flex items-center gap-1 px-3 py-1 rounded-lg transition-all duration-200 ${
+                          className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-lg transition-all duration-200 ${
                             isDarkMode 
                               ? "bg-blue-900/50 text-blue-300 hover:bg-blue-800/50 border border-blue-600/30" 
                               : "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
@@ -2067,10 +2068,11 @@ export default function Marketplace() {
                           disabled={isLoadingBalance}
                         >
                           <RefreshCw className={`h-3 w-3 ${isLoadingBalance ? "animate-spin" : ""}`} />
-                          {isLoadingBalance ? "Actualizando..." : "Actualizar"}
+                          <span className="hidden sm:inline">{isLoadingBalance ? "Actualizando..." : "Actualizar"}</span>
+                          <span className="sm:hidden">↻</span>
                         </button>
                         <button 
-                          className={`flex items-center gap-1 px-3 py-1 rounded-lg transition-all duration-200 ${
+                          className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-lg transition-all duration-200 ${
                             isDarkMode 
                               ? "bg-purple-900/50 text-purple-300 hover:bg-purple-800/50 border border-purple-600/30" 
                               : "bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-200"
@@ -2078,19 +2080,20 @@ export default function Marketplace() {
                           onClick={() => handleDiscoverAction()}
                         >
                           <Compass className="h-3 w-3" />
-                          Descubrir
+                          <span className="hidden sm:inline">Descubrir</span>
+                          <span className="sm:hidden">🧭</span>
                         </button>
                       </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="p-4 grid grid-cols-4 gap-3">
+                    <div className="p-3 sm:p-4 grid grid-cols-4 gap-2 sm:gap-3">
                       <button 
-                        className="group flex flex-col items-center gap-1 p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
+                        className="group flex flex-col items-center gap-1 p-2 sm:p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
                         onClick={() => handleDepositAction()}
                       >
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#0d47a1] to-[#00bcd4] shadow-lg shadow-blue-500/25">
-                          <CreditCard className="h-5 w-5 text-white" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#0d47a1] to-[#00bcd4] shadow-lg shadow-blue-500/25">
+                          <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                         <span className={`text-xs font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-slate-200 group-hover:text-white" : "text-gray-700 group-hover:text-gray-900"
@@ -2100,11 +2103,11 @@ export default function Marketplace() {
                       </button>
                       
                       <button 
-                        className="group flex flex-col items-center gap-1 p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
+                        className="group flex flex-col items-center gap-1 p-2 sm:p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
                         onClick={() => handleReceiveAction()}
                       >
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/25">
-                          <Download className="h-5 w-5 text-white" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/25">
+                          <Download className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                         <span className={`text-xs font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-slate-200 group-hover:text-white" : "text-gray-700 group-hover:text-gray-900"
@@ -2114,15 +2117,15 @@ export default function Marketplace() {
                       </button>
 
                       <button 
-                        className="group flex flex-col items-center gap-1 p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
+                        className="group flex flex-col items-center gap-1 p-2 sm:p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowUserDropdown(false);
                           setShowSalesModal(true);
                         }}
                       >
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#ff9800] to-[#ff9800]/80 shadow-lg shadow-[#ff9800]/25">
-                          <Package className="h-5 w-5 text-white" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#ff9800] to-[#ff9800]/80 shadow-lg shadow-[#ff9800]/25">
+                          <Package className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                         <span className={`text-xs font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-slate-200 group-hover:text-white" : "text-gray-700 group-hover:text-gray-900"
@@ -2132,15 +2135,15 @@ export default function Marketplace() {
                       </button>
 
                       <button 
-                        className="group flex flex-col items-center gap-1 p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
+                        className="group flex flex-col items-center gap-1 p-2 sm:p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowUserDropdown(false);
                           setShowPurchasesModal(true);
                         }}
                       >
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#00bcd4] to-[#00bcd4]/80 shadow-lg shadow-[#00bcd4]/25">
-                          <ShoppingCart className="h-5 w-5 text-white" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#00bcd4] to-[#00bcd4]/80 shadow-lg shadow-[#00bcd4]/25">
+                          <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                         <span className={`text-xs font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-slate-200 group-hover:text-white" : "text-gray-700 group-hover:text-gray-900"
@@ -2192,9 +2195,9 @@ export default function Marketplace() {
                   isDarkMode ? "hover:bg-slate-700 text-cyan-400" : "hover:bg-cyan-100 text-cyan-600"
                 }`}
               >
-                <Heart className="h-5 w-5" />
+                <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
                 {wishlistItems.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-cyan-500 to-blue-500 text-white animate-bounce">
+                  <Badge className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-cyan-500 to-blue-500 text-white animate-bounce">
                     {wishlistItems.length}
                   </Badge>
                 )}
@@ -2208,7 +2211,7 @@ export default function Marketplace() {
                   isDarkMode ? "hover:bg-slate-700 text-purple-400" : "hover:bg-purple-100 text-purple-600"
                 }`}
               >
-                <Star className="h-5 w-5" />
+                <Star className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
 
               <Button
@@ -2222,7 +2225,7 @@ export default function Marketplace() {
                   isDarkMode ? "hover:bg-slate-700 text-cyan-400" : "hover:bg-cyan-100 text-cyan-600"
                 }`}
               >
-                <Users className="h-5 w-5" />
+                <Users className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
 
               <FloatingCart />
@@ -2230,20 +2233,20 @@ export default function Marketplace() {
               <Button
                 variant="ghost"
                 size="icon"
-                className={`md:hidden transition-colors duration-300 ${
+                className={`lg:hidden transition-colors duration-300 ${
                   isDarkMode ? "hover:bg-slate-700 text-amber-400" : "hover:bg-amber-100 text-amber-600"
                 }`}
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
           </div>
 
-          <div className="md:hidden mt-4">
+          <div className="lg:hidden mt-3 sm:mt-4">
             <div className="relative">
               <Search
-                className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 ${
+                className={`absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 ${
                   isDarkMode ? "text-cyan-400" : "text-blue-500"
                 }`}
               />
@@ -2251,7 +2254,7 @@ export default function Marketplace() {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`pl-12 pr-4 py-2 w-full border-2 rounded-lg backdrop-blur-sm ${
+                className={`pl-10 sm:pl-12 pr-4 py-2.5 sm:py-2 w-full border-2 rounded-lg backdrop-blur-sm ${
                   isDarkMode
                     ? "border-slate-600 focus:border-cyan-500 bg-slate-800/50 text-white placeholder:text-gray-400"
                     : "border-blue-200 focus:border-blue-500 bg-white/50"
@@ -2267,13 +2270,13 @@ export default function Marketplace() {
           isDarkMode ? "bg-slate-800/70 border-slate-700" : "bg-white/70 border-blue-100"
         }`}
       >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center space-x-6 py-4 overflow-x-auto">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex items-center space-x-3 sm:space-x-6 py-3 sm:py-4 overflow-x-auto">
             {categories.map((category, index) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(selectedCategory === category ? "All Categories" : category)}
-                className={`whitespace-nowrap px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 hover:scale-105 ${
+                className={`whitespace-nowrap px-3 sm:px-6 py-2 sm:py-3 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 hover:scale-105 ${
                   selectedCategory === category
                     ? `bg-gradient-to-r ${
                         index % 3 === 0
@@ -2294,25 +2297,25 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <aside className="lg:w-64 space-y-6">
+      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
+          <aside className="lg:w-64 space-y-4 sm:space-y-6">
             <Card
               className={`backdrop-blur-sm border-2 shadow-xl transition-all duration-500 ${
                 isDarkMode ? "bg-slate-800/80 border-slate-600" : "bg-white/80 border-blue-100"
               }`}
             >
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <h3
-                  className={`font-bold mb-6 flex items-center gap-2 text-lg bg-gradient-to-r bg-clip-text text-transparent ${
+                  className={`font-bold mb-4 sm:mb-6 flex items-center gap-2 text-base sm:text-lg bg-gradient-to-r bg-clip-text text-transparent ${
                     isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
                   }`}
                 >
-                  <Filter className={`h-5 w-5 ${isDarkMode ? "text-cyan-400" : "text-blue-500"}`} />
+                  <Filter className={`h-4 w-4 sm:h-5 sm:w-5 ${isDarkMode ? "text-cyan-400" : "text-blue-500"}`} />
                   Filters
                 </h3>
 
-                <div className="space-y-2 mb-6">
+                <div className="space-y-2 mb-4 sm:mb-6">
                   <h4 className={`text-sm font-bold ${isDarkMode ? "text-cyan-300" : "text-blue-700"}`}>Category</h4>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                     <SelectTrigger
@@ -2341,7 +2344,7 @@ export default function Marketplace() {
                   </Select>
                 </div>
 
-                <div className="space-y-2 mb-6">
+                <div className="space-y-2 mb-4 sm:mb-6">
                   <h4 className={`text-sm font-bold ${isDarkMode ? "text-cyan-300" : "text-cyan-700"}`}>Location</h4>
                   <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                     <SelectTrigger
@@ -2370,7 +2373,7 @@ export default function Marketplace() {
                   </Select>
                 </div>
 
-                <div className="space-y-2 mb-6">
+                <div className="space-y-2 mb-4 sm:mb-6">
                   <h4 className={`text-sm font-bold ${isDarkMode ? "text-amber-300" : "text-amber-700"}`}>Condition</h4>
                   <Select value={selectedCondition} onValueChange={setSelectedCondition}>
                     <SelectTrigger
@@ -2421,23 +2424,23 @@ export default function Marketplace() {
                   : "bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200"
               }`}
             >
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
-                  <Plus className="h-8 w-8 text-white" />
+              <CardContent className="p-4 sm:p-6 text-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg animate-pulse">
+                  <Plus className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                 </div>
-                <h3 className={`font-bold text-lg mb-2 ${isDarkMode ? "text-amber-300" : "text-amber-800"}`}>
+                <h3 className={`font-bold text-base sm:text-lg mb-2 ${isDarkMode ? "text-amber-300" : "text-amber-800"}`}>
                   Sell Your Product
                 </h3>
-                <p className={`text-sm mb-4 ${isDarkMode ? "text-amber-400" : "text-amber-700"}`}>
+                <p className={`text-sm mb-3 sm:mb-4 ${isDarkMode ? "text-amber-400" : "text-amber-700"}`}>
                   Turn your items into cash!
                 </p>
                 <Sheet open={isSellerDashboardOpen} onOpenChange={setIsSellerDashboardOpen}>
                   <SheetTrigger asChild>
                     <Button
                       onClick={handleSellProductClick}
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
+                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold transition-all duration-300 hover:scale-105 shadow-lg text-sm"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       Sell Product
                     </Button>
                   </SheetTrigger>
@@ -2446,9 +2449,9 @@ export default function Marketplace() {
             </Card>
           </aside>
 
-          <div className="flex-1 space-y-8">
+          <div className="flex-1 space-y-6 sm:space-y-8">
             {viewMode === "grid" ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -2470,21 +2473,21 @@ export default function Marketplace() {
       <Sheet open={contactSellerOpen} onOpenChange={setContactSellerOpen}>
         <SheetContent
             side="right"
-            className="w-full sm:max-w-3xl p-8 sm:p-12 bg-gradient-to-br from-[#0d47a1] via-[#0d47a1]/95 to-[#0d47a1]/90 border-l-4 border-[#00bcd4] backdrop-blur-xl shadow-2xl"
+            className="w-full sm:max-w-2xl lg:max-w-3xl p-4 sm:p-8 lg:p-12 bg-gradient-to-br from-[#0d47a1] via-[#0d47a1]/95 to-[#0d47a1]/90 border-l-4 border-[#00bcd4] backdrop-blur-xl shadow-2xl overflow-y-auto"
         >
           <SheetHeader
-            className="mb-8 pb-8 border-b-2 relative overflow-hidden bg-gradient-to-r from-[#00bcd4]/20 to-[#00bcd4]/10 border-[#00bcd4]/30 shadow-xl rounded-lg"
+            className="mb-6 sm:mb-8 pb-4 sm:pb-8 border-b-2 relative overflow-hidden bg-gradient-to-r from-[#00bcd4]/20 to-[#00bcd4]/10 border-[#00bcd4]/30 shadow-xl rounded-lg"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-[#00bcd4]/10 to-[#ff9800]/10 animate-pulse" />
-            <div className="relative z-10 flex items-center gap-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#ff9800] via-[#00bcd4] to-[#ff9800] rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-white/20">
-                <User className="h-10 w-10 text-white drop-shadow-lg" />
+            <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#ff9800] via-[#00bcd4] to-[#ff9800] rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-white/20">
+                <User className="h-8 w-8 sm:h-10 sm:w-10 text-white drop-shadow-lg" />
               </div>
-              <div className="flex-1">
-                <SheetTitle className="text-3xl font-bold mb-2 bg-gradient-to-r bg-clip-text text-transparent from-white to-[#00bcd4]">
+              <div className="flex-1 text-center sm:text-left">
+                <SheetTitle className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r bg-clip-text text-transparent from-white to-[#00bcd4]">
                   Contact Seller
                 </SheetTitle>
-                <p className="text-base text-white/90">
+                <p className="text-sm sm:text-base text-white/90">
                   Connect directly with the seller for this amazing product
                 </p>
               </div>
@@ -2492,30 +2495,30 @@ export default function Marketplace() {
           </SheetHeader>
 
           {selectedSeller && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Product Info */}
-              <div className="p-4 rounded-xl border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
-                <h3 className="text-lg font-semibold mb-3 text-gray-900">
+              <div className="p-3 sm:p-4 rounded-xl border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
+                <h3 className="text-base sm:text-lg font-semibold mb-3 text-gray-900">
                   Product Details
                 </h3>
                 <div className="flex gap-3">
                   <img
                     src={selectedSeller.image || "/placeholder.svg"}
                     alt={selectedSeller.name}
-                    className="w-16 h-16 object-cover rounded-lg"
+                    className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg"
                   />
-                  <div className="flex-1">
-                    <h4 className="font-bold text-lg text-[#0d47a1]">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-base sm:text-lg text-[#0d47a1] truncate">
                       {selectedSeller.name}
                     </h4>
                     <p
-                      className="text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-[#ff9800] to-[#ff9800]/80"
+                      className="text-xl sm:text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-[#ff9800] to-[#ff9800]/80"
                     >
                       ${selectedSeller.price.toLocaleString()}
                     </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <MapPin className="h-4 w-4 text-[#00bcd4]" />
-                      <span className="text-sm text-gray-600">
+                    <div className="flex items-center gap-2 mt-1 sm:mt-2">
+                      <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-[#00bcd4] flex-shrink-0" />
+                      <span className="text-xs sm:text-sm text-gray-600 truncate">
                         {selectedSeller.location}
                       </span>
                     </div>
@@ -2524,62 +2527,62 @@ export default function Marketplace() {
               </div>
 
               {/* Seller Info */}
-              <div className="p-4 rounded-xl border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
-                <h3 className="text-lg font-semibold mb-3 text-gray-900">
+              <div className="p-3 sm:p-4 rounded-xl border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
+                <h3 className="text-base sm:text-lg font-semibold mb-3 text-gray-900">
                   Seller Information
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-lg">{selectedSeller.seller.charAt(0)}</span>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-sm sm:text-lg">{selectedSeller.seller.charAt(0)}</span>
                     </div>
-                    <div>
-                      <p className="font-bold text-lg text-gray-900">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-base sm:text-lg text-gray-900 truncate">
                         {selectedSeller.seller}
                       </p>
                       <div className="flex items-center gap-1">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-4 w-4 ${i < 4 ? "fill-[#ff9800] text-[#ff9800]" : "text-gray-300"}`}
+                            className={`h-3 w-3 sm:h-4 sm:w-4 ${i < 4 ? "fill-[#ff9800] text-[#ff9800]" : "text-gray-300"}`}
                           />
                         ))}
-                        <span className="text-sm ml-2 text-gray-600">
+                        <span className="text-xs sm:text-sm ml-1 sm:ml-2 text-gray-600">
                           4.8 (127 reviews)
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
                     <div className="p-3 rounded-lg bg-[#0d47a1]/10 border border-[#0d47a1]/20">
-                      <p className="text-sm text-gray-600">Member since</p>
-                      <p className="font-semibold text-gray-900">March 2023</p>
+                      <p className="text-xs sm:text-sm text-gray-600">Member since</p>
+                      <p className="font-semibold text-sm sm:text-base text-gray-900">March 2023</p>
                     </div>
                     <div className="p-3 rounded-lg bg-[#0d47a1]/10 border border-[#0d47a1]/20">
-                      <p className="text-sm text-gray-600">Response time</p>
-                      <p className="font-semibold text-gray-900">Within 2 hours</p>
+                      <p className="text-xs sm:text-sm text-gray-600">Response time</p>
+                      <p className="font-semibold text-sm sm:text-base text-gray-900">Within 2 hours</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Contact Form */}
-              <div className="p-4 rounded-xl border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
-                <h3 className="text-lg font-semibold mb-3 text-gray-900">
+              <div className="p-3 sm:p-4 rounded-xl border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
+                <h3 className="text-base sm:text-lg font-semibold mb-3 text-gray-900">
                   Send Message
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div>
-                    <Label className="text-gray-700">Your Message</Label>
+                    <Label className="text-gray-700 text-sm">Your Message</Label>
                     <Textarea
                       placeholder={`Hi ${selectedSeller.seller}, I'm interested in your ${selectedSeller.name}. Is it still available?`}
-                      className="mt-2 min-h-[120px] bg-white border-[#0d47a1]/30 focus:border-[#00bcd4]"
+                      className="mt-2 min-h-[100px] sm:min-h-[120px] bg-white border-[#0d47a1]/30 focus:border-[#00bcd4] text-sm sm:text-base"
                     />
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <Button 
-                      className="flex-1 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold"
+                      className="w-full sm:flex-1 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold text-sm sm:text-base py-2 sm:py-2.5"
                       onClick={(e) => {
                         e.stopPropagation();
                         // Aquí iría la lógica para enviar el mensaje
@@ -2591,7 +2594,7 @@ export default function Marketplace() {
                     </Button>
                     <Button
                       variant="outline"
-                      className="border-[#ff9800] text-[#ff9800] hover:bg-[#ff9800]/10"
+                      className="w-full sm:w-auto border-[#ff9800] text-[#ff9800] hover:bg-[#ff9800]/10 text-sm sm:text-base py-2 sm:py-2.5"
                       onClick={(e) => {
                         e.stopPropagation();
                         // Aquí iría la lógica para llamar
@@ -2613,7 +2616,7 @@ export default function Marketplace() {
       <Sheet open={productDetailOpen} onOpenChange={setProductDetailOpen}>
         <SheetContent
           side="right"
-          className="w-[95%] sm:w-[90%] max-w-3xl p-4 sm:p-2 h-[100vh] overflow-y-auto scrollbar-hide bg-gradient-to-br from-[#0d47a1] via-[#0d47a1]/95 to-[#0d47a1]/90 border-l-4 border-[#00bcd4] backdrop-blur-xl shadow-2xl"
+          className="w-full sm:w-[90%] lg:w-[85%] max-w-4xl p-3 sm:p-4 lg:p-6 h-[100vh] overflow-y-auto scrollbar-hide bg-gradient-to-br from-[#0d47a1] via-[#0d47a1]/95 to-[#0d47a1]/90 border-l-4 border-[#00bcd4] backdrop-blur-xl shadow-2xl"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -2625,47 +2628,47 @@ export default function Marketplace() {
             }
           `}</style>
           {selectedProductDetail && (
-            <div className="space-y-4 sm:space-y-6">
-              <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-                <div className="relative group">
+            <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+              <div className="flex flex-col lg:flex-row items-start gap-3 sm:gap-4 lg:gap-6">
+                <div className="relative group w-full lg:w-auto">
                   <img
                     src={selectedProductDetail.image || "/placeholder.svg"}
                     alt={selectedProductDetail.name}
-                    className="w-full sm:w-36 h-48 sm:h-36 object-cover rounded-xl shadow-xl border-2 border-white/20 group-hover:scale-105 transition-all duration-300"
+                    className="w-full lg:w-36 h-40 sm:h-48 lg:h-36 object-cover rounded-xl shadow-xl border-2 border-white/20 group-hover:scale-105 transition-all duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl" />
                 </div>
                 <div className="flex-1 w-full">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white line-clamp-2">
                     {selectedProductDetail.name}
                   </h2>
-                  <p className="text-lg sm:text-xl font-semibold mt-2 text-[#ff9800]">
+                  <p className="text-lg sm:text-xl lg:text-2xl font-semibold mt-2 text-[#ff9800]">
                     ${selectedProductDetail.price.toLocaleString()}
                   </p>
-                  <p className="text-sm mt-2 text-white/80">
+                  <p className="text-xs sm:text-sm mt-2 text-white/80">
                     {selectedProductDetail.location} • {selectedProductDetail.condition}
                   </p>
                 </div>
               </div>
 
-              <div className="p-4 sm:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#00bcd4]/30 shadow-xl">
+              <div className="p-3 sm:p-4 lg:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#00bcd4]/30 shadow-xl">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#00bcd4]/5 to-[#ff9800]/5" />
                 <div className="relative z-10">
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
-                    <div className="w-2 h-6 rounded-full bg-gradient-to-b from-[#0d47a1] to-[#00bcd4]" />
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
+                    <div className="w-2 h-4 sm:h-6 rounded-full bg-gradient-to-b from-[#0d47a1] to-[#00bcd4]" />
                     Description
                   </h3>
-                  <p className="leading-relaxed text-gray-700">
+                  <p className="leading-relaxed text-gray-700 text-sm sm:text-base">
                     {selectedProductDetail.description || "No description provided for this product. Contact the seller for more details about this item."}
                   </p>
                 </div>
               </div>
 
-              <div className="p-4 sm:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#ff9800]/30 shadow-xl">
+              <div className="p-3 sm:p-4 lg:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#ff9800]/30 shadow-xl">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#ff9800]/5 to-[#ff9800]/10" />
                 <div className="relative z-10">
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
-                    <div className="w-2 h-6 rounded-full bg-gradient-to-b from-[#ff9800] to-[#ff9800]/80" />
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
+                    <div className="w-2 h-4 sm:h-6 rounded-full bg-gradient-to-b from-[#ff9800] to-[#ff9800]/80" />
                     Apply Coupon
                   </h3>
                   <div className="flex flex-col sm:flex-row gap-3">
@@ -2673,7 +2676,7 @@ export default function Marketplace() {
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
                       placeholder="Enter coupon code"
-                      className="flex-1 rounded-lg p-3 border-2 backdrop-blur-sm transition-all duration-300 bg-white border-[#ff9800]/30 focus:border-[#ff9800] text-gray-900"
+                      className="flex-1 rounded-lg p-2 sm:p-3 border-2 backdrop-blur-sm transition-all duration-300 bg-white border-[#ff9800]/30 focus:border-[#ff9800] text-gray-900 text-sm sm:text-base"
                     />
                     <Button
                       onClick={() => {
@@ -2689,37 +2692,66 @@ export default function Marketplace() {
                           setCouponMessage("Invalid coupon")
                         }
                       }}
-                      className="px-6 py-3 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg sm:w-auto w-full"
+                      className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg w-full sm:w-auto text-sm sm:text-base"
                     >
                       Apply
                     </Button>
                   </div>
                   {discountPercent > 0 && (
-                    <p className="mt-3 text-sm font-medium text-[#ff9800]">Discount: {discountPercent}% — New price: ${((selectedProductDetail.price * (100 - discountPercent)) / 100).toFixed(2)}</p>
+                    <p className="mt-3 text-xs sm:text-sm font-medium text-[#ff9800]">Discount: {discountPercent}% — New price: ${((selectedProductDetail.price * (100 - discountPercent)) / 100).toFixed(2)}</p>
                   )}
-                  {couponMessage && <p className="mt-2 text-sm text-gray-600">{couponMessage}</p>}
+                  {couponMessage && <p className="mt-2 text-xs sm:text-sm text-gray-600">{couponMessage}</p>}
                 </div>
               </div>
 
-              <div className="p-4 sm:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#0d47a1]/30 shadow-xl">
+              <div className="p-3 sm:p-4 lg:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#0d47a1]/30 shadow-xl">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#0d47a1]/5 to-[#00bcd4]/5" />
                 <div className="relative z-10">
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
-                    <div className="w-2 h-6 rounded-full bg-gradient-to-b from-[#0d47a1] to-[#00bcd4]" />
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
+                    <div className="w-2 h-4 sm:h-6 rounded-full bg-gradient-to-b from-[#0d47a1] to-[#00bcd4]" />
                     Contact Seller
                   </h3>
-                  <p className="text-sm mb-4 text-gray-700">
+                  <p className="text-xs sm:text-sm mb-4 text-gray-700">
                     Use the button below to message the seller. (Button is non-functional as requested.)
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Button className="flex-1 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                    <Button className="w-full sm:flex-1 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-2 sm:py-3">
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Send Message
                     </Button>
                     <Button 
                       variant="outline" 
+                      className="w-full sm:w-auto bg-gradient-to-r from-[#ff9800]/10 to-[#ff9800]/20 border-2 border-[#ff9800] hover:border-[#ff9800]/80 text-[#ff9800] hover:text-[#ff9800]/80 shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-2 sm:py-3"
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Call
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 sm:p-4 lg:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#00bcd4]/30 shadow-xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#00bcd4]/5 to-[#ff9800]/5" />
+                <div className="relative z-10">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
+                    <div className="w-2 h-4 sm:h-6 rounded-full bg-gradient-to-b from-[#0d47a1] to-[#00bcd4]" />
+                    Quick Actions
+                  </h3>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button 
+                      onClick={() => {
+                        addToCart(selectedProductDetail.id);
+                        setProductDetailOpen(false);
+                      }}
+                      className="w-full sm:flex-1 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-2 sm:py-3"
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Add to Cart
+                    </Button>
+                    <Button 
+                      variant="outline" 
                       onClick={() => setProductDetailOpen(false)} 
-                      className="w-full sm:w-auto border-2 border-[#ff9800] text-[#ff9800] hover:bg-[#ff9800]/10 hover:border-[#ff9800]/80"
+                      className="w-full sm:w-auto border-2 border-[#ff9800] text-[#ff9800] hover:bg-[#ff9800]/10 hover:border-[#ff9800]/80 text-sm sm:text-base py-2 sm:py-3"
                     >
                       Close
                     </Button>
@@ -2733,15 +2765,15 @@ export default function Marketplace() {
 
       {/* Send QR Modal */}
       <Sheet open={showSendQR} onOpenChange={setShowSendQR}>
-        <SheetContent className="w-[90%] max-w-md p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
+        <SheetContent className="w-full sm:w-[90%] max-w-md p-4 sm:p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
           <SheetHeader>
-            <SheetTitle className="flex items-center gap-2 text-white">
-              <Send className="h-5 w-5 text-[#00bcd4]" />
+            <SheetTitle className="flex items-center gap-2 text-white text-lg sm:text-xl">
+              <Send className="h-4 w-4 sm:h-5 sm:w-5 text-[#00bcd4]" />
               Enviar Crypto
             </SheetTitle>
           </SheetHeader>
           
-          <div className="mt-6 space-y-6">
+          <div className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
             {/* Recipient Address */}
             <div>
               <Label htmlFor="recipient" className="text-sm font-medium text-white">
@@ -2752,7 +2784,7 @@ export default function Marketplace() {
                 placeholder="0x..."
                 value={recipientAddress}
                 onChange={(e) => setRecipientAddress(e.target.value)}
-                className="mt-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-[#00bcd4] focus:ring-[#00bcd4]"
+                className="mt-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-[#00bcd4] focus:ring-[#00bcd4] text-sm sm:text-base"
               />
             </div>
 
@@ -2768,7 +2800,7 @@ export default function Marketplace() {
                 placeholder="0.0"
                 value={sendAmount}
                 onChange={(e) => setSendAmount(e.target.value)}
-                className="mt-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-[#00bcd4] focus:ring-[#00bcd4]"
+                className="mt-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-[#00bcd4] focus:ring-[#00bcd4] text-sm sm:text-base"
               />
               <p className="text-xs mt-1 text-white/70">
                 Balance disponible: {balance} ETH
@@ -2777,27 +2809,27 @@ export default function Marketplace() {
 
             {/* QR Code */}
             {recipientAddress && sendAmount && (
-              <div className="flex flex-col items-center space-y-4">
-                <div className="p-4 rounded-lg bg-white/10 border border-white/20">
+              <div className="flex flex-col items-center space-y-3 sm:space-y-4">
+                <div className="p-3 sm:p-4 rounded-lg bg-white/10 border border-white/20">
                   <img 
                     src={generateSendQR()} 
                     alt="QR Code para envío"
-                    className="w-48 h-48"
+                    className="w-40 h-40 sm:w-48 sm:h-48"
                   />
                 </div>
-                <p className="text-sm text-center text-white/80">
+                <p className="text-xs sm:text-sm text-center text-white/80 px-2">
                   Escanea este código QR para enviar {sendAmount} ETH
                 </p>
-                <div className="p-3 rounded-lg text-xs font-mono bg-white/10 text-[#00bcd4] border border-white/20">
+                <div className="p-2 sm:p-3 rounded-lg text-xs font-mono bg-white/10 text-[#00bcd4] border border-white/20 max-w-full overflow-hidden">
                   Para: {truncateAddress(recipientAddress)}
                 </div>
               </div>
             )}
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button 
                 variant="outline" 
-                className="flex-1 border-white/20 text-white hover:bg-white/10 hover:text-white"
+                className="w-full sm:flex-1 border-white/20 text-white hover:bg-white/10 hover:text-white text-sm sm:text-base py-2 sm:py-2.5"
                 onClick={() => {
                   setShowSendQR(false)
                   setRecipientAddress("")
@@ -2807,7 +2839,7 @@ export default function Marketplace() {
                 Cancelar
               </Button>
               <Button 
-                className="flex-1 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white"
+                className="w-full sm:flex-1 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white text-sm sm:text-base py-2 sm:py-2.5"
                 disabled={!recipientAddress || !sendAmount}
                 onClick={() => {
                   alert(`🚀 Transacción preparada!\n\nEnviando ${sendAmount} ETH\nA: ${truncateAddress(recipientAddress)}\n\n(Simulación - QR generado exitosamente)`)
@@ -2826,15 +2858,15 @@ export default function Marketplace() {
 
       {/* Receive QR Modal */}
       <Sheet open={showReceiveQR} onOpenChange={setShowReceiveQR}>
-        <SheetContent className="w-[90%] max-w-md p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
+        <SheetContent className="w-full sm:w-[90%] max-w-md p-4 sm:p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
           <SheetHeader>
-            <SheetTitle className="flex items-center gap-2 text-white">
-              <Download className="h-5 w-5 text-[#00bcd4]" />
+            <SheetTitle className="flex items-center gap-2 text-white text-lg sm:text-xl">
+              <Download className="h-4 w-4 sm:h-5 sm:w-5 text-[#00bcd4]" />
               Recibir Crypto
             </SheetTitle>
           </SheetHeader>
           
-          <div className="mt-6 space-y-6">
+          <div className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
             {/* QR Code */}
             <div className="flex flex-col items-center space-y-4">
               <div className="p-4 rounded-lg bg-white/10 border border-white/20">
