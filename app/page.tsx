@@ -8,6 +8,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import {
   Search,
   ShoppingCart,
+  ShoppingBag,
   Heart,
   Wallet,
   Menu,
@@ -24,15 +25,19 @@ import {
   Moon,
   Sun,
   Package,
+  AlertTriangle,
   DollarSign,
   Tag,
   FileText,
   User,
+  Users,
   MessageCircle,
   Phone,
   Upload,
   Eye,
   EyeOff,
+  ChevronLeft,
+  ChevronRight,
   Send,
   Download,
   QrCode,
@@ -69,6 +74,8 @@ const mockProducts = [
     seller: "TechStore NYC",
     inStock: true,
     featured: true,
+    saleStatus: undefined as "pago_recibido" | "producto_entregado" | "finalizado" | undefined,
+    purchaseStatus: undefined as "pendiente" | "completado" | "disputa" | "en revision" | undefined,
   },
   {
     id: 2,
@@ -244,6 +251,168 @@ export default function Marketplace() {
   const [balanceUSD, setBalanceUSD] = useState("0.00")
   const [isLoadingBalance, setIsLoadingBalance] = useState(false)
 
+  // Sales module state
+  const [showSalesModal, setShowSalesModal] = useState(false)
+  const [selectedSaleProduct, setSelectedSaleProduct] = useState<Product | null>(null)
+  
+  // Purchases module state
+  const [showPurchasesModal, setShowPurchasesModal] = useState(false)
+  const [selectedPurchaseProduct, setSelectedPurchaseProduct] = useState<Product | null>(null)
+  
+  // Dispute module state
+  const [showDisputeModal, setShowDisputeModal] = useState(false)
+  const [disputeProduct, setDisputeProduct] = useState<Product | null>(null)
+  const [disputeReason, setDisputeReason] = useState("")
+  const [disputeDescription, setDisputeDescription] = useState("")
+  const [disputeImages, setDisputeImages] = useState<string[]>([])
+  
+  // Dispute review module state (for sellers)
+  const [showDisputeReviewModal, setShowDisputeReviewModal] = useState(false)
+  const [reviewingDisputeProduct, setReviewingDisputeProduct] = useState<Product | null>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  
+  // Appeal module state (for sellers)
+  const [showAppealModal, setShowAppealModal] = useState(false)
+  const [appealProduct, setAppealProduct] = useState<Product | null>(null)
+  const [appealReason, setAppealReason] = useState("")
+  const [appealDescription, setAppealDescription] = useState("")
+  const [appealImages, setAppealImages] = useState<string[]>([])
+  
+  // Appeal review module state (for buyers when seller appeals)
+  const [showAppealReviewModal, setShowAppealReviewModal] = useState(false)
+  const [appealReviewProduct, setAppealReviewProduct] = useState<Product | null>(null)
+  
+  // Reviews modal state
+  const [showReviewsModal, setShowReviewsModal] = useState(false)
+  
+  // Referrals modal state
+  const [showReferralsModal, setShowReferralsModal] = useState(false)
+  const [referralsContext, setReferralsContext] = useState<'navbar' | 'seller' | 'buyer'>('navbar')
+  const [selectedReferral, setSelectedReferral] = useState<any>(null)
+  const [showAddReferralModal, setShowAddReferralModal] = useState(false)
+  const [newReferral, setNewReferral] = useState({
+    nombre: '',
+    direccionWallet: '',
+    codigoReferido: '',
+    validoHasta: ''
+  })
+  
+  const [userPurchases, setUserPurchases] = useState<Product[]>([
+    // Algunos productos de ejemplo que el usuario ha comprado
+    {
+      id: 8001,
+      name: "Mi iPhone 14 Pro", // Mismo nombre que en ventas
+      price: 700,
+      originalPrice: 800,
+      image: "/diverse-products-still-life.png",
+      description: "Compra de iPhone que tiene problemas.",
+      rating: 4.5,
+      reviews: 5,
+      category: "Electronics",
+      location: "Lima, Perú",
+      condition: "used" as const,
+      seller: "VendedorX",
+      inStock: true,
+      featured: false,
+      purchaseStatus: "disputa" as const, // En disputa
+      saleStatus: undefined,
+    },
+    {
+      id: 8002,
+      name: "Mochila de Viaje",
+      price: 45,
+      originalPrice: 60,
+      image: "/diverse-products-still-life.png",
+      description: "Mochila resistente para viajes largos.",
+      rating: 4.8,
+      reviews: 12,
+      category: "Travel",
+      location: "Lima, Perú",
+      condition: "new" as const,
+      seller: "OutdoorGear",
+      inStock: true,
+      featured: false,
+      purchaseStatus: "completado" as const,
+      saleStatus: undefined,
+    },
+    {
+      id: 8003,
+      name: "Reloj Deportivo",
+      price: 120,
+      originalPrice: 150,
+      image: "/diverse-products-still-life.png",
+      description: "Reloj inteligente para deportes y fitness.",
+      rating: 4.6,
+      reviews: 8,
+      category: "Electronics",
+      location: "Lima, Perú",
+      condition: "new" as const,
+      seller: "SportsTech",
+      inStock: true,
+      featured: false,
+      purchaseStatus: "en revision" as const,
+      saleStatus: undefined,
+    },
+    {
+      id: 8004,
+      name: "Tablet Android",
+      price: 280,
+      originalPrice: 320,
+      image: "/diverse-products-still-life.png",
+      description: "Tablet Android con pantalla de 10 pulgadas.",
+      rating: 4.4,
+      reviews: 15,
+      category: "Electronics",
+      location: "Lima, Perú",
+      condition: "used" as const,
+      seller: "TabletStore",
+      inStock: true,
+      featured: false,
+      purchaseStatus: "pendiente" as const,
+      saleStatus: undefined,
+    }
+  ])
+
+  const [userSalesProducts, setUserSalesProducts] = useState<Product[]>([
+    // Algunos productos de ejemplo que el usuario tiene en venta
+    {
+      id: 9001,
+      name: "Mi iPhone 14 Pro",
+      price: 899,
+      originalPrice: 1099,
+      image: "/diverse-products-still-life.png",
+      description: "iPhone 14 Pro en excelente estado, apenas usado por 6 meses.",
+      rating: 5.0,
+      reviews: 8,
+      category: "Electronics",
+      location: "Lima, Perú",
+      condition: "used" as const,
+      seller: "Tú",
+      inStock: true,
+      featured: false,
+      saleStatus: "pago_recibido" as const,
+      purchaseStatus: undefined,
+    },
+    {
+      id: 9002,
+      name: "MacBook Air M2",
+      price: 1199,
+      originalPrice: 1399,
+      image: "/diverse-products-still-life.png",
+      description: "Laptop prácticamente nueva, incluye cargador y funda.",
+      rating: 4.9,
+      reviews: 12,
+      category: "Electronics",
+      location: "Lima, Perú",
+      condition: "used" as const,
+      seller: "Tú",
+      inStock: true,
+      featured: false,
+      saleStatus: "producto_entregado" as const,
+      purchaseStatus: undefined,
+    }
+  ])
+
   const [imagePreview, setImagePreview] = useState<string>("")
   // showSellModal removed; we use the seller dashboard state (`isSellerDashboardOpen`) instead.
 
@@ -397,6 +566,253 @@ export default function Marketplace() {
 
   const getCartItemsCount = () => {
     return cartItems.length
+  }
+
+  // Función para obtener productos que está vendiendo el usuario actual
+  const getUserSalesProducts = () => {
+    return userSalesProducts
+  }
+
+  // Función para actualizar el estado de progreso de un producto en venta
+  const updateSaleStatus = (productId: number, newStatus: "pago_recibido" | "producto_entregado" | "finalizado") => {
+    setUserSalesProducts((prev) =>
+      prev.map((product) =>
+        product.id === productId ? { ...product, saleStatus: newStatus } : product
+      )
+    )
+  }
+
+  // Función para actualizar el estado de una compra
+  const updatePurchaseStatus = (productId: number, newStatus: "pendiente" | "completado" | "disputa") => {
+    setUserPurchases((prev) =>
+      prev.map((product) =>
+        product.id === productId ? { ...product, purchaseStatus: newStatus } : product
+      )
+    )
+  }
+
+  // Función para abrir modal de disputa
+  const openDisputeModal = (product: Product) => {
+    setDisputeProduct(product)
+    setDisputeReason("")
+    setDisputeDescription("")
+    setDisputeImages([])
+    setShowDisputeModal(true)
+  }
+
+  // Función para agregar imagen a la disputa
+  const addDisputeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && disputeImages.length < 5) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        setDisputeImages(prev => [...prev, result])
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Función para remover imagen de la disputa
+  const removeDisputeImage = (index: number) => {
+    setDisputeImages(prev => prev.filter((_, i) => i !== index))
+  }
+
+  // Función para enviar disputa
+  const submitDispute = () => {
+    if (disputeProduct && disputeReason && disputeDescription) {
+      updatePurchaseStatus(disputeProduct.id, "disputa")
+      setShowDisputeModal(false)
+      alert("🚨 Disputa enviada exitosamente. Un moderador revisará tu caso pronto.")
+    } else {
+      alert("❌ Please complete all required fields.")
+    }
+  }
+
+  // Función para verificar si un producto tiene disputas
+  const hasDispute = (productId: number) => {
+    return userPurchases.some(purchase => 
+      purchase.name === userSalesProducts.find(sale => sale.id === productId)?.name && 
+      purchase.purchaseStatus === "disputa"
+    )
+  }
+
+  // Función para obtener información de la disputa
+  const getDisputeInfo = (productName: string) => {
+    const disputedPurchase = userPurchases.find(purchase => 
+      purchase.name === productName && purchase.purchaseStatus === "disputa"
+    )
+    
+    // Datos de ejemplo para la disputa
+    return {
+      motivo: "Producto dañado",
+      descripcion: "El producto llegó con la pantalla rota y no funciona correctamente. Además, el empaque estaba dañado.",
+      imagenes: [
+        "/diverse-products-still-life.png", // Imagen de ejemplo 1
+        "/diverse-products-still-life.png", // Imagen de ejemplo 2
+        "/diverse-products-still-life.png"  // Imagen de ejemplo 3
+      ],
+      comprador: disputedPurchase?.seller || "Comprador Anónimo"
+    }
+  }
+
+  // Función para abrir modal de revisión de disputa
+  const openDisputeReview = (product: Product) => {
+    setReviewingDisputeProduct(product)
+    setCurrentImageIndex(0)
+    setShowDisputeReviewModal(true)
+  }
+
+  // Función para navegar entre imágenes
+  const navigateImage = (direction: 'prev' | 'next') => {
+    const disputeInfo = getDisputeInfo(reviewingDisputeProduct?.name || "")
+    const totalImages = disputeInfo.imagenes.length
+    
+    if (direction === 'prev') {
+      setCurrentImageIndex(prev => prev > 0 ? prev - 1 : totalImages - 1)
+    } else {
+      setCurrentImageIndex(prev => prev < totalImages - 1 ? prev + 1 : 0)
+    }
+  }
+
+  // Función para aceptar y resolver disputa
+  const acceptDispute = () => {
+    if (reviewingDisputeProduct) {
+      // Actualizar estado de la compra a completado
+      updatePurchaseStatus(
+        userPurchases.find(p => p.name === reviewingDisputeProduct.name)?.id || 0, 
+        "completado"
+      )
+      setShowDisputeReviewModal(false)
+      alert("✅ Disputa aceptada. Se ha procesado el reembolso al comprador.")
+    }
+  }
+
+  // Función para apelar disputa
+  const appealDispute = () => {
+    setShowDisputeReviewModal(false)
+    setShowAppealModal(true)
+    setAppealProduct(reviewingDisputeProduct)
+    setAppealReason("")
+    setAppealDescription("")
+    setAppealImages([])
+  }
+
+  // Handle appeal image uploads
+  const handleAppealImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    if (appealImages.length + files.length > 5) {
+      alert("Máximo 5 imágenes permitidas")
+      return
+    }
+
+    files.forEach(file => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        setAppealImages(prev => [...prev, result])
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const removeAppealImage = (index: number) => {
+    setAppealImages(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const submitAppeal = () => {
+    if (!appealDescription.trim()) {
+      alert("Please describe your appeal")
+      return
+    }
+
+    // Here you would submit to your backend
+    console.log("Appeal submitted:", {
+      product: appealProduct,
+      reason: appealReason,
+      description: appealDescription,
+      images: appealImages
+    })
+
+    // Update the purchase status to "en revision" when seller appeals
+    if (appealProduct) {
+      const updatedPurchases = userPurchases.map(purchase => 
+        purchase.name === appealProduct.name 
+          ? { ...purchase, purchaseStatus: "en revision" as const }
+          : purchase
+      )
+      setUserPurchases(updatedPurchases)
+    }
+
+    alert("Apelación enviada exitosamente. Un moderador revisará el caso en las próximas 24-48 horas.")
+    setShowAppealModal(false)
+    setAppealProduct(null)
+  }
+
+  // Function to get seller appeal info (simulated data)
+  const getSellerAppealInfo = (productName: string) => {
+    const appealData: { [key: string]: any } = {
+      "Celular Samsung Galaxy": {
+        motivoApelacion: "producto-entregado",
+        descripcionApelacion: "El producto fue entregado correctamente según lo acordado. Tengo evidencia de la entrega y el comprador confirmó recibirlo en perfecto estado inicialmente.",
+        imagenesApelacion: [
+          "/api/placeholder/400/300",
+          "/api/placeholder/400/300",
+          "/api/placeholder/400/300"
+        ],
+        fechaApelacion: "2024-01-15",
+        vendedor: "TechStore2024"
+      },
+      "Reloj Deportivo": {
+        motivoApelacion: "producto-entregado",
+        descripcionApelacion: "El reloj fue entregado en perfecto estado y funcionando correctamente. El comprador lo probó durante 2 semanas antes de abrir la disputa. Adjunto evidencia de la entrega y conversaciones donde confirmaba que todo estaba bien.",
+        imagenesApelacion: [
+          "/diverse-products-still-life.png",
+          "/diverse-products-still-life.png",
+          "/diverse-products-still-life.png"
+        ],
+        fechaApelacion: "2024-01-20",
+        vendedor: "SportsTech"
+      }
+    }
+    return appealData[productName] || {
+      motivoApelacion: "producto-entregado",
+      descripcionApelacion: "El vendedor ha apelado esta disputa.",
+      imagenesApelacion: ["/api/placeholder/400/300"],
+      fechaApelacion: "2024-01-15",
+      vendedor: "Vendedor"
+    }
+  }
+
+  // Function to open appeal review modal (for buyers)
+  const openAppealReview = (product: Product) => {
+    setAppealReviewProduct(product)
+    setShowAppealReviewModal(true)
+  }
+
+  // Function to close appeal (buyer accepts seller's appeal)
+  const closeAppeal = () => {
+    if (appealReviewProduct) {
+      // Update purchase status back to completed
+      const updatedPurchases = userPurchases.map(purchase => 
+        purchase.name === appealReviewProduct.name 
+          ? { ...purchase, purchaseStatus: "completado" as const }
+          : purchase
+      )
+      setUserPurchases(updatedPurchases)
+      
+      alert("✅ Apelación cerrada. El caso se ha resuelto a favor del vendedor.")
+      setShowAppealReviewModal(false)
+      setAppealReviewProduct(null)
+    }
+  }
+
+  // Function to continue discussion
+  const continueDiscussion = () => {
+    alert("💬 Se ha notificado a un moderador para mediar en la discusión. Recibirás una respuesta en 24-48 horas.")
+    setShowAppealReviewModal(false)
   }
 
   const toggleWishlist = (productId: number) => {
@@ -563,7 +979,7 @@ export default function Marketplace() {
 
   const handleDepositConfirm = async () => {
     if (!depositAmountBs || parseFloat(depositAmountBs) <= 0) {
-      alert("❌ Por favor ingresa una cantidad válida")
+      alert("❌ Please enter a valid amount")
       return
     }
 
@@ -618,7 +1034,7 @@ export default function Marketplace() {
 
   const processQRCode = async () => {
     if (!uploadedQRImage) {
-      alert("❌ Por favor selecciona una imagen primero")
+      alert("❌ Please select an image first")
       return
     }
 
@@ -647,7 +1063,7 @@ export default function Marketplace() {
       setShowQRResultModal(true)
     } catch (error) {
       setIsProcessingQR(false)
-      alert("❌ Error al procesar el código QR. Por favor intenta de nuevo.")
+      alert("❌ Error processing QR code. Please try again.")
     }
   }
 
@@ -701,14 +1117,14 @@ export default function Marketplace() {
       // Validar que es una imagen PNG, JPG, JPEG, GIF o WebP
       const validImageTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp']
       if (!validImageTypes.includes(file.type)) {
-        alert('❌ Formato de imagen no válido. Por favor, usa PNG, JPG, JPEG, GIF o WebP.')
+        alert('❌ Invalid image format. Please use PNG, JPG, JPEG, GIF, or WebP.')
         return
       }
 
       // Validar tamaño de archivo (máximo 5MB)
       const maxSize = 5 * 1024 * 1024 // 5MB en bytes
       if (file.size > maxSize) {
-        alert('❌ El archivo es muy grande. El tamaño máximo es 5MB.')
+      alert("❌ File is too large. Maximum size is 5MB.")
         return
       }
 
@@ -742,9 +1158,15 @@ export default function Marketplace() {
       seller: walletConnected ? `User ${walletAddress.slice(0, 6)}...` : "Anonymous Seller",
       inStock: true,
       featured: false,
+      saleStatus: "pago_recibido" as const,
+      purchaseStatus: undefined,
     }
 
     setProducts((prev) => [productToAdd, ...prev])
+    // Add to user's sales products if wallet is connected
+    if (walletConnected) {
+      setUserSalesProducts((prev) => [productToAdd, ...prev])
+    }
 
     setNewProduct({
       name: "",
@@ -761,7 +1183,7 @@ export default function Marketplace() {
   // Close the seller sheet after successful submission
   setIsSellerDashboardOpen(false)
 
-    alert("¡Producto agregado exitosamente!")
+    alert("¡Product added successfully!")
   }
 
   const contactSeller = (product: Product) => {
@@ -1532,7 +1954,7 @@ export default function Marketplace() {
                 {/* Dropdown Menu */}
                 {walletConnected && showUserDropdown && (
                   <div 
-                    className={`absolute right-0 top-12 w-80 rounded-xl border-2 shadow-xl z-50 transition-all duration-300 ${
+                    className={`absolute right-0 top-12 w-80 max-h-[80vh] overflow-y-auto rounded-xl border-2 shadow-xl z-50 transition-all duration-300 ${
                       isDarkMode 
                         ? "bg-slate-900 border-slate-600 text-white" 
                         : "bg-white border-gray-200 text-gray-900"
@@ -1696,7 +2118,7 @@ export default function Marketplace() {
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowUserDropdown(false);
-                          alert("📊 Módulo de Ventas - Próximamente disponible");
+                          setShowSalesModal(true);
                         }}
                       >
                         <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#ff9800] to-[#ff9800]/80 shadow-lg shadow-[#ff9800]/25">
@@ -1714,7 +2136,7 @@ export default function Marketplace() {
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowUserDropdown(false);
-                          setIsCartOpen(true);
+                          setShowPurchasesModal(true);
                         }}
                       >
                         <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#00bcd4] to-[#00bcd4]/80 shadow-lg shadow-[#00bcd4]/25">
@@ -1723,7 +2145,7 @@ export default function Marketplace() {
                         <span className={`text-xs font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-slate-200 group-hover:text-white" : "text-gray-700 group-hover:text-gray-900"
                         }`}>
-                          Compras
+                          Purchases
                         </span>
                       </button>
                     </div>
@@ -1741,7 +2163,7 @@ export default function Marketplace() {
                         </div>
                         <div className="text-left">
                           <div className="font-medium">MetaMask</div>
-                          <div className="text-sm text-gray-500">Wallet conectada</div>
+                          <div className="text-sm text-gray-500">Wallet connected</div>
                         </div>
                       </button>
                     </div>
@@ -1756,7 +2178,7 @@ export default function Marketplace() {
                           setShowUserDropdown(false)
                         }}
                       >
-                        Desconectar Wallet
+                        Disconnect Wallet
                       </Button>
                     </div>
                   </div>
@@ -1776,6 +2198,31 @@ export default function Marketplace() {
                     {wishlistItems.length}
                   </Badge>
                 )}
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowReviewsModal(true)}
+                className={`relative transition-all duration-300 hover:scale-110 ${
+                  isDarkMode ? "hover:bg-slate-700 text-purple-400" : "hover:bg-purple-100 text-purple-600"
+                }`}
+              >
+                <Star className="h-5 w-5" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setReferralsContext('navbar')
+                  setShowReferralsModal(true)
+                }}
+                className={`relative transition-all duration-300 hover:scale-110 ${
+                  isDarkMode ? "hover:bg-slate-700 text-cyan-400" : "hover:bg-cyan-100 text-cyan-600"
+                }`}
+              >
+                <Users className="h-5 w-5" />
               </Button>
 
               <FloatingCart />
@@ -2593,7 +3040,7 @@ export default function Marketplace() {
                     {qrData.fee && (
                       <div className="flex justify-between items-center mt-2">
                         <span className="text-xs text-gray-500">
-                          Comisión:
+                          Commission:
                         </span>
                         <span className="text-xs text-gray-500">
                           {qrData.fee} {qrData.currency}
@@ -2704,7 +3151,7 @@ export default function Marketplace() {
                       className="border-0 bg-transparent text-right text-lg font-semibold focus-visible:ring-0 text-gray-900 placeholder:text-gray-400"
                     />
                     <span className="text-xs text-gray-500">
-                      Comisión 0 Bs
+                      Commission 0 Bs
                     </span>
                   </div>
                 </div>
@@ -2888,6 +3335,1758 @@ export default function Marketplace() {
               <p className="text-xs text-white/70">
                 🕐 Este QR expira en 15 minutos
               </p>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Sales Modal */}
+      <Sheet open={showSalesModal} onOpenChange={setShowSalesModal}>
+        <SheetContent 
+          side="right"
+          className="w-full sm:max-w-6xl p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4] overflow-y-auto"
+        >
+          <SheetHeader className="mb-6">
+            <SheetTitle className="flex items-center gap-3 text-white text-2xl">
+              <Package className="h-6 w-6 text-[#ff9800]" />
+              My Sales
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+            {/* Sidebar con lista de productos */}
+            <div className="lg:col-span-1 space-y-4">
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-[#00bcd4]" />
+                  My Products
+                </h3>
+                <div className="space-y-3">
+                  {getUserSalesProducts().map((product) => (
+                    <button
+                      key={product.id}
+                      className={`w-full text-left p-3 rounded-lg border transition-all duration-200 hover:scale-[1.02] ${
+                        selectedSaleProduct?.id === product.id
+                          ? "bg-[#00bcd4]/20 border-[#00bcd4] text-white"
+                          : "bg-white/5 border-white/20 text-white/80 hover:bg-white/10"
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedSaleProduct(product);
+                      }}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{product.name}</div>
+                          <div className="text-xs text-[#ff9800]">${product.price} USDC</div>
+                        </div>
+                        <div className="ml-3">
+                          {(!product.saleStatus || product.saleStatus === "pago_recibido") && (
+                            <div className="w-3 h-3 rounded-full bg-[#00bcd4]"></div>
+                          )}
+                          {product.saleStatus === "producto_entregado" && (
+                            <div className="w-3 h-3 rounded-full bg-[#00bcd4]"></div>
+                          )}
+                          {product.saleStatus === "finalizado" && (
+                            <div className="w-3 h-3 rounded-full bg-[#ff9800]"></div>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Botón de Referidos */}
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <Button
+                  className="w-full bg-gradient-to-r from-[#00bcd4] to-[#00acc1] hover:from-[#00acc1] hover:to-[#00838f] text-white font-semibold py-3"
+                  onClick={() => {
+                    setShowSalesModal(false)
+                    setReferralsContext('seller')
+                    setShowReferralsModal(true)
+                  }}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Ver Referidos
+                </Button>
+              </div>
+            </div>
+
+            {/* Área principal de detalles del producto */}
+            <div className="lg:col-span-3">
+              {selectedSaleProduct ? (
+                <div className="bg-white/5 rounded-xl p-6 border border-white/20 h-full">
+                  <div className="flex items-start gap-6 mb-6">
+                    <img
+                      src={selectedSaleProduct.image || "/placeholder.svg"}
+                      alt={selectedSaleProduct.name}
+                      className="w-32 h-32 object-cover rounded-xl"
+                    />
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold text-white mb-2">{selectedSaleProduct.name}</h2>
+                      <p className="text-3xl font-bold text-[#ff9800] mb-3">${selectedSaleProduct.price} USDC</p>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white/10 rounded-lg p-3 border border-white/20">
+                          <div className="text-xs text-white/60">Condition</div>
+                          <div className="text-sm text-white font-medium">{selectedSaleProduct.condition}</div>
+                        </div>
+                        <div className="bg-white/10 rounded-lg p-3 border border-white/20">
+                          <div className="text-xs text-white/60">Category</div>
+                          <div className="text-sm text-white font-medium">{selectedSaleProduct.category}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sistema de progreso de ventas - 3 etapas */}
+                  <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                    <h3 className="text-lg font-semibold text-white mb-4">Estado de la Venta</h3>
+                    
+                    {/* Progress Bar */}
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between relative">
+                        {/* Línea de progreso */}
+                        <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-white/20 -translate-y-1/2 z-0"></div>
+                        <div 
+                          className="absolute top-1/2 left-0 h-0.5 bg-[#00bcd4] -translate-y-1/2 z-0 transition-all duration-300"
+                          style={{
+                            width: !selectedSaleProduct.saleStatus || selectedSaleProduct.saleStatus === "pago_recibido" ? "50%" :
+                                   selectedSaleProduct.saleStatus === "producto_entregado" ? "100%" :
+                                   selectedSaleProduct.saleStatus === "finalizado" ? "100%" : "0%"
+                          }}
+                        ></div>
+                        
+                        {/* Etapa 1: Pago Recibido */}
+                        <div className="flex flex-col items-center z-10">
+                          <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                            !selectedSaleProduct.saleStatus || selectedSaleProduct.saleStatus === "pago_recibido" || selectedSaleProduct.saleStatus === "producto_entregado" || selectedSaleProduct.saleStatus === "finalizado"
+                              ? "bg-[#00bcd4] border-[#00bcd4] text-white"
+                              : "bg-white/10 border-white/30 text-white/60" 
+                          }`}>
+                            <span className="text-xs font-bold">1</span>
+                          </div>
+                          <span className="text-xs text-white/80 mt-2 text-center">Pago<br/>Recibido</span>
+                        </div>
+                        
+                        {/* Etapa 2: Producto Entregado */}
+                        <div className="flex flex-col items-center z-10">
+                          <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                            selectedSaleProduct.saleStatus === "producto_entregado" || selectedSaleProduct.saleStatus === "finalizado"
+                              ? "bg-[#00bcd4] border-[#00bcd4] text-white"
+                              : "bg-white/10 border-white/30 text-white/60" 
+                          }`}>
+                            <span className="text-xs font-bold">2</span>
+                          </div>
+                          <span className="text-xs text-white/80 mt-2 text-center">Producto<br/>Entregado</span>
+                        </div>
+                        
+                        {/* Etapa 3: Finalizar */}
+                        <div className="flex flex-col items-center z-10">
+                          <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                            selectedSaleProduct.saleStatus === "finalizado"
+                              ? "bg-[#ff9800] border-[#ff9800] text-white" 
+                              : "bg-white/10 border-white/30 text-white/60"
+                          }`}>
+                            <span className="text-xs font-bold">3</span>
+                          </div>
+                          <span className="text-xs text-white/80 mt-2 text-center">Finalizar</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Botones de acción según el estado actual */}
+                    <div className="space-y-3">
+                      {(!selectedSaleProduct.saleStatus || selectedSaleProduct.saleStatus === "pago_recibido") && (
+                        <Button
+                          className="w-full bg-gradient-to-r from-[#00bcd4] to-[#00bcd4]/80 hover:from-[#00bcd4]/90 hover:to-[#00bcd4]/70 text-white py-3 font-semibold"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateSaleStatus(selectedSaleProduct.id, "producto_entregado");
+                          }}
+                        >
+                          📦 Marcar como Entregado
+                        </Button>
+                      )}
+                      
+                      {selectedSaleProduct.saleStatus === "producto_entregado" && (
+                        <Button
+                          className="w-full bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white py-3 font-semibold"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateSaleStatus(selectedSaleProduct.id, "finalizado");
+                          }}
+                        >
+                          🎉 Finalizar Venta
+                        </Button>
+                      )}
+                      
+                      {selectedSaleProduct.saleStatus === "finalizado" && (
+                        <div className="text-center py-4">
+                          <div className="inline-flex items-center px-4 py-2 bg-[#ff9800]/20 rounded-lg border border-[#ff9800]/30">
+                            <span className="text-[#ff9800] font-semibold">🎉 Venta Completada</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Botón de revisar disputa si hay una disputa abierta */}
+                      {hasDispute(selectedSaleProduct.id) && (
+                        <div className="mt-4">
+                          <Button
+                            className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 font-semibold"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDisputeReview(selectedSaleProduct);
+                            }}
+                          >
+                            🚨 Revisar Disputa
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Botón principal de acción - REMOVIDO */}
+                  {/* 
+                  <div className="flex justify-center">
+                    <Button
+                      className="bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white px-8 py-3 text-lg font-semibold"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        alert("🎉 ¡Producto marcado como completado!");
+                      }}
+                    >
+                      Marcar como Completado
+                    </Button>
+                  </div>
+                  */}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full bg-white/5 rounded-xl border border-white/20">
+                  <div className="text-center">
+                    <Package className="h-16 w-16 text-white/40 mx-auto mb-4" />
+                    <p className="text-white/60 text-lg">Selecciona un producto para ver los detalles</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Purchases Modal */}
+      <Sheet open={showPurchasesModal} onOpenChange={setShowPurchasesModal}>
+        <SheetContent 
+          side="right"
+          className="w-full sm:max-w-6xl p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4] overflow-y-auto"
+        >
+          <SheetHeader className="mb-6">
+            <SheetTitle className="flex items-center gap-3 text-white text-2xl">
+              <ShoppingCart className="h-6 w-6 text-[#ff9800]" />
+              My Purchases
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+            {/* Sidebar con lista de compras */}
+            <div className="lg:col-span-1 space-y-4">
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <ShoppingBag className="h-4 w-4 text-[#00bcd4]" />
+                  My Purchases
+                </h3>
+                <div className="space-y-3">
+                  {userPurchases.map((product) => (
+                    <button
+                      key={product.id}
+                      className={`w-full text-left p-3 rounded-lg transition-all duration-200 border ${
+                        selectedPurchaseProduct?.id === product.id
+                          ? "bg-[#00bcd4]/20 border-[#00bcd4]/50 text-white"
+                          : "bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20"
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPurchaseProduct(product);
+                      }}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{product.name}</div>
+                          <div className="text-xs text-[#ff9800]">${product.price} USDC</div>
+                        </div>
+                        <div className="ml-3">
+                          {product.purchaseStatus === "pendiente" && (
+                            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                          )}
+                          {product.purchaseStatus === "completado" && (
+                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                          )}
+                          {product.purchaseStatus === "disputa" && (
+                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Botón de Referidos */}
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <Button
+                  className="w-full bg-gradient-to-r from-[#00bcd4] to-[#00acc1] hover:from-[#00acc1] hover:to-[#00838f] text-white font-semibold py-3"
+                  onClick={() => {
+                    setShowPurchasesModal(false)
+                    setReferralsContext('buyer')
+                    setShowReferralsModal(true)
+                  }}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Ver Referidos
+                </Button>
+              </div>
+            </div>
+
+            {/* Área principal de detalles de la compra */}
+            <div className="lg:col-span-3">
+              {selectedPurchaseProduct ? (
+                <div className="bg-white/5 rounded-xl p-6 border border-white/20 h-full">
+                  <div className="flex items-start gap-6 mb-6">
+                    <img
+                      src={selectedPurchaseProduct.image || "/placeholder.svg"}
+                      alt={selectedPurchaseProduct.name}
+                      className="w-32 h-32 object-cover rounded-xl"
+                    />
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold text-white mb-2">{selectedPurchaseProduct.name}</h2>
+                      <p className="text-3xl font-bold text-[#ff9800] mb-3">${selectedPurchaseProduct.price} USDC</p>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white/10 rounded-lg p-3 border border-white/20">
+                          <div className="text-xs text-white/60">Vendedor</div>
+                          <div className="text-sm text-white font-medium">{selectedPurchaseProduct.seller}</div>
+                        </div>
+                        <div className="bg-white/10 rounded-lg p-3 border border-white/20">
+                          <div className="text-xs text-white/60">Estado</div>
+                          <div className="text-sm text-white font-medium">
+                            {selectedPurchaseProduct.purchaseStatus === "pendiente" && "⏳ Pendiente"}
+                            {selectedPurchaseProduct.purchaseStatus === "completado" && "✅ Completado"}
+                            {selectedPurchaseProduct.purchaseStatus === "disputa" && "⚠️ En Disputa"}
+                            {selectedPurchaseProduct.purchaseStatus === "en revision" && "🔍 En Revisión"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Acciones según el estado de la compra */}
+                  <div className="space-y-4">
+                    {selectedPurchaseProduct.purchaseStatus === "pendiente" && (
+                      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                        <h3 className="text-lg font-semibold text-white mb-4">Acciones de Compra</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Button
+                            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 font-semibold"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updatePurchaseStatus(selectedPurchaseProduct.id, "completado");
+                            }}
+                          >
+                            ✅ Marcar como Completado
+                          </Button>
+                          <Button
+                            className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 font-semibold"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDisputeModal(selectedPurchaseProduct);
+                            }}
+                          >
+                            ⚠️ Abrir Disputa
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedPurchaseProduct.purchaseStatus === "completado" && (
+                      <div className="text-center py-6">
+                        <div className="inline-flex items-center px-6 py-3 bg-green-500/20 rounded-lg border border-green-500/30">
+                          <span className="text-green-400 font-semibold text-lg">✅ Compra Completada</span>
+                        </div>
+                        <p className="text-white/60 mt-3">¡Gracias por tu compra! Esperamos que disfrutes tu producto.</p>
+                      </div>
+                    )}
+                    
+                    {selectedPurchaseProduct.purchaseStatus === "disputa" && (
+                      <div className="text-center py-6">
+                        <div className="inline-flex items-center px-6 py-3 bg-red-500/20 rounded-lg border border-red-500/30">
+                          <span className="text-red-400 font-semibold text-lg">⚠️ Disputa Abierta</span>
+                        </div>
+                        <p className="text-white/60 mt-3">Tu disputa ha sido registrada. Un moderador revisará el caso pronto.</p>
+                      </div>
+                    )}
+
+                    {selectedPurchaseProduct.purchaseStatus === "en revision" && (
+                      <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                        <div className="text-center mb-6">
+                          <div className="inline-flex items-center px-6 py-3 bg-yellow-500/20 rounded-lg border border-yellow-500/30 mb-4">
+                            <span className="text-yellow-400 font-semibold text-lg">🔍 Producto en Revisión</span>
+                          </div>
+                          <p className="text-white/80">El vendedor ha apelado tu disputa. Puedes revisar su respuesta y decidir cómo proceder.</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Button
+                            className="w-full bg-gradient-to-r from-[#00bcd4] to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white py-3 font-semibold"
+                            onClick={() => openAppealReview(selectedPurchaseProduct)}
+                          >
+                            📋 Revisar Apelación
+                          </Button>
+                          <Button
+                            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 font-semibold"
+                            onClick={() => {
+                              if (selectedPurchaseProduct) {
+                                // Update purchase status back to completed
+                                const updatedPurchases = userPurchases.map(purchase => 
+                                  purchase.id === selectedPurchaseProduct.id 
+                                    ? { ...purchase, purchaseStatus: "completado" as const }
+                                    : purchase
+                                )
+                                setUserPurchases(updatedPurchases)
+                                
+                                alert("✅ Apelación cerrada. El caso se ha resuelto a favor del vendedor.")
+                                setShowPurchasesModal(false)
+                              }
+                            }}
+                          >
+                            ✅ Cerrar Apelación
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full bg-white/5 rounded-xl border border-white/20">
+                  <div className="text-center">
+                    <ShoppingBag className="h-16 w-16 text-white/40 mx-auto mb-4" />
+                    <p className="text-white/60 text-lg">Selecciona una compra para ver los detalles</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Dispute Modal */}
+      <Sheet open={showDisputeModal} onOpenChange={setShowDisputeModal}>
+        <SheetContent 
+          side="right"
+          className="w-full sm:max-w-4xl p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4] overflow-y-auto"
+        >
+          <SheetHeader className="mb-6">
+            <SheetTitle className="flex items-center gap-3 text-white text-2xl">
+              <AlertTriangle className="h-6 w-6 text-red-500" />
+              Disputa - {disputeProduct?.name}
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-6">
+            {/* Información del producto */}
+            {disputeProduct && (
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={disputeProduct.image || "/placeholder.svg"}
+                    alt={disputeProduct.name}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">{disputeProduct.name}</h3>
+                    <p className="text-[#ff9800] font-bold">${disputeProduct.price} USDC</p>
+                    <p className="text-white/60 text-sm">Vendedor: {disputeProduct.seller}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Motivo de la disputa */}
+            <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+              <h3 className="text-lg font-semibold text-white mb-4">Motivo de la Disputa</h3>
+              <select
+                value={disputeReason}
+                onChange={(e) => setDisputeReason(e.target.value)}
+                className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:border-[#00bcd4] focus:outline-none"
+              >
+                <option value="" className="text-gray-900">Selecciona un motivo</option>
+                <option value="producto_no_recibido" className="text-gray-900">Producto no recibido</option>
+                <option value="producto_danado" className="text-gray-900">Producto dañado</option>
+                <option value="descripcion_incorrecta" className="text-gray-900">Descripción incorrecta</option>
+                <option value="producto_falsificado" className="text-gray-900">Producto falsificado</option>
+                <option value="otro" className="text-gray-900">Otro motivo</option>
+              </select>
+            </div>
+
+            {/* Descripción detallada */}
+            <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+              <h3 className="text-lg font-semibold text-white mb-4">Descripción Detallada</h3>
+              <textarea
+                value={disputeDescription}
+                onChange={(e) => setDisputeDescription(e.target.value)}
+                placeholder="Describe detalladamente el problema con tu compra..."
+                className="w-full h-32 p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-[#00bcd4] focus:outline-none resize-none"
+              />
+            </div>
+
+            {/* Agregar imágenes */}
+            <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <Camera className="h-5 w-5 text-[#00bcd4]" />
+                Agregar Imágenes (Opcional)
+              </h3>
+              
+              {/* Galería de imágenes */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                {disputeImages.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={image}
+                      alt={`Evidencia ${index + 1}`}
+                      className="w-full h-24 object-cover rounded-lg border border-white/20"
+                    />
+                    <button
+                      onClick={() => removeDisputeImage(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+                
+                {/* Botón para agregar imagen */}
+                {disputeImages.length < 5 && (
+                  <label className="w-full h-24 border-2 border-dashed border-white/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#00bcd4] transition-colors">
+                    <Plus className="h-6 w-6 text-white/60 mb-1" />
+                    <span className="text-xs text-white/60">Agregar</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={addDisputeImage}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+              
+              <p className="text-white/60 text-xs">
+                Puedes agregar hasta 5 imágenes como evidencia ({disputeImages.length}/5)
+              </p>
+            </div>
+
+            {/* Botones de acción */}
+            <div className="flex gap-4 pt-4">
+              <Button
+                className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white py-3 font-semibold"
+                onClick={() => setShowDisputeModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-3 font-semibold"
+                onClick={submitDispute}
+              >
+                Publicar Disputa
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Dispute Review Modal (for sellers) */}
+      <Sheet open={showDisputeReviewModal} onOpenChange={setShowDisputeReviewModal}>
+        <SheetContent 
+          side="right"
+          className="w-full sm:max-w-4xl p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4] overflow-y-auto"
+        >
+          <SheetHeader className="mb-6">
+            <SheetTitle className="flex items-center gap-3 text-white text-2xl">
+              <AlertTriangle className="h-6 w-6 text-red-500" />
+              Disputa - {reviewingDisputeProduct?.name}
+            </SheetTitle>
+          </SheetHeader>
+
+          {reviewingDisputeProduct && (
+            <div className="space-y-6">
+              {/* Información del producto */}
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={reviewingDisputeProduct.image || "/placeholder.svg"}
+                    alt={reviewingDisputeProduct.name}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">{reviewingDisputeProduct.name}</h3>
+                    <p className="text-[#ff9800] font-bold">${reviewingDisputeProduct.price} USDC</p>
+                    <p className="text-white/60 text-sm">Comprador: {getDisputeInfo(reviewingDisputeProduct.name).comprador}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Galería de imágenes de evidencia */}
+                <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Camera className="h-5 w-5 text-[#00bcd4]" />
+                    Evidencia del Comprador
+                  </h3>
+                  
+                  {/* Imagen principal */}
+                  <div className="relative mb-4">
+                    <img
+                      src={getDisputeInfo(reviewingDisputeProduct.name).imagenes[currentImageIndex] || "/placeholder.svg"}
+                      alt={`Evidencia ${currentImageIndex + 1}`}
+                      className="w-full h-64 object-cover rounded-lg border border-white/20"
+                    />
+                    
+                    {/* Controles de navegación */}
+                    {getDisputeInfo(reviewingDisputeProduct.name).imagenes.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => navigateImage('prev')}
+                          className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => navigateImage('next')}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </>
+                    )}
+                    
+                    {/* Indicador de imagen */}
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      Imagen {currentImageIndex + 1} de {getDisputeInfo(reviewingDisputeProduct.name).imagenes.length}
+                    </div>
+                  </div>
+
+                  {/* Thumbnails */}
+                  <div className="flex gap-2 overflow-x-auto">
+                    {getDisputeInfo(reviewingDisputeProduct.name).imagenes.map((imagen, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden transition-all ${
+                          currentImageIndex === index ? "border-[#00bcd4]" : "border-white/20 hover:border-white/40"
+                        }`}
+                      >
+                        <img
+                          src={imagen}
+                          alt={`Evidencia ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Información de la disputa */}
+                <div className="space-y-4">
+                  {/* Motivo */}
+                  <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                    <h4 className="text-white font-semibold mb-2">Motivo</h4>
+                    <p className="text-white/80">{getDisputeInfo(reviewingDisputeProduct.name).motivo}</p>
+                  </div>
+
+                  {/* Descripción */}
+                  <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                    <h4 className="text-white font-semibold mb-2">Descripción</h4>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      {getDisputeInfo(reviewingDisputeProduct.name).descripcion}
+                    </p>
+                  </div>
+
+                  {/* Botones de acción */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                    <Button
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 font-semibold"
+                      onClick={acceptDispute}
+                    >
+                      ✅ Aceptar y Reembolsar
+                    </Button>
+                    <Button
+                      className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white py-3 font-semibold"
+                      onClick={appealDispute}
+                    >
+                      📋 Apelar
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Appeal Modal (for sellers) */}
+      <Sheet open={showAppealModal} onOpenChange={setShowAppealModal}>
+        <SheetContent 
+          side="right"
+          className="w-full sm:max-w-3xl p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4] overflow-y-auto"
+        >
+          <SheetHeader className="mb-6">
+            <SheetTitle className="flex items-center gap-3 text-white text-2xl">
+              <FileText className="h-6 w-6 text-[#ff9800]" />
+              Apelar Disputa - {appealProduct?.name}
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-6">
+            {/* Información del producto */}
+            {appealProduct && (
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={appealProduct.image || "/placeholder.svg"}
+                    alt={appealProduct.name}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">{appealProduct.name}</h3>
+                    <p className="text-[#ff9800] font-bold">${appealProduct.price} USDC</p>
+                    <p className="text-white/60 text-sm">Disputa presentada por el comprador</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Motivo de la apelación */}
+            <div className="space-y-3">
+              <label className="block text-white font-medium">
+                Motivo de la Apelación
+              </label>
+              <select
+                value={appealReason}
+                onChange={(e) => setAppealReason(e.target.value)}
+                className="w-full p-3 rounded-lg border border-white/20 bg-white/10 text-white placeholder-white/50 focus:border-[#00bcd4] focus:outline-none"
+              >
+                <option value="" className="text-black">Selecciona un motivo</option>
+                <option value="producto-entregado" className="text-black">Producto entregado correctamente</option>
+                <option value="evidencia-falsa" className="text-black">Evidencia del comprador es falsa</option>
+                <option value="descripcion-correcta" className="text-black">Producto coincide con la descripción</option>
+                <option value="comunicacion-previa" className="text-black">Había comunicación previa con el comprador</option>
+                <option value="otro" className="text-black">Otro</option>
+              </select>
+            </div>
+
+            {/* Descripción de la apelación */}
+            <div className="space-y-3">
+              <label className="block text-white font-medium">
+                Descripción de tu Apelación
+              </label>
+              <textarea
+                value={appealDescription}
+                onChange={(e) => setAppealDescription(e.target.value)}
+                placeholder="Explica detalladamente por qué consideras que la disputa no es válida..."
+                className="w-full p-3 rounded-lg border border-white/20 bg-white/10 text-white placeholder-white/50 focus:border-[#00bcd4] focus:outline-none resize-none h-32"
+              />
+            </div>
+
+            {/* Subir evidencia */}
+            <div className="space-y-3">
+              <label className="block text-white font-medium">
+                Evidencia de tu Apelación (Máximo 5 imágenes)
+              </label>
+              
+              <div className="space-y-4">
+                {/* Botón para subir imágenes */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleAppealImageUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="border-2 border-dashed border-white/30 rounded-lg p-6 text-center hover:border-[#00bcd4] transition-colors">
+                    <Camera className="h-8 w-8 text-white/60 mx-auto mb-2" />
+                    <p className="text-white/60">
+                      Haz clic para subir imágenes ({appealImages.length}/5)
+                    </p>
+                  </div>
+                </div>
+
+                {/* Preview de imágenes subidas */}
+                {appealImages.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {appealImages.map((image, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={image}
+                          alt={`Evidencia ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border border-white/20"
+                        />
+                        <button
+                          onClick={() => removeAppealImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Botones de acción */}
+            <div className="flex gap-4 pt-6">
+              <Button
+                className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white py-3 font-semibold"
+                onClick={() => setShowAppealModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-[#ff9800] to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 font-semibold"
+                onClick={submitAppeal}
+              >
+                Enviar Apelación
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Appeal Review Modal (for buyers when seller appeals) */}
+      <Sheet open={showAppealReviewModal} onOpenChange={setShowAppealReviewModal}>
+        <SheetContent 
+          side="right"
+          className="w-full sm:max-w-4xl p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4] overflow-y-auto"
+        >
+          <SheetHeader className="mb-6">
+            <SheetTitle className="flex items-center gap-3 text-white text-2xl">
+              <Eye className="h-6 w-6 text-[#00bcd4]" />
+              Apelación del Vendedor - {appealReviewProduct?.name}
+            </SheetTitle>
+          </SheetHeader>
+
+          {appealReviewProduct && (
+            <div className="space-y-6">
+              {/* Información del producto */}
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={appealReviewProduct.image || "/placeholder.svg"}
+                    alt={appealReviewProduct.name}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">{appealReviewProduct.name}</h3>
+                    <p className="text-[#ff9800] font-bold">${appealReviewProduct.price} USDC</p>
+                    <p className="text-white/60 text-sm">
+                      Vendedor: {getSellerAppealInfo(appealReviewProduct.name).vendedor}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Estado actual */}
+              <div className="bg-yellow-500/10 rounded-xl p-6 border border-yellow-500/30 text-center">
+                <div className="inline-flex items-center px-4 py-2 bg-yellow-500/20 rounded-lg border border-yellow-500/40 mb-3">
+                  <span className="text-yellow-400 font-semibold">🔍 Producto en Revisión</span>
+                </div>
+                <p className="text-white/80">
+                  El vendedor ha apelado tu disputa y ha proporcionado evidencia adicional. 
+                  Revisa la información y decide cómo proceder.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Evidencia del vendedor */}
+                <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Camera className="h-5 w-5 text-[#00bcd4]" />
+                    Evidencia del Vendedor
+                  </h3>
+                  
+                  {/* Imagen principal */}
+                  <div className="relative mb-4">
+                    <img
+                      src={getSellerAppealInfo(appealReviewProduct.name).imagenesApelacion[0] || "/placeholder.svg"}
+                      alt="Evidencia del vendedor"
+                      className="w-full h-64 object-cover rounded-lg border border-white/20"
+                    />
+                    
+                    {/* Indicador de imagen */}
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      Evidencia de apelación
+                    </div>
+                  </div>
+
+                  {/* Thumbnails */}
+                  <div className="flex gap-2 overflow-x-auto">
+                    {getSellerAppealInfo(appealReviewProduct.name).imagenesApelacion.map((imagen: string, index: number) => (
+                      <div
+                        key={index}
+                        className="flex-shrink-0 w-16 h-16 rounded-lg border-2 border-white/20 overflow-hidden"
+                      >
+                        <img
+                          src={imagen}
+                          alt={`Evidencia ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Información de la apelación */}
+                <div className="space-y-4">
+                  {/* Motivo de la apelación */}
+                  <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                    <h4 className="text-white font-semibold mb-2">Motivo de la Apelación</h4>
+                    <p className="text-white/80">
+                      {getSellerAppealInfo(appealReviewProduct.name).motivoApelacion === "producto-entregado" && "Producto entregado correctamente"}
+                      {getSellerAppealInfo(appealReviewProduct.name).motivoApelacion === "evidencia-falsa" && "Evidencia del comprador es falsa"}
+                      {getSellerAppealInfo(appealReviewProduct.name).motivoApelacion === "descripcion-correcta" && "Producto coincide con la descripción"}
+                      {getSellerAppealInfo(appealReviewProduct.name).motivoApelacion === "comunicacion-previa" && "Había comunicación previa con el comprador"}
+                      {getSellerAppealInfo(appealReviewProduct.name).motivoApelacion === "otro" && "Otro"}
+                    </p>
+                  </div>
+
+                  {/* Descripción de la apelación */}
+                  <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                    <h4 className="text-white font-semibold mb-2">Explicación del Vendedor</h4>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      {getSellerAppealInfo(appealReviewProduct.name).descripcionApelacion}
+                    </p>
+                  </div>
+
+                  {/* Fecha de apelación */}
+                  <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                    <h4 className="text-white font-semibold mb-2">Fecha de Apelación</h4>
+                    <p className="text-white/80 text-sm">
+                      {getSellerAppealInfo(appealReviewProduct.name).fechaApelacion}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Opciones del comprador */}
+              <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4">¿Qué deseas hacer?</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button
+                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 font-semibold"
+                    onClick={closeAppeal}
+                  >
+                    ✅ Cerrar Apelación
+                    <div className="text-xs opacity-80 mt-1">Aceptar la respuesta del vendedor</div>
+                  </Button>
+                  <Button
+                    className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 font-semibold"
+                    onClick={continueDiscussion}
+                  >
+                    💬 Seguir Discutiendo
+                    <div className="text-xs opacity-80 mt-1">Solicitar mediación de un moderador</div>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Reviews Modal - Jury System */}
+      <Sheet open={showReviewsModal} onOpenChange={setShowReviewsModal}>
+        <SheetContent 
+          side="right"
+          className="w-full sm:max-w-6xl p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4] overflow-y-auto"
+        >
+          <SheetHeader className="mb-6">
+            <SheetTitle className="flex items-center gap-3 text-white text-2xl">
+              <Star className="h-6 w-6 text-[#ff9800]" />
+              Mis Revisiones - Sistema de Jurado
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Sidebar - Cases to Review */}
+            <div className="lg:col-span-1 space-y-4">
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <h3 className="text-white font-semibold mb-4">Casos para Revisar</h3>
+                <div className="space-y-2">
+                  <button className="w-full text-left p-3 rounded-lg bg-[#00bcd4] text-white font-medium">
+                    iPhone 14 Pro
+                  </button>
+                  <button className="w-full text-left p-3 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors">
+                    Mochila Deportiva Nike
+                  </button>
+                  <button className="w-full text-left p-3 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors">
+                    Apple Watch Series 8
+                  </button>
+                  <button className="w-full text-left p-3 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors">
+                    iPad Pro 11"
+                  </button>
+                  <button className="w-full text-left p-3 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors">
+                    Laptop Gaming Asus
+                  </button>
+                  <button className="w-full text-left p-3 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors">
+                    Audífonos Sony WH-1000XM4
+                  </button>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <h3 className="text-white font-semibold mb-4">Mis Estadísticas</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-white/80">Casos revisados:</span>
+                    <span className="text-[#ff9800] font-bold">47</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/80">Precisión:</span>
+                    <span className="text-green-400 font-bold">94%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/80">Nivel de jurado:</span>
+                    <span className="text-[#00bcd4] font-bold">Expert</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content - Dispute to Review */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Current Case */}
+              <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-white">Caso #1247 - Celular</h3>
+                  <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-sm">
+                    Disputa Activa
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Product Info */}
+                  <div className="space-y-4">
+                    <div className="bg-white/5 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-2">Producto en Disputa</h4>
+                      <div className="flex items-center gap-3">
+                        <img
+                          src="/placeholder.svg"
+                          alt="Celular"
+                          className="w-16 h-16 rounded-lg object-cover border border-white/20"
+                        />
+                        <div>
+                          <p className="text-white font-medium">iPhone 14 Pro</p>
+                          <p className="text-[#ff9800] font-bold">$700 USDC</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/5 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-2">Partes Involucradas</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-white/80">Comprador:</span>
+                          <span className="text-white">@user_buyer</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-white/80">Vendedor:</span>
+                          <span className="text-white">@tech_seller</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/5 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-2">Motivo de la Disputa</h4>
+                      <p className="text-white/80 text-sm">
+                        "El producto no coincide con la descripción. La pantalla tiene rayones que no se mencionaron en la publicación."
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Evidence Gallery */}
+                  <div className="space-y-4">
+                    <div className="bg-white/5 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-3">Evidencia del Comprador</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        <img
+                          src="/placeholder.svg"
+                          alt="Evidencia 1"
+                          className="w-full h-24 object-cover rounded border border-white/20"
+                        />
+                        <img
+                          src="/placeholder.svg"
+                          alt="Evidencia 2"
+                          className="w-full h-24 object-cover rounded border border-white/20"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-white/5 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-3">Respuesta del Vendedor</h4>
+                      <p className="text-white/80 text-sm mb-3">
+                        "Los rayones son mínimos y normales por el uso. El producto está en excelente estado como se describió."
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <img
+                          src="/placeholder.svg"
+                          alt="Respuesta 1"
+                          className="w-full h-24 object-cover rounded border border-white/20"
+                        />
+                        <img
+                          src="/placeholder.svg"
+                          alt="Respuesta 2"
+                          className="w-full h-24 object-cover rounded border border-white/20"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Voting Section */}
+                <div className="mt-6 bg-white/5 rounded-lg p-4">
+                  <h4 className="text-white font-semibold mb-4">Tu Veredicto como Jurado</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-6 font-semibold text-sm leading-tight"
+                      onClick={() => {
+                        alert("✅ Disputa EXITOSA - Has votado a favor del comprador")
+                        setShowReviewsModal(false)
+                      }}
+                    >
+                      <div className="text-center">
+                        <div className="text-base font-bold">Voto a favor del comprador</div>
+                        <div className="text-xs opacity-70">Reembolso</div>
+                      </div>
+                    </Button>
+                    <Button
+                      className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-6 font-semibold text-sm leading-tight"
+                      onClick={() => {
+                        alert("❌ Disputa FALLIDA - Has votado a favor del vendedor")
+                        setShowReviewsModal(false)
+                      }}
+                    >
+                      <div className="text-center">
+                        <div className="text-base font-bold">Voto a favor del vendedor</div>
+                        <div className="text-xs opacity-70">Mantener venta</div>
+                      </div>
+                    </Button>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <label className="block text-white/80 text-sm mb-2">
+                      Comentario adicional (opcional):
+                    </label>
+                    <textarea
+                      placeholder="Explica tu decisión para ayudar a otros jurados..."
+                      className="w-full p-3 rounded-lg border border-white/20 bg-white/10 text-white placeholder-white/50 focus:border-[#00bcd4] focus:outline-none resize-none h-20"
+                    />
+                  </div>
+                </div>
+
+                {/* Current Voting Status */}
+                <div className="mt-4 bg-white/5 rounded-lg p-4">
+                  <h5 className="text-white font-medium mb-3">Estado Actual de Votación</h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-400">7</div>
+                      <div className="text-white/60 text-sm">Disputa Exitosa</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-400">3</div>
+                      <div className="text-white/60 text-sm">Disputa Fallida</div>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-center">
+                    <span className="text-white/60 text-xs">Faltan 2 votos para cerrar el caso</span>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <div className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm inline-block">
+                      ✅ Tendencia: Disputa Exitosa
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Available Cases Queue */}
+              <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                <h3 className="text-white font-semibold mb-4">Casos Pendientes de Revisión</h3>
+                <div className="space-y-3">
+                  <div className="bg-white/5 rounded-lg p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-medium">Caso #1248 - Mochila Deportiva</p>
+                      <p className="text-white/60 text-sm">Hace 2 horas</p>
+                    </div>
+                    <Button className="bg-[#ff9800] hover:bg-[#f57c00] text-white text-sm">
+                      Revisar
+                    </Button>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-medium">Caso #1249 - Reloj Inteligente</p>
+                      <p className="text-white/60 text-sm">Hace 4 horas</p>
+                    </div>
+                    <Button className="bg-[#ff9800] hover:bg-[#f57c00] text-white text-sm">
+                      Revisar
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Referrals Modal */}
+      <Sheet open={showReferralsModal} onOpenChange={setShowReferralsModal}>
+        <SheetContent 
+          side="right"
+          className="w-full sm:max-w-6xl p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4] overflow-y-auto"
+        >
+          <SheetHeader className="mb-6">
+            <SheetTitle className="flex items-center gap-3 text-white text-2xl">
+              <Users className="h-6 w-6 text-[#00bcd4]" />
+              {referralsContext === 'seller' ? 'My Referrals' : 'Referred People'}
+            </SheetTitle>
+          </SheetHeader>
+
+          {referralsContext === 'seller' ? (
+            // Vista específica para vendedores
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Sidebar - Referrals List */}
+              <div className="lg:col-span-1 space-y-4">
+                <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-white font-semibold">Mis Referidos</h3>
+                    <Button
+                      size="sm"
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
+                      onClick={() => setShowAddReferralModal(true)}
+                    >
+                      + Agregar
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      { id: 1, name: 'Cris', sales: 50, earnings: 350 },
+                      { id: 2, name: 'Juan', sales: 32, earnings: 280 },
+                      { id: 3, name: 'Pedro', sales: 18, earnings: 190 },
+                      { id: 4, name: 'Brian', sales: 25, earnings: 220 }
+                    ].map((referral) => (
+                      <button
+                        key={referral.id}
+                        onClick={() => setSelectedReferral(referral)}
+                        className={`w-full text-left p-3 rounded-lg transition-colors ${
+                          selectedReferral?.id === referral.id 
+                            ? "bg-[#00bcd4] text-white" 
+                            : "bg-white/20 text-white hover:bg-white/30"
+                        }`}
+                      >
+                        {referral.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Content - Detalles del Referido */}
+              <div className="lg:col-span-2">
+                {selectedReferral ? (
+                  <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                    {/* Perfil del referido */}
+                    <div className="flex items-center gap-6 mb-6">
+                      <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                        <User className="h-12 w-12 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-3xl font-bold text-white mb-2">{selectedReferral.name}</h2>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-white/10 rounded-lg p-3">
+                            <div className="text-2xl font-bold text-[#ff9800]">{selectedReferral.sales}</div>
+                            <div className="text-white/80 text-sm">ventas</div>
+                          </div>
+                          <div className="bg-white/10 rounded-lg p-3">
+                            <div className="text-2xl font-bold text-[#00bcd4]">{selectedReferral.earnings}</div>
+                            <div className="text-white/80 text-sm">USDC ganados</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Estadísticas detalladas */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-white/5 rounded-lg p-4">
+                        <h4 className="text-white font-semibold mb-4">Rendimiento</h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Ventas este mes:</span>
+                            <span className="text-[#ff9800] font-bold">12</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Tasa de conversión:</span>
+                            <span className="text-green-400 font-bold">8.5%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Calificación promedio:</span>
+                            <span className="text-yellow-400 font-bold">4.8⭐</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white/5 rounded-lg p-4">
+                        <h4 className="text-white font-semibold mb-4">Información</h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Se unió:</span>
+                            <span className="text-white">Hace 2 meses</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Última actividad:</span>
+                            <span className="text-white">Hace 2 días</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Estado:</span>
+                            <span className="text-green-400">Activo</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Commissions earned */}
+                    <div className="mt-6 bg-white/5 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-4">Historial de Comisiones</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center p-2 bg-white/5 rounded">
+                          <span className="text-white/80 text-sm">iPhone 14 Pro - Venta</span>
+                          <span className="text-[#00bcd4] font-bold">+$35.00</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-white/5 rounded">
+                          <span className="text-white/80 text-sm">MacBook Air - Venta</span>
+                          <span className="text-[#00bcd4] font-bold">+$60.00</span>
+                        </div>
+                        <div className="flex justify-between items-center p-2 bg-white/5 rounded">
+                          <span className="text-white/80 text-sm">AirPods Pro - Venta</span>
+                          <span className="text-[#00bcd4] font-bold">+$12.50</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white/10 rounded-xl p-6 border border-white/20 flex items-center justify-center h-96">
+                    <div className="text-center">
+                      <Users className="h-16 w-16 text-white/50 mx-auto mb-4" />
+                      <p className="text-white/80">Selecciona un referido para ver sus detalles</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : referralsContext === 'buyer' ? (
+            // Vista específica para compradores
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Sidebar - Buyer's Referrals List */}
+              <div className="lg:col-span-1 space-y-4">
+                <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                  <h3 className="text-white font-semibold mb-4">Mis Referidos</h3>
+                  <div className="space-y-2">
+                    {[
+                      { id: 1, name: 'Dismac', sales: 50, earnings: 35, code: 'CRIS020', date: '28/08/25' },
+                      { id: 2, name: 'TechStore', sales: 28, earnings: 42, code: 'TECH015', date: '25/08/25' },
+                      { id: 3, name: 'GamerHub', sales: 35, earnings: 28, code: 'GAME030', date: '22/08/25' },
+                      { id: 4, name: 'PhoneZone', sales: 19, earnings: 31, code: 'PHONE12', date: '20/08/25' }
+                    ].map((referral) => (
+                      <button
+                        key={referral.id}
+                        onClick={() => setSelectedReferral(referral)}
+                        className={`w-full text-left p-3 rounded-lg transition-colors border ${
+                          selectedReferral?.id === referral.id 
+                            ? "bg-[#00bcd4] text-white border-[#00bcd4]" 
+                            : "bg-white/20 text-white hover:bg-white/30 border-white/30"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-8 bg-current rounded opacity-50"></div>
+                          <span className="font-medium">{referral.name}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Content - Detalles del Referido Comprador */}
+              <div className="lg:col-span-2">
+                {selectedReferral ? (
+                  <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                    {/* Header con información principal */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Avatar y nombre */}
+                      <div className="flex items-center gap-4">
+                        <div className="w-24 h-24 bg-white rounded-lg flex items-center justify-center">
+                          <User className="h-12 w-12 text-[#0d47a1]" />
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-bold text-white mb-1">{selectedReferral.name}</h2>
+                          <p className="text-white/70 text-sm">
+                            Validó hasta<br />
+                            <span className="font-semibold">{selectedReferral.date}</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Métricas principales */}
+                      <div className="space-y-4">
+                        <div>
+                          <div className="text-3xl font-bold text-white">{selectedReferral.sales}</div>
+                          <div className="text-white/80 text-lg">ventas</div>
+                        </div>
+                        <div>
+                          <div className="text-3xl font-bold text-[#00bcd4]">{selectedReferral.earnings}</div>
+                          <div className="text-white/80 text-lg">USDC ganados</div>
+                        </div>
+                        <div>
+                          <div className="text-white/80 text-sm">Código</div>
+                          <div className="text-xl font-bold text-[#ff9800]">{selectedReferral.code}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Información adicional */}
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-white/5 rounded-lg p-4">
+                        <h4 className="text-white font-semibold mb-4">Actividad Reciente</h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Última compra:</span>
+                            <span className="text-white">Hace 3 días</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Producto favorito:</span>
+                            <span className="text-white">Electrónicos</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Calificación:</span>
+                            <span className="text-yellow-400">4.9⭐</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white/5 rounded-lg p-4">
+                        <h4 className="text-white font-semibold mb-4">Estadísticas</h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Compras totales:</span>
+                            <span className="text-[#00bcd4] font-bold">{selectedReferral.sales}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Monto gastado:</span>
+                            <span className="text-[#ff9800] font-bold">${(selectedReferral.earnings * 8).toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-white/80">Estado:</span>
+                            <span className="text-green-400">Activo</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Historial de compras */}
+                    <div className="mt-6 bg-white/5 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-4">Historial de Compras</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                          <div>
+                            <span className="text-white font-medium">iPhone 15 Pro Max</span>
+                            <p className="text-white/60 text-sm">24/08/25</p>
+                          </div>
+                          <span className="text-[#00bcd4] font-bold">$1,299.00</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                          <div>
+                            <span className="text-white font-medium">MacBook Air M3</span>
+                            <p className="text-white/60 text-sm">20/08/25</p>
+                          </div>
+                          <span className="text-[#00bcd4] font-bold">$1,499.00</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                          <div>
+                            <span className="text-white font-medium">AirPods Pro 2</span>
+                            <p className="text-white/60 text-sm">18/08/25</p>
+                          </div>
+                          <span className="text-[#00bcd4] font-bold">$249.00</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white/10 rounded-xl p-6 border border-white/20 flex items-center justify-center h-96">
+                    <div className="text-center">
+                      <Users className="h-16 w-16 text-white/50 mx-auto mb-4" />
+                      <p className="text-white/80">Selecciona un referido para ver sus detalles</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            // Vista general para navbar
+            <div className="space-y-6">
+              {/* Referral Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white/10 rounded-xl p-4 border border-white/20 text-center">
+                  <div className="text-3xl font-bold text-[#00bcd4]">12</div>
+                  <div className="text-white/80 text-sm">Total Referrals</div>
+                </div>
+                <div className="bg-white/10 rounded-xl p-4 border border-white/20 text-center">
+                  <div className="text-3xl font-bold text-[#ff9800]">$234</div>
+                  <div className="text-white/80 text-sm">Commissions Earned</div>
+                </div>
+                <div className="bg-white/10 rounded-xl p-4 border border-white/20 text-center">
+                  <div className="text-3xl font-bold text-green-400">8</div>
+                  <div className="text-white/80 text-sm">Active this month</div>
+                </div>
+              </div>
+
+              {/* Referral Link */}
+              <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                <h3 className="text-white font-semibold mb-4">Your Referral Link</h3>
+                <div className="flex gap-3">
+                  <div className="flex-1 bg-white/5 rounded-lg p-3 border border-white/10">
+                    <code className="text-[#00bcd4] text-sm break-all">
+                      https://koneque.com/ref/user123456
+                    </code>
+                  </div>
+                  <Button 
+                    className="bg-gradient-to-r from-[#00bcd4] to-[#00acc1] hover:from-[#00acc1] hover:to-[#00838f] text-white px-6"
+                    onClick={() => {
+                      navigator.clipboard.writeText("https://koneque.com/ref/user123456")
+                      alert("¡Enlace copiado al portapapeles!")
+                    }}
+                  >
+                    Copiar
+                  </Button>
+                </div>
+                <p className="text-white/60 text-sm mt-3">
+                  Comparte este enlace y gana el 5% de comisión por cada venta que hagan tus referidos.
+                </p>
+              </div>
+
+              {/* Referral List */}
+              <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                <h3 className="text-white font-semibold mb-4">Referrals List</h3>
+                <div className="space-y-4">
+                  <div className="bg-white/5 rounded-lg p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">JD</span>
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">Juan Díaz</p>
+                        <p className="text-white/60 text-sm">Se unió hace 2 semanas</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[#ff9800] font-bold">$45.50</p>
+                      <p className="text-white/60 text-sm">Comisión ganada</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 rounded-lg p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">MR</span>
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">María Rodríguez</p>
+                        <p className="text-white/60 text-sm">Se unió hace 1 mes</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[#ff9800] font-bold">$89.25</p>
+                      <p className="text-white/60 text-sm">Comisión ganada</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 rounded-lg p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">CL</span>
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">Carlos López</p>
+                        <p className="text-white/60 text-sm">Se unió hace 3 días</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[#ff9800] font-bold">$12.75</p>
+                      <p className="text-white/60 text-sm">Comisión ganada</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Referral Program Info */}
+              <div className="bg-white/10 rounded-xl p-6 border border-white/20">
+                <h3 className="text-white font-semibold mb-4">Cómo Funciona el Programa</h3>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#00bcd4] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-xs font-bold">1</span>
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">Comparte tu enlace</p>
+                      <p className="text-white/60 text-sm">Invita a amigos y familiares usando tu enlace único</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#ff9800] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-xs font-bold">2</span>
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">Ellos se registran</p>
+                      <p className="text-white/60 text-sm">Cuando se registren usando tu enlace, serán tus referidos</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-xs font-bold">3</span>
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">Gana comisiones</p>
+                      <p className="text-white/60 text-sm">Recibe el 5% de comisión por cada venta que realicen tus referidos</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Add Referral Modal */}
+      <Sheet open={showAddReferralModal} onOpenChange={setShowAddReferralModal}>
+        <SheetContent 
+          side="right"
+          className="w-full sm:max-w-md p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4] overflow-y-auto"
+        >
+          <SheetHeader className="mb-6">
+            <SheetTitle className="flex items-center gap-3 text-white text-2xl">
+              <Plus className="h-6 w-6 text-[#00bcd4]" />
+              Agregar Referido
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-6">
+            {/* Formulario */}
+            <div className="space-y-4">
+              {/* Nombre */}
+              <div>
+                <label className="block text-white font-medium mb-2">
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  value={newReferral.nombre}
+                  onChange={(e) => setNewReferral({...newReferral, nombre: e.target.value})}
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-[#00bcd4] focus:ring-1 focus:ring-[#00bcd4]"
+                  placeholder="Ingresa el nombre del referido"
+                />
+              </div>
+
+              {/* Dirección Wallet */}
+              <div>
+                <label className="block text-white font-medium mb-2">
+                  Dirección wallet
+                </label>
+                <input
+                  type="text"
+                  value={newReferral.direccionWallet}
+                  onChange={(e) => setNewReferral({...newReferral, direccionWallet: e.target.value})}
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-[#00bcd4] focus:ring-1 focus:ring-[#00bcd4]"
+                  placeholder="0x..."
+                />
+              </div>
+
+              {/* Código Referido */}
+              <div>
+                <label className="block text-white font-medium mb-2">
+                  Código referido
+                </label>
+                <input
+                  type="text"
+                  value={newReferral.codigoReferido}
+                  onChange={(e) => setNewReferral({...newReferral, codigoReferido: e.target.value})}
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-[#00bcd4] focus:ring-1 focus:ring-[#00bcd4]"
+                  placeholder="Ingresa el código"
+                />
+              </div>
+
+              {/* Válido hasta */}
+              <div>
+                <label className="block text-white font-medium mb-2">
+                  Válido hasta
+                </label>
+                <input
+                  type="date"
+                  value={newReferral.validoHasta}
+                  onChange={(e) => setNewReferral({...newReferral, validoHasta: e.target.value})}
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-[#00bcd4] focus:ring-1 focus:ring-[#00bcd4]"
+                />
+              </div>
+            </div>
+
+            {/* Botones de acción */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                className="flex-1 bg-gradient-to-r from-[#00bcd4] to-[#00acc1] hover:from-[#00acc1] hover:to-[#00838f] text-white font-semibold py-3"
+                onClick={() => {
+                  // Validar que todos los campos estén llenos
+                  if (!newReferral.nombre || !newReferral.direccionWallet || !newReferral.codigoReferido || !newReferral.validoHasta) {
+                    alert('Please complete all fields')
+                    return
+                  }
+                  
+                  // Agregar el referido (aquí iría la lógica real)
+                  alert(`Referido ${newReferral.nombre} agregado exitosamente`)
+                  
+                  // Limpiar formulario y cerrar modal
+                  setNewReferral({
+                    nombre: '',
+                    direccionWallet: '',
+                    codigoReferido: '',
+                    validoHasta: ''
+                  })
+                  setShowAddReferralModal(false)
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Subir
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="border-white/30 text-white hover:bg-white/10"
+                onClick={() => {
+                  setNewReferral({
+                    nombre: '',
+                    direccionWallet: '',
+                    codigoReferido: '',
+                    validoHasta: ''
+                  })
+                  setShowAddReferralModal(false)
+                }}
+              >
+                Cancelar
+              </Button>
             </div>
           </div>
         </SheetContent>
