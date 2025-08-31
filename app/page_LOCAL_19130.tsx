@@ -1197,13 +1197,13 @@ export default function Marketplace() {
         <Button variant="ghost" size="icon" className="relative">
           <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
           {getCartItemsCount() > 0 && (
-            <Badge className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 text-white animate-bounce">
+            <Badge className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 text-white animate-bounce">
               {getCartItemsCount()}
             </Badge>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg bg-gradient-to-br p-3 sm:p-4 lg:p-6 from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
+      <SheetContent className="w-full sm:max-w-lg bg-gradient-to-br p-3 sm:p-4 from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
         <SheetHeader>
           <SheetTitle className="text-white text-lg sm:text-xl">Shopping Cart</SheetTitle>
         </SheetHeader>
@@ -1212,7 +1212,7 @@ export default function Marketplace() {
           <div className="flex-1 overflow-y-auto py-3 sm:py-4">
             {cartItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-48 sm:h-64 text-center">
-                <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 mb-3 sm:mb-4 text-white/50" />
+                <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 mb-4 text-white/50" />
                 <p className="text-white/80 text-sm sm:text-base">Your cart is empty</p>
                 <p className="text-xs sm:text-sm mt-2 text-white/60">
                   Add some products to get started
@@ -1232,7 +1232,7 @@ export default function Marketplace() {
                       <img
                         src={product.image || "/placeholder.svg"}
                         alt={product.name}
-                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0"
+                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-md"
                       />
                       <div className="flex-1 min-w-0">
                         <h4 className="text-xs sm:text-sm font-medium text-balance leading-tight text-white line-clamp-2">
@@ -1242,7 +1242,7 @@ export default function Marketplace() {
                           ${product.price}
                         </p>
                       </div>
-                      <div className="text-right flex-shrink-0">
+                      <div className="text-right">
                         <p className="text-xs sm:text-sm font-medium text-[#ff9800]">${product.price.toFixed(2)}</p>
                         <Button
                           variant="ghost"

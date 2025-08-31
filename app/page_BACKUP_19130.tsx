@@ -1197,13 +1197,21 @@ export default function Marketplace() {
         <Button variant="ghost" size="icon" className="relative">
           <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
           {getCartItemsCount() > 0 && (
+<<<<<<< HEAD
+            <Badge className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 text-white animate-bounce">
+=======
             <Badge className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 text-white animate-bounce">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               {getCartItemsCount()}
             </Badge>
           )}
         </Button>
       </SheetTrigger>
+<<<<<<< HEAD
+      <SheetContent className="w-full sm:max-w-lg bg-gradient-to-br p-3 sm:p-4 from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
+=======
       <SheetContent className="w-full sm:max-w-lg bg-gradient-to-br p-3 sm:p-4 lg:p-6 from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
         <SheetHeader>
           <SheetTitle className="text-white text-lg sm:text-xl">Shopping Cart</SheetTitle>
         </SheetHeader>
@@ -1212,7 +1220,11 @@ export default function Marketplace() {
           <div className="flex-1 overflow-y-auto py-3 sm:py-4">
             {cartItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-48 sm:h-64 text-center">
+<<<<<<< HEAD
+                <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 mb-4 text-white/50" />
+=======
                 <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 mb-3 sm:mb-4 text-white/50" />
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                 <p className="text-white/80 text-sm sm:text-base">Your cart is empty</p>
                 <p className="text-xs sm:text-sm mt-2 text-white/60">
                   Add some products to get started
@@ -1232,7 +1244,11 @@ export default function Marketplace() {
                       <img
                         src={product.image || "/placeholder.svg"}
                         alt={product.name}
+<<<<<<< HEAD
+                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-md"
+=======
                         className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0"
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                       />
                       <div className="flex-1 min-w-0">
                         <h4 className="text-xs sm:text-sm font-medium text-balance leading-tight text-white line-clamp-2">
@@ -1242,7 +1258,11 @@ export default function Marketplace() {
                           ${product.price}
                         </p>
                       </div>
+<<<<<<< HEAD
+                      <div className="text-right">
+=======
                       <div className="text-right flex-shrink-0">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                         <p className="text-xs sm:text-sm font-medium text-[#ff9800]">${product.price.toFixed(2)}</p>
                         <Button
                           variant="ghost"
@@ -1279,10 +1299,17 @@ export default function Marketplace() {
               </div>
 
               <div className="space-y-2">
+<<<<<<< HEAD
                 <Button className="w-full bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white text-sm sm:text-base py-2.5 sm:py-3" size="lg">
                   Proceed to Checkout
                 </Button>
                 <Button variant="outline" className="w-full bg-transparent border-white/20 text-white hover:bg-white/10 text-sm" onClick={() => setIsCartOpen(false)}>
+=======
+                <Button className="w-full bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white text-sm sm:text-base py-2 sm:py-3" size="lg">
+                  Proceed to Checkout
+                </Button>
+                <Button variant="outline" className="w-full bg-transparent border-white/20 text-white hover:bg-white/10 text-sm sm:text-base" onClick={() => setIsCartOpen(false)}>
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                   Continue Shopping
                 </Button>
               </div>
@@ -1295,7 +1322,7 @@ export default function Marketplace() {
 
   const ProductCard = ({ product }: { product: Product }) => (
   <Card
-      className={`group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden relative ${
+      className={`group hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 sm:hover:-translate-y-2 overflow-hidden relative ${
         isDarkMode
           ? "bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800/90 border-2 border-slate-600 hover:border-gradient-to-r hover:from-blue-400/30 hover:via-cyan-400/30 hover:to-amber-400/30"
           : "bg-gradient-to-br from-card via-card to-card/50 border-2 border-transparent hover:border-gradient-to-r hover:from-blue-500/20 hover:via-cyan-500/20 hover:to-amber-500/20"
@@ -1310,7 +1337,11 @@ export default function Marketplace() {
       />
 
       <CardContent 
+<<<<<<< HEAD
         className="p-3 sm:p-4 relative z-10 cursor-pointer" 
+=======
+        className="p-3 sm:p-4 lg:p-4 relative z-10 cursor-pointer" 
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
         onClick={(e) => {
           // Solo abrir detalles si no se hizo click en un botón
           const target = e.target as HTMLElement;
@@ -1323,11 +1354,19 @@ export default function Marketplace() {
         }}
       >
         <div className="relative mb-3 sm:mb-4">
+<<<<<<< HEAD
           <div className="relative overflow-hidden rounded-xl">
             <img
               src={product.image || "/placeholder.svg"}
               alt={product.name}
               className="w-full h-36 sm:h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+=======
+          <div className="relative overflow-hidden rounded-lg sm:rounded-xl">
+            <img
+              src={product.image || "/placeholder.svg"}
+              alt={product.name}
+              className="w-full h-36 sm:h-44 lg:h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
             />
             <div
               className={`absolute inset-0 bg-gradient-to-t opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
@@ -1339,19 +1378,33 @@ export default function Marketplace() {
           </div>
 
           {!product.inStock && (
+<<<<<<< HEAD
             <Badge variant="destructive" className="absolute top-2 sm:top-3 left-2 sm:left-3 animate-pulse text-xs">
+=======
+            <Badge variant="destructive" className="absolute top-2 left-2 sm:top-3 sm:left-3 text-xs animate-pulse">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               Out of Stock
             </Badge>
           )}
           {product.originalPrice > product.price && (
+<<<<<<< HEAD
             <Badge className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-bounce text-xs">
               <Sparkles className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />-
+=======
+            <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-bounce">
+              <Sparkles className="h-3 w-3 mr-1" />-
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
             </Badge>
           )}
           {product.featured && (
+<<<<<<< HEAD
             <Badge className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs">
               <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+=======
+            <Badge className="absolute top-2 left-2 sm:top-3 sm:left-3 text-xs bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
+              <TrendingUp className="h-3 w-3 mr-1" />
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               Featured
             </Badge>
           )}
@@ -1359,7 +1412,11 @@ export default function Marketplace() {
           <Button
             variant="ghost"
             size="icon"
+<<<<<<< HEAD
             className={`absolute bottom-2 sm:bottom-3 right-2 sm:right-3 backdrop-blur-sm transition-all duration-300 hover:scale-110 w-8 h-8 sm:w-10 sm:h-10 ${
+=======
+            className={`absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-8 h-8 sm:w-10 sm:h-10 backdrop-blur-sm transition-all duration-300 hover:scale-110 ${
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               wishlistItems.includes(product.id)
                 ? "text-red-500 bg-red-500/20"
                 : isDarkMode
@@ -1374,21 +1431,35 @@ export default function Marketplace() {
 
         <div className="space-y-2 sm:space-y-3">
           <h3
+<<<<<<< HEAD
             className={`font-bold text-sm sm:text-base text-balance leading-tight transition-colors duration-300 line-clamp-2 ${
+=======
+            className={`font-bold text-sm sm:text-base lg:text-base text-balance leading-tight transition-colors duration-300 line-clamp-2 ${
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               isDarkMode ? "text-white group-hover:text-cyan-300" : "text-foreground group-hover:text-blue-700"
             }`}
           >
             {product.name}
           </h3>
 
+<<<<<<< HEAD
           <div className="flex items-center gap-1 sm:gap-2 text-xs">
             <div className={`flex items-center gap-1 ${isDarkMode ? "text-cyan-400" : "text-blue-600"}`}>
               <MapPin className="h-3 w-3" />
+=======
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs">
+            <div className={`flex items-center gap-1 ${isDarkMode ? "text-cyan-400" : "text-blue-600"}`}>
+              <MapPin className="h-3 w-3 flex-shrink-0" />
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               <span className="font-medium truncate">{product.location}</span>
             </div>
             <Badge
               variant="outline"
+<<<<<<< HEAD
               className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 font-medium ${
+=======
+              className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 font-medium flex-shrink-0 ${
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                 product.condition === "new"
                   ? isDarkMode
                     ? "bg-green-900/50 text-green-300 border-green-600"
@@ -1406,8 +1477,13 @@ export default function Marketplace() {
             </Badge>
           </div>
 
+<<<<<<< HEAD
           <div className="flex items-center gap-1 sm:gap-2">
             <div className="flex items-center gap-1">
+=======
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-0.5 sm:gap-1">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
@@ -1428,7 +1504,11 @@ export default function Marketplace() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <span
+<<<<<<< HEAD
               className={`text-lg sm:text-xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
+=======
+              className={`text-lg sm:text-xl lg:text-xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                 isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
               }`}
             >
@@ -1441,8 +1521,13 @@ export default function Marketplace() {
             )}
           </div>
 
+<<<<<<< HEAD
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+=======
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               <span className="text-white font-bold text-xs">{product.seller.charAt(0)}</span>
             </div>
             <p className={`text-xs sm:text-sm font-medium truncate ${isDarkMode ? "text-gray-300" : "text-muted-foreground"}`}>
@@ -1454,7 +1539,11 @@ export default function Marketplace() {
 
       <CardFooter className="p-3 sm:p-4 pt-0 space-y-2 sm:space-y-3 relative z-20">
         <Button
+<<<<<<< HEAD
           className="w-full bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm sm:text-base py-2 sm:py-2.5"
+=======
+          className="w-full text-xs sm:text-sm bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg py-2 sm:py-2.5"
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
           onClick={(e) => { 
             e.stopPropagation(); 
             e.preventDefault();
@@ -1468,7 +1557,11 @@ export default function Marketplace() {
         </Button>
         <Button
           variant="outline"
+<<<<<<< HEAD
           className="w-full font-medium transition-all duration-300 hover:scale-105 bg-gradient-to-r from-[#ff9800]/10 to-[#ff9800]/20 border-2 border-[#ff9800] hover:border-[#ff9800]/80 text-[#ff9800] hover:text-[#ff9800]/80 text-sm sm:text-base py-2 sm:py-2.5"
+=======
+          className="w-full text-xs sm:text-sm font-medium transition-all duration-300 hover:scale-105 bg-gradient-to-r from-[#ff9800]/10 to-[#ff9800]/20 border-2 border-[#ff9800] hover:border-[#ff9800]/80 text-[#ff9800] hover:text-[#ff9800]/80 py-2 sm:py-2.5"
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
           onClick={(e) => { 
             e.stopPropagation(); 
             e.preventDefault();
@@ -1508,6 +1601,7 @@ export default function Marketplace() {
             : "bg-white/80 supports-[backdrop-filter]:bg-white/60 border-gradient-to-r from-blue-200 via-cyan-200 to-amber-200"
         }`}
       >
+<<<<<<< HEAD
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-3">
@@ -1518,18 +1612,41 @@ export default function Marketplace() {
               />
               <span
                 className={`text-lg sm:text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
+=======
+        <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-2 sm:py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            {/* Logo Section - Responsive */}
+            <div className="flex items-center space-x-1 sm:space-x-3 min-w-0 flex-shrink-0">
+              <img 
+                src="/koneque.png" 
+                alt="Koñeque Logo" 
+                className="w-8 h-8 sm:w-12 md:w-16 sm:h-12 md:h-16 object-contain hover:scale-110 transition-transform duration-300"
+              />
+              <span
+                className={`text-sm sm:text-xl md:text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent truncate ${
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                   isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
                 }`}
               >
                 Koñeque
               </span>
+<<<<<<< HEAD
               <Badge className="hidden sm:inline-flex bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse">
                 <Sparkles className="h-3 w-3 mr-1" />
+=======
+              <Badge className="hidden sm:inline-flex bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse text-xs">
+                <Sparkles className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                 New!
               </Badge>
             </div>
 
+<<<<<<< HEAD
             <div className="hidden lg:flex flex-1 max-w-2xl mx-8">
+=======
+            {/* Search Section - Desktop Only */}
+            <div className="hidden lg:flex flex-1 max-w-2xl mx-4 xl:mx-8">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               <div className="relative w-full">
                 <Search
                   className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 ${
@@ -1565,32 +1682,60 @@ export default function Marketplace() {
               </div>
             </div>
 
+<<<<<<< HEAD
             <div className="flex items-center space-x-2 sm:space-x-3">
+=======
+            {/* Actions Section - Responsive */}
+            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 flex-shrink-0">
+              {/* Search Button - Mobile/Tablet Only */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`lg:hidden transition-all duration-300 hover:scale-110 w-8 h-8 sm:w-10 sm:h-10 ${
+                  isDarkMode ? "hover:bg-slate-700 text-cyan-400" : "hover:bg-blue-100 text-blue-600"
+                }`}
+                onClick={() => {
+                  // Open mobile search modal here
+                  alert("Mobile search functionality - to be implemented")
+                }}
+              >
+                <Search className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
+
+              {/* Dark Mode Toggle */}
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleDarkMode}
-                className={`transition-all duration-300 hover:scale-110 ${
+                className={`transition-all duration-300 hover:scale-110 w-8 h-8 sm:w-10 sm:h-10 ${
                   isDarkMode ? "hover:bg-slate-700 text-amber-400" : "hover:bg-amber-100 text-amber-600"
                 }`}
               >
                 {isDarkMode ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
               </Button>
 
+              {/* Sell Product Button - Responsive */}
               <Sheet open={isSellerDashboardOpen} onOpenChange={setIsSellerDashboardOpen}>
                 <SheetTrigger asChild>
+<<<<<<< HEAD
                   <Button className="hidden sm:flex bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-xs sm:text-sm px-2 sm:px-4 py-2">
                     <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+=======
+                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2 h-8 sm:h-10">
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                     <span className="hidden sm:inline">Sell Product</span>
                     <span className="sm:hidden">Sell</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent
-                  className={`w-full sm:max-w-4xl overflow-y-auto ${
+                  className={`w-full sm:max-w-2xl lg:max-w-4xl overflow-y-auto ${
                     isDarkMode
                       ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700"
                       : "bg-gradient-to-br from-white via-blue-50 to-cyan-50 border-blue-200"
                   } backdrop-blur-sm`}
+                  side="right"
                 >
                   <SheetHeader className="pb-6 sm:pb-8 px-3 sm:px-6 border-b border-opacity-20">
                     <div className="flex items-center gap-3">
@@ -2270,13 +2415,22 @@ export default function Marketplace() {
           isDarkMode ? "bg-slate-800/70 border-slate-700" : "bg-white/70 border-blue-100"
         }`}
       >
+<<<<<<< HEAD
         <div className="container mx-auto px-3 sm:px-4">
           <div className="flex items-center space-x-3 sm:space-x-6 py-3 sm:py-4 overflow-x-auto">
+=======
+        <div className="container mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 py-2 sm:py-3 lg:py-4 overflow-x-auto scrollbar-hide">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
             {categories.map((category, index) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(selectedCategory === category ? "All Categories" : category)}
+<<<<<<< HEAD
                 className={`whitespace-nowrap px-3 sm:px-6 py-2 sm:py-3 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 hover:scale-105 ${
+=======
+                className={`flex-shrink-0 whitespace-nowrap px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm lg:text-sm font-bold transition-all duration-300 hover:scale-105 active:scale-95 ${
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                   selectedCategory === category
                     ? `bg-gradient-to-r ${
                         index % 3 === 0
@@ -2297,9 +2451,124 @@ export default function Marketplace() {
         </div>
       </nav>
 
+<<<<<<< HEAD
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 relative z-10">
         <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
           <aside className="lg:w-64 space-y-4 sm:space-y-6">
+=======
+      <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
+          {/* Mobile Filters - Horizontal Scroll */}
+          <div className="lg:hidden">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+              {/* Category Filter */}
+              <div className="flex-shrink-0 min-w-[140px]">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger
+                    className={`border-2 rounded-lg text-xs sm:text-sm ${
+                      isDarkMode
+                        ? "border-slate-600 focus:border-cyan-500 bg-slate-800 text-white"
+                        : "border-blue-200 focus:border-blue-500"
+                    }`}
+                  >
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent className={isDarkMode ? "bg-slate-800 border-slate-600" : ""}>
+                    <SelectItem value="All Categories" className={isDarkMode ? "text-white hover:bg-slate-700" : ""}>
+                      All Categories
+                    </SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem
+                        key={category}
+                        value={category}
+                        className={isDarkMode ? "text-white hover:bg-slate-700" : ""}
+                      >
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Location Filter */}
+              <div className="flex-shrink-0 min-w-[140px]">
+                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                  <SelectTrigger
+                    className={`border-2 rounded-lg text-xs sm:text-sm ${
+                      isDarkMode
+                        ? "border-slate-600 focus:border-cyan-500 bg-slate-800 text-white"
+                        : "border-cyan-200 focus:border-cyan-500"
+                    }`}
+                  >
+                    <SelectValue placeholder="Location" />
+                  </SelectTrigger>
+                  <SelectContent className={isDarkMode ? "bg-slate-800 border-slate-600" : ""}>
+                    <SelectItem value="All Locations" className={isDarkMode ? "text-white hover:bg-slate-700" : ""}>
+                      All Locations
+                    </SelectItem>
+                    {locations.map((location) => (
+                      <SelectItem
+                        key={location}
+                        value={location}
+                        className={isDarkMode ? "text-white hover:bg-slate-700" : ""}
+                      >
+                        {location}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Condition Filter */}
+              <div className="flex-shrink-0 min-w-[140px]">
+                <Select value={selectedCondition} onValueChange={setSelectedCondition}>
+                  <SelectTrigger
+                    className={`border-2 rounded-lg text-xs sm:text-sm ${
+                      isDarkMode
+                        ? "border-slate-600 focus:border-amber-500 bg-slate-800 text-white"
+                        : "border-amber-200 focus:border-amber-500"
+                    }`}
+                  >
+                    <SelectValue placeholder="Condition" />
+                  </SelectTrigger>
+                  <SelectContent className={isDarkMode ? "bg-slate-800 border-slate-600" : ""}>
+                    <SelectItem value="All Conditions" className={isDarkMode ? "text-white hover:bg-slate-700" : ""}>
+                      All Conditions
+                    </SelectItem>
+                    <SelectItem value="new" className={isDarkMode ? "text-white hover:bg-slate-700" : ""}>
+                      New
+                    </SelectItem>
+                    <SelectItem value="used" className={isDarkMode ? "text-white hover:bg-slate-700" : ""}>
+                      Used
+                    </SelectItem>
+                    <SelectItem value="refurbished" className={isDarkMode ? "text-white hover:bg-slate-700" : ""}>
+                      Refurbished
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sell Button for Mobile */}
+              <div className="flex-shrink-0">
+                <Sheet open={isSellerDashboardOpen} onOpenChange={setIsSellerDashboardOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      onClick={handleSellProductClick}
+                      size="sm"
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold transition-all duration-300 hover:scale-105 shadow-lg whitespace-nowrap"
+                    >
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <span className="text-xs sm:text-sm">Sell</span>
+                    </Button>
+                  </SheetTrigger>
+                </Sheet>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Sidebar */}
+          <aside className="hidden lg:block lg:w-64 space-y-6">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
             <Card
               className={`backdrop-blur-sm border-2 shadow-xl transition-all duration-500 ${
                 isDarkMode ? "bg-slate-800/80 border-slate-600" : "bg-white/80 border-blue-100"
@@ -2449,17 +2718,23 @@ export default function Marketplace() {
             </Card>
           </aside>
 
+<<<<<<< HEAD
           <div className="flex-1 space-y-6 sm:space-y-8">
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+=======
+          <div className="flex-1 space-y-4 sm:space-y-6 lg:space-y-8">
+            {viewMode === "grid" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+>>>>>>> 6356442b64438c5a238ccdaa8bc7dfbb292d38e2
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {filteredProducts.map((product) => (
-                  <div key={product.id} className="p-4 border rounded-lg">
+                  <div key={product.id} className="p-3 sm:p-4 border rounded-lg">
                     <ProductCard product={product} />
                   </div>
                 ))}
