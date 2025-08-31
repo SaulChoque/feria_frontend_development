@@ -38,6 +38,8 @@ import {
   QrCode,
   CreditCard,
   ArrowDownUp,
+  RefreshCw,
+  Compass,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -58,7 +60,7 @@ const mockProducts = [
     price: 1199.99,
     originalPrice: 1299.99,
     image: "/iphone-15-pro-max.png",
-  description: "Powerful smartphone with Pro camera system and long battery life.",
+    description: "Latest iPhone with A17 Pro chip, titanium design, and advanced camera system. Features 6.7-inch Super Retina XDR display, Action Button, and all-day battery life. Perfect for photography enthusiasts and power users.",
     rating: 4.8,
     reviews: 2847,
     category: "Electronics",
@@ -74,7 +76,7 @@ const mockProducts = [
     price: 899.99,
     originalPrice: 1199.99,
     image: "/modern-gray-sectional-sofa-furniture.png",
-  description: "Comfortable 3-seater sectional in modern gray fabric, great condition.",
+    description: "Spacious 3-seater sectional sofa in contemporary gray fabric. Features deep cushions, sturdy hardwood frame, and removable covers for easy cleaning. Perfect for living rooms and family spaces.",
     rating: 4.6,
     reviews: 432,
     category: "Furniture",
@@ -90,7 +92,7 @@ const mockProducts = [
     price: 170.0,
     originalPrice: 200.0,
     image: "/nike-air-jordan-1-sneakers-red-black.png",
-  description: "Classic AJ1 sneakers, authentic and lightly worn.",
+    description: "Iconic Air Jordan 1 in classic Chicago colorway. Premium leather construction with original design elements. Authentic and in excellent condition, perfect for collectors and sneaker enthusiasts.",
     rating: 4.9,
     reviews: 1256,
     category: "Clothing",
@@ -106,7 +108,7 @@ const mockProducts = [
     price: 18500.0,
     originalPrice: 19500.0,
     image: "/2019-honda-civic-sedan-blue-car.png",
-  description: "Well-maintained sedan with service records; reliable daily driver.",
+    description: "Reliable 2019 Honda Civic sedan with low mileage and complete service history. Features fuel-efficient engine, CVT transmission, Honda Sensing safety suite, and excellent build quality. One owner, garage kept.",
     rating: 4.5,
     reviews: 89,
     category: "Vehicles",
@@ -122,7 +124,7 @@ const mockProducts = [
     price: 2399.99,
     originalPrice: 2599.99,
     image: "/macbook-pro-16-inch-laptop-silver.png",
-  description: "High-performance laptop with M3 chip, ideal for creative work.",
+    description: "Brand new MacBook Pro 16-inch featuring the revolutionary M3 Pro chip with 12-core CPU and 18-core GPU. This powerhouse includes 18GB unified memory, 512GB SSD storage, and the stunning Liquid Retina XDR display with ProMotion technology. Perfect for professional video editing, 3D rendering, and software development. Features the advanced camera system, studio-quality three-mic array, and six-speaker sound system with Spatial Audio. Includes MagSafe 3 charging, three Thunderbolt 4 ports, HDMI port, and SDXC card slot. All-day battery life up to 22 hours video playback. Comes with 1-year AppleCare warranty and original packaging.",
     rating: 4.8,
     reviews: 1876,
     category: "Electronics",
@@ -138,7 +140,7 @@ const mockProducts = [
     price: 650.0,
     originalPrice: 850.0,
     image: "/vintage-brown-leather-armchair-furniture.png",
-  description: "Classic leather armchair with character; small wear marks.",
+    description: "Stunning mid-century vintage leather armchair crafted from premium full-grain brown leather with beautiful patina that tells its story. Features solid hardwood frame construction with traditional mortise and tenon joinery for exceptional durability. The high-density foam cushioning provides excellent comfort while maintaining its shape over time. Hand-rubbed leather finish shows authentic character marks that add to its charm and uniqueness. Deep button tufting and rolled arms showcase classic design elements. Minor wear marks on arms and seat edges are consistent with age and add to its vintage appeal. Dimensions: 32\"W x 34\"D x 36\"H with 18\" seat height. Professional cleaning recommended.",
     rating: 4.4,
     reviews: 234,
     category: "Furniture",
@@ -154,7 +156,7 @@ const mockProducts = [
     price: 59.99,
     originalPrice: 79.99,
     image: "/levis-501-blue-denim-jeans.png",
-  description: "Authentic Levi's 501, timeless fit and durable denim.",
+    description: "Authentic Levi's 501 Original jeans in classic medium blue wash - the gold standard of denim since 1873. Made from 100% cotton denim with the iconic straight leg fit that never goes out of style. Features the original button fly, five-pocket styling, and signature arcuate stitching on back pockets. Pre-shrunk for consistent fit and constructed with reinforced stress points for maximum durability. This timeless design has been worn by generations and continues to be the most popular jean style worldwide. Perfect for everyday wear, these jeans get better with age and develop unique fading patterns. Available in waist sizes 28-40 and inseam lengths 30-36. Machine washable. New with tags.",
     rating: 4.7,
     reviews: 892,
     category: "Clothing",
@@ -170,7 +172,7 @@ const mockProducts = [
     price: 35000.0,
     originalPrice: 37000.0,
     image: "/2020-tesla-model-3-white-electric-car.png",
-  description: "Electric vehicle with long range and updated features; clean title.",
+    description: "Exceptional 2020 Tesla Model 3 Long Range in pristine Pearl White Multi-Coat finish. This electric vehicle delivers an impressive 358 miles of range on a single charge with dual motor all-wheel drive for superior traction in all weather conditions. Features the latest Autopilot hardware with Full Self-Driving capability, over-the-air software updates, and the premium connectivity package. Interior boasts vegan leather seating, heated front and rear seats, premium audio system with 14 speakers, and the iconic 15-inch touchscreen display. Recent software update includes Tesla Theater, gaming, and enhanced navigation. Only 23,000 miles with complete service history and clean title. Includes mobile connector, wall connector, and all original documentation. No accidents, non-smoking owner.",
     rating: 4.9,
     reviews: 156,
     category: "Vehicles",
@@ -206,7 +208,7 @@ export default function Marketplace() {
   const [selectedCondition, setSelectedCondition] = useState("All Conditions")
   const [selectedLocation, setSelectedLocation] = useState("All Locations")
   const [priceRange, setPriceRange] = useState([0, 50000])
-  const [cartItems, setCartItems] = useState<{ productId: number; quantity: number }[]>([])
+  const [cartItems, setCartItems] = useState<{ id: string; productId: number }[]>([])
   const [wishlistItems, setWishlistItems] = useState<number[]>([])
   const [walletConnected, setWalletConnected] = useState(false)
   const [walletAddress, setWalletAddress] = useState("")
@@ -250,6 +252,22 @@ export default function Marketplace() {
   const [showReceiveQR, setShowReceiveQR] = useState(false)
   const [sendAmount, setSendAmount] = useState("")
   const [recipientAddress, setRecipientAddress] = useState("")
+
+  // States for QR Upload functionality
+  const [showQRUploadModal, setShowQRUploadModal] = useState(false)
+  const [showQRResultModal, setShowQRResultModal] = useState(false)
+  const [uploadedQRImage, setUploadedQRImage] = useState<File | null>(null)
+  const [isProcessingQR, setIsProcessingQR] = useState(false)
+  const [qrData, setQrData] = useState<{
+    type: string;
+    amount?: string;
+    address?: string;
+    currency?: string;
+    recipient?: string;
+    fee?: string;
+    exchangeRate?: string;
+    rawData: string;
+  } | null>(null)
 
   // States for deposit modal
   const [showDepositModal, setShowDepositModal] = useState(false)
@@ -350,36 +368,35 @@ export default function Marketplace() {
   // featuredProducts removed because it's not used in the UI currently
 
   const addToCart = (productId: number) => {
+    console.log('Adding product to cart:', productId)
+    // Siempre agregar como nuevo item con ID único
     setCartItems((prev) => {
-      const existingItem = prev.find((item) => item.productId === productId)
-      if (existingItem) {
-        return prev.map((item) => (item.productId === productId ? { ...item, quantity: item.quantity + 1 } : item))
-      }
-      return [...prev, { productId, quantity: 1 }]
+      const newItem = { id: `${productId}-${Date.now()}-${Math.random()}`, productId }
+      const newCart = [...prev, newItem]
+      console.log('New cart items:', newCart)
+      return newCart
     })
-  }
-
-  const updateCartQuantity = (productId: number, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId)
-      return
+    
+    // Mostrar notificación visual
+    const product = products.find(p => p.id === productId)
+    if (product) {
+      alert(`✅ ${product.name} has been added to your cart!`)
     }
-    setCartItems((prev) => prev.map((item) => (item.productId === productId ? { ...item, quantity } : item)))
   }
 
-  const removeFromCart = (productId: number) => {
-    setCartItems((prev) => prev.filter((item) => item.productId !== productId))
+  const removeFromCart = (itemId: string) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== itemId))
   }
 
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {
       const product = products.find((p) => p.id === item.productId)
-      return total + (product?.price || 0) * item.quantity
+      return total + (product?.price || 0)
     }, 0)
   }
 
   const getCartItemsCount = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0)
+    return cartItems.length
   }
 
   const toggleWishlist = (productId: number) => {
@@ -511,7 +528,7 @@ export default function Marketplace() {
   }
 
   const handleReceiveAction = () => {
-    setShowReceiveQR(true)
+    setShowQRUploadModal(true)
   }
 
   // Generate QR code URL using a QR service
@@ -589,6 +606,57 @@ export default function Marketplace() {
   const handleMetaMaskSettings = () => {
     // Simular configuración de MetaMask
     alert(`⚙️ Configuración de Wallet\n\nRed actual: Sepolia Testnet\nWallet: ${truncateAddress(walletAddress)}\nEstado: Conectada ✅\n\n¡Configuración próximamente disponible!`)
+  }
+
+  // QR Upload functions
+  const handleQRImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setUploadedQRImage(file)
+    }
+  }
+
+  const processQRCode = async () => {
+    if (!uploadedQRImage) {
+      alert("❌ Por favor selecciona una imagen primero")
+      return
+    }
+
+    setIsProcessingQR(true)
+    
+    try {
+      // Simular procesamiento de QR (en un proyecto real usarías una librería como jsQR)
+      await new Promise(resolve => setTimeout(resolve, 2000)) // Simular tiempo de procesamiento
+
+      // Simular datos extraídos del QR basados en la imagen que mostaste
+      const mockQRData = {
+        type: "payment",
+        amount: "50.00",
+        currency: "BOB", 
+        recipient: "Saul Mijael Choquehuanca Huanca",
+        address: "0x742d35Cc6638C0532925a3b8aA5e59e7e8E19c5B",
+        fee: "0.00",
+        paymentMin: "1.00",
+        exchangeRate: "1 USD = 12.12 BOB",
+        rawData: "payment://recipient=Saul+Mijael+Choquehuanca+Huanca&amount=50.00&currency=BOB&fee=0.00"
+      }
+
+      setQrData(mockQRData)
+      setIsProcessingQR(false)
+      setShowQRUploadModal(false)
+      setShowQRResultModal(true)
+    } catch (error) {
+      setIsProcessingQR(false)
+      alert("❌ Error al procesar el código QR. Por favor intenta de nuevo.")
+    }
+  }
+
+  const resetQRUpload = () => {
+    setUploadedQRImage(null)
+    setQrData(null)
+    setShowQRUploadModal(false)
+    setShowQRResultModal(false)
+    setIsProcessingQR(false)
   }
 
   // Sync Privy auth state with local wallet state
@@ -707,24 +775,24 @@ export default function Marketplace() {
         <Button variant="ghost" size="icon" className="relative">
           <ShoppingCart className="h-5 w-5" />
           {getCartItemsCount() > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-accent text-accent-foreground">
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 text-white animate-bounce">
               {getCartItemsCount()}
             </Badge>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className={`w-full sm:max-w-lg ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-background"}`}>
+      <SheetContent className="w-full sm:max-w-lg bg-gradient-to-br p-4 from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
         <SheetHeader>
-          <SheetTitle className={isDarkMode ? "text-white" : ""}>Shopping Cart</SheetTitle>
+          <SheetTitle className="text-white">Shopping Cart</SheetTitle>
         </SheetHeader>
 
         <div className="flex flex-col h-full">
           <div className="flex-1 overflow-y-auto py-4">
             {cartItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 text-center">
-                <ShoppingCart className={`h-16 w-16 mb-4 ${isDarkMode ? "text-gray-400" : "text-muted-foreground"}`} />
-                <p className={isDarkMode ? "text-gray-300" : "text-muted-foreground"}>Your cart is empty</p>
-                <p className={`text-sm mt-2 ${isDarkMode ? "text-gray-400" : "text-muted-foreground"}`}>
+                <ShoppingCart className="h-16 w-16 mb-4 text-white/50" />
+                <p className="text-white/80">Your cart is empty</p>
+                <p className="text-sm mt-2 text-white/60">
                   Add some products to get started
                 </p>
               </div>
@@ -736,10 +804,8 @@ export default function Marketplace() {
 
                   return (
                     <div
-                      key={item.productId}
-                      className={`flex items-center space-x-4 p-4 border rounded-lg ${
-                        isDarkMode ? "border-slate-600 bg-slate-800/50" : "border-border"
-                      }`}
+                      key={item.id}
+                      className="flex items-center space-x-4 p-4 border rounded-lg bg-white/10 border-white/20"
                     >
                       <img
                         src={product.image || "/placeholder.svg"}
@@ -747,42 +813,20 @@ export default function Marketplace() {
                         className="w-16 h-16 object-cover rounded-md"
                       />
                       <div className="flex-1 min-w-0">
-                        <h4
-                          className={`text-sm font-medium text-balance leading-tight ${isDarkMode ? "text-white" : ""}`}
-                        >
+                        <h4 className="text-sm font-medium text-balance leading-tight text-white">
                           {product.name}
                         </h4>
-                        <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-muted-foreground"}`}>
+                        <p className="text-sm text-[#00bcd4]">
                           ${product.price}
                         </p>
-
-                        <div className="flex items-center space-x-2 mt-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 bg-transparent"
-                            onClick={() => updateCartQuantity(item.productId, item.quantity - 1)}
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 bg-transparent"
-                            onClick={() => updateCartQuantity(item.productId, item.quantity + 1)}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">${(product.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-sm font-medium text-[#ff9800]">${product.price.toFixed(2)}</p>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          onClick={() => removeFromCart(item.productId)}
+                          className="h-8 w-8 text-white/60 hover:text-red-400"
+                          onClick={() => removeFromCart(item.id)}
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -795,28 +839,28 @@ export default function Marketplace() {
           </div>
 
           {cartItems.length > 0 && (
-            <div className="border-t pt-4 space-y-4">
+            <div className="border-t border-white/20 pt-4 space-y-4">
               <div className="space-y-2">
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-sm text-white">
                   <span>Subtotal ({getCartItemsCount()} items)</span>
                   <span>${getCartTotal().toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-sm text-white/80">
                   <span>Shipping</span>
                   <span>Free</span>
                 </div>
-                <Separator />
-                <div className="flex justify-between font-semibold">
+                <Separator className="bg-white/20" />
+                <div className="flex justify-between font-semibold text-white">
                   <span>Total</span>
-                  <span>${getCartTotal().toFixed(2)}</span>
+                  <span className="text-[#ff9800]">${getCartTotal().toFixed(2)}</span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Button className="w-full" size="lg">
+                <Button className="w-full bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white" size="lg">
                   Proceed to Checkout
                 </Button>
-                <Button variant="outline" className="w-full bg-transparent" onClick={() => setIsCartOpen(false)}>
+                <Button variant="outline" className="w-full bg-transparent border-white/20 text-white hover:bg-white/10" onClick={() => setIsCartOpen(false)}>
                   Continue Shopping
                 </Button>
               </div>
@@ -843,12 +887,19 @@ export default function Marketplace() {
         }`}
       />
 
-      <CardContent className="p-4 relative z-10" onClick={() => {
-        setSelectedProductDetail(product)
-        setCouponCode("")
-        setDiscountPercent(0)
-        setProductDetailOpen(true)
-      }}>
+      <CardContent 
+        className="p-4 relative z-10 cursor-pointer" 
+        onClick={(e) => {
+          // Solo abrir detalles si no se hizo click en un botón
+          const target = e.target as HTMLElement;
+          if (e.target === e.currentTarget || !target.closest('button')) {
+            setSelectedProductDetail(product)
+            setCouponCode("")
+            setDiscountPercent(0)
+            setProductDetailOpen(true)
+          }
+        }}
+      >
         <div className="relative mb-4">
           <div className="relative overflow-hidden rounded-xl">
             <img
@@ -979,23 +1030,29 @@ export default function Marketplace() {
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 space-y-3">
+      <CardFooter className="p-4 pt-0 space-y-3 relative z-20">
         <Button
-          className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-          onClick={(e) => { e.stopPropagation(); addToCart(product.id) }}
+          className="w-full bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          onClick={(e) => { 
+            e.stopPropagation(); 
+            e.preventDefault();
+            console.log('Add to cart button clicked for product:', product.id);
+            addToCart(product.id);
+          }}
           disabled={!product.inStock}
         >
           <Plus className="h-4 w-4 mr-2" />
           {product.inStock ? "Add to Cart" : "Out of Stock"}
         </Button>
-  <Button
+        <Button
           variant="outline"
-          className={`w-full font-medium transition-all duration-300 hover:scale-105 ${
-            isDarkMode
-              ? "bg-gradient-to-r from-amber-900/30 to-orange-900/30 border-2 border-amber-600 hover:border-amber-500 text-amber-300 hover:text-orange-300"
-              : "bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-300 text-amber-700 hover:text-orange-700"
-          }`}
-          onClick={(e) => { e.stopPropagation(); contactSeller(product) }}
+          className="w-full font-medium transition-all duration-300 hover:scale-105 bg-gradient-to-r from-[#ff9800]/10 to-[#ff9800]/20 border-2 border-[#ff9800] hover:border-[#ff9800]/80 text-[#ff9800] hover:text-[#ff9800]/80"
+          onClick={(e) => { 
+            e.stopPropagation(); 
+            e.preventDefault();
+            console.log('Contact seller button clicked for product:', product.id);
+            contactSeller(product);
+          }}
         >
           <Zap className="h-4 w-4 mr-2" />
           Contact Seller
@@ -1035,7 +1092,7 @@ export default function Marketplace() {
               <img 
                 src="/koneque.png" 
                 alt="Koñeque Logo" 
-                className="w-10 h-10 object-contain hover:scale-110 transition-transform duration-300"
+                className="w-16 h-16 object-contain hover:scale-110 transition-transform duration-300"
               />
               <span
                 className={`text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
@@ -1492,27 +1549,40 @@ export default function Marketplace() {
                             <span className="font-semibold">Account 1</span>
                             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm font-mono text-gray-500">
-                              {showFullAddress ? walletAddress : truncateAddress(walletAddress)}
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className={`h-6 w-6 p-0 rounded transition-all duration-200 ${
-                                isDarkMode 
-                                  ? "hover:bg-slate-700 text-gray-400 hover:text-white" 
-                                  : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
-                              }`}
-                              onClick={() => setShowFullAddress(!showFullAddress)}
-                              title={showFullAddress ? "Ocultar dirección completa" : "Mostrar dirección completa"}
-                            >
+                          <div className="mt-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs text-gray-400">Dirección:</span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`h-5 w-5 p-0 rounded transition-all duration-200 ${
+                                  isDarkMode 
+                                    ? "hover:bg-slate-700 text-gray-400 hover:text-white" 
+                                    : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                                }`}
+                                onClick={() => setShowFullAddress(!showFullAddress)}
+                                title={showFullAddress ? "Ocultar dirección completa" : "Mostrar dirección completa"}
+                              >
+                                {showFullAddress ? (
+                                  <EyeOff className="h-3 w-3" />
+                                ) : (
+                                  <Eye className="h-3 w-3" />
+                                )}
+                              </Button>
+                            </div>
+                            <div className={`text-sm font-mono p-2 rounded-md border ${
+                              isDarkMode 
+                                ? "bg-slate-800 border-slate-600 text-gray-300" 
+                                : "bg-gray-50 border-gray-200 text-gray-600"
+                            }`}>
                               {showFullAddress ? (
-                                <EyeOff className="h-3 w-3" />
+                                <span className="break-all leading-relaxed">
+                                  {walletAddress}
+                                </span>
                               ) : (
-                                <Eye className="h-3 w-3" />
+                                <span>{truncateAddress(walletAddress)}</span>
                               )}
-                            </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1521,72 +1591,86 @@ export default function Marketplace() {
                     {/* Balance Section */}
                     <div className={`p-4 border-b ${isDarkMode ? "border-slate-600" : "border-gray-200"}`}>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-2xl font-bold">
-                          {isLoadingBalance ? (
-                            <span className="animate-pulse">Cargando...</span>
-                          ) : showBalance ? (
-                            `$${balanceUSD} USD`
-                          ) : (
-                            "****"
-                          )}
-                        </span>
-                        <button
-                          className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 hover:scale-105 ${
-                            isDarkMode 
-                              ? "hover:bg-slate-700 text-gray-400 hover:text-white" 
-                              : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
-                          }`}
-                          onClick={() => setShowBalance(!showBalance)}
-                          title={showBalance ? "Ocultar balance" : "Mostrar balance"}
-                        >
-                          {showBalance ? (
-                            <Eye className="h-4 w-4" />
-                          ) : (
-                            <EyeOff className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                      {showBalance && !isLoadingBalance && (
-                        <div className="text-sm text-gray-500 mb-2">
-                          {balance} ETH (Sepolia)
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-xs font-semibold ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                              BALANCE TOTAL
+                            </span>
+                            <button
+                              className={`flex items-center justify-center w-6 h-6 rounded-lg transition-all duration-200 hover:scale-105 ${
+                                isDarkMode 
+                                  ? "hover:bg-slate-700 text-gray-400 hover:text-white" 
+                                  : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                              }`}
+                              onClick={() => setShowBalance(!showBalance)}
+                              title={showBalance ? "Ocultar balance" : "Mostrar balance"}
+                            >
+                              {showBalance ? (
+                                <Eye className="h-3 w-3" />
+                              ) : (
+                                <EyeOff className="h-3 w-3" />
+                              )}
+                            </button>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-2xl font-bold">
+                              {isLoadingBalance ? (
+                                <span className="animate-pulse">Cargando...</span>
+                              ) : showBalance ? (
+                                <span className={`bg-gradient-to-r bg-clip-text text-transparent ${
+                                  isDarkMode ? "from-green-400 to-emerald-400" : "from-green-600 to-emerald-600"
+                                }`}>
+                                  ${balanceUSD} USD
+                                </span>
+                              ) : (
+                                "****"
+                              )}
+                            </div>
+                            {showBalance && !isLoadingBalance && (
+                              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                                {balance} ETH • Sepolia Testnet
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
-                      <div className="text-sm text-gray-500">
+                      </div>
+                      <div className="flex items-center gap-4 text-xs">
                         <button 
-                          className="text-blue-500 underline hover:text-blue-600 disabled:opacity-50"
+                          className={`flex items-center gap-1 px-3 py-1 rounded-lg transition-all duration-200 ${
+                            isDarkMode 
+                              ? "bg-blue-900/50 text-blue-300 hover:bg-blue-800/50 border border-blue-600/30" 
+                              : "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
+                          } disabled:opacity-50`}
                           onClick={() => updateBalance()}
                           disabled={isLoadingBalance}
                         >
-                          {isLoadingBalance ? "Actualizando..." : "Actualizar Balance"}
+                          <RefreshCw className={`h-3 w-3 ${isLoadingBalance ? "animate-spin" : ""}`} />
+                          {isLoadingBalance ? "Actualizando..." : "Actualizar"}
                         </button>
-                        {" | "}
                         <button 
-                          className="text-blue-500 underline hover:text-blue-600 ml-1"
+                          className={`flex items-center gap-1 px-3 py-1 rounded-lg transition-all duration-200 ${
+                            isDarkMode 
+                              ? "bg-purple-900/50 text-purple-300 hover:bg-purple-800/50 border border-purple-600/30" 
+                              : "bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-200"
+                          }`}
                           onClick={() => handleDiscoverAction()}
                         >
+                          <Compass className="h-3 w-3" />
                           Descubrir
                         </button>
                       </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="p-4 grid grid-cols-2 gap-3">
+                    <div className="p-4 grid grid-cols-4 gap-3">
                       <button 
-                        className={`group flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${
-                          isDarkMode 
-                            ? "bg-gradient-to-br from-slate-800 to-slate-700 border-slate-600 hover:border-blue-500/50 hover:from-slate-700 hover:to-slate-600" 
-                            : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-blue-400/50 hover:from-blue-50 hover:to-cyan-50"
-                        }`}
+                        className="group flex flex-col items-center gap-1 p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
                         onClick={() => handleDepositAction()}
                       >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
-                          isDarkMode 
-                            ? "bg-gradient-to-br from-blue-600 to-cyan-600 shadow-lg shadow-blue-500/25" 
-                            : "bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/25"
-                        }`}>
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#0d47a1] to-[#00bcd4] shadow-lg shadow-blue-500/25">
                           <CreditCard className="h-5 w-5 text-white" />
                         </div>
-                        <span className={`text-sm font-semibold transition-colors duration-300 ${
+                        <span className={`text-xs font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-slate-200 group-hover:text-white" : "text-gray-700 group-hover:text-gray-900"
                         }`}>
                           Depositar
@@ -1594,30 +1678,58 @@ export default function Marketplace() {
                       </button>
                       
                       <button 
-                        className={`group flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${
-                          isDarkMode 
-                            ? "bg-gradient-to-br from-slate-800 to-slate-700 border-slate-600 hover:border-green-500/50 hover:from-slate-700 hover:to-slate-600" 
-                            : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-green-400/50 hover:from-green-50 hover:to-emerald-50"
-                        }`}
+                        className="group flex flex-col items-center gap-1 p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
                         onClick={() => handleReceiveAction()}
                       >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
-                          isDarkMode 
-                            ? "bg-gradient-to-br from-green-600 to-emerald-600 shadow-lg shadow-green-500/25" 
-                            : "bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/25"
-                        }`}>
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/25">
                           <Download className="h-5 w-5 text-white" />
                         </div>
-                        <span className={`text-sm font-semibold transition-colors duration-300 ${
+                        <span className={`text-xs font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-slate-200 group-hover:text-white" : "text-gray-700 group-hover:text-gray-900"
                         }`}>
                           Recibir
                         </span>
                       </button>
+
+                      <button 
+                        className="group flex flex-col items-center gap-1 p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowUserDropdown(false);
+                          alert("📊 Módulo de Ventas - Próximamente disponible");
+                        }}
+                      >
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#ff9800] to-[#ff9800]/80 shadow-lg shadow-[#ff9800]/25">
+                          <Package className="h-5 w-5 text-white" />
+                        </div>
+                        <span className={`text-xs font-medium transition-colors duration-300 ${
+                          isDarkMode ? "text-slate-200 group-hover:text-white" : "text-gray-700 group-hover:text-gray-900"
+                        }`}>
+                          Ventas
+                        </span>
+                      </button>
+
+                      <button 
+                        className="group flex flex-col items-center gap-1 p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowUserDropdown(false);
+                          setIsCartOpen(true);
+                        }}
+                      >
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-gradient-to-br from-[#00bcd4] to-[#00bcd4]/80 shadow-lg shadow-[#00bcd4]/25">
+                          <ShoppingCart className="h-5 w-5 text-white" />
+                        </div>
+                        <span className={`text-xs font-medium transition-colors duration-300 ${
+                          isDarkMode ? "text-slate-200 group-hover:text-white" : "text-gray-700 group-hover:text-gray-900"
+                        }`}>
+                          Compras
+                        </span>
+                      </button>
                     </div>
 
                     {/* Wallet Provider */}
-                    <div className={`p-4 border-t ${isDarkMode ? "border-slate-600" : "border-gray-200"}`}>
+                    <div className={`p-1 border-t ${isDarkMode ? "border-slate-600" : "border-gray-200"}`}>
                       <button 
                         className={`w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 hover:scale-105 ${
                           isDarkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"
@@ -1635,7 +1747,7 @@ export default function Marketplace() {
                     </div>
 
                     {/* Logout Button */}
-                    <div className="p-4">
+                    <div className="p-2">
                       <Button
                         variant="outline"
                         className="w-full"
@@ -1910,66 +2022,53 @@ export default function Marketplace() {
       {/* Contact Seller Modal */}
       <Sheet open={contactSellerOpen} onOpenChange={setContactSellerOpen}>
         <SheetContent
-          side="right"
-          className={`w-full sm:max-w-2xl p-0 ${
-            isDarkMode
-              ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-l-2 border-slate-600"
-              : "bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/30 border-l-2 border-blue-200"
-          }`}
+            side="right"
+            className="w-full sm:max-w-3xl p-8 sm:p-12 bg-gradient-to-br from-[#0d47a1] via-[#0d47a1]/95 to-[#0d47a1]/90 border-l-4 border-[#00bcd4] backdrop-blur-xl shadow-2xl"
         >
           <SheetHeader
-            className={`p-8 pb-6 ${
-              isDarkMode
-                ? "bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border-b border-slate-600"
-                : "bg-gradient-to-r from-blue-100/50 to-cyan-100/50 border-b border-blue-200"
-            }`}
+            className="mb-8 pb-8 border-b-2 relative overflow-hidden bg-gradient-to-r from-[#00bcd4]/20 to-[#00bcd4]/10 border-[#00bcd4]/30 shadow-xl rounded-lg"
           >
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center shadow-lg">
-                <User className="h-8 w-8 text-white" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#00bcd4]/10 to-[#ff9800]/10 animate-pulse" />
+            <div className="relative z-10 flex items-center gap-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#ff9800] via-[#00bcd4] to-[#ff9800] rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-white/20">
+                <User className="h-10 w-10 text-white drop-shadow-lg" />
               </div>
-              <div>
-                <SheetTitle className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+              <div className="flex-1">
+                <SheetTitle className="text-3xl font-bold mb-2 bg-gradient-to-r bg-clip-text text-transparent from-white to-[#00bcd4]">
                   Contact Seller
                 </SheetTitle>
-                <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
-                  Get in touch with the seller about this product
+                <p className="text-base text-white/90">
+                  Connect directly with the seller for this amazing product
                 </p>
               </div>
             </div>
           </SheetHeader>
 
           {selectedSeller && (
-            <div className="p-8 space-y-8">
+            <div className="space-y-6">
               {/* Product Info */}
-              <div
-                className={`p-6 rounded-2xl border-2 ${
-                  isDarkMode ? "bg-slate-800/50 border-slate-600" : "bg-white/80 border-blue-200"
-                }`}
-              >
-                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+              <div className="p-4 rounded-xl border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">
                   Product Details
                 </h3>
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                   <img
                     src={selectedSeller.image || "/placeholder.svg"}
                     alt={selectedSeller.name}
-                    className="w-20 h-20 object-cover rounded-xl"
+                    className="w-16 h-16 object-cover rounded-lg"
                   />
                   <div className="flex-1">
-                    <h4 className={`font-bold text-lg ${isDarkMode ? "text-cyan-300" : "text-blue-700"}`}>
+                    <h4 className="font-bold text-lg text-[#0d47a1]">
                       {selectedSeller.name}
                     </h4>
                     <p
-                      className={`text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
-                        isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
-                      }`}
+                      className="text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-[#ff9800] to-[#ff9800]/80"
                     >
                       ${selectedSeller.price.toLocaleString()}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <MapPin className={`h-4 w-4 ${isDarkMode ? "text-cyan-400" : "text-blue-600"}`} />
-                      <span className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                      <MapPin className="h-4 w-4 text-[#00bcd4]" />
+                      <span className="text-sm text-gray-600">
                         {selectedSeller.location}
                       </span>
                     </div>
@@ -1978,31 +2077,27 @@ export default function Marketplace() {
               </div>
 
               {/* Seller Info */}
-              <div
-                className={`p-6 rounded-2xl border-2 ${
-                  isDarkMode ? "bg-slate-800/50 border-slate-600" : "bg-white/80 border-blue-200"
-                }`}
-              >
-                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+              <div className="p-4 rounded-xl border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">
                   Seller Information
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] rounded-full flex items-center justify-center">
                       <span className="text-white font-bold text-lg">{selectedSeller.seller.charAt(0)}</span>
                     </div>
                     <div>
-                      <p className={`font-bold text-lg ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                      <p className="font-bold text-lg text-gray-900">
                         {selectedSeller.seller}
                       </p>
                       <div className="flex items-center gap-1">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-4 w-4 ${i < 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                            className={`h-4 w-4 ${i < 4 ? "fill-[#ff9800] text-[#ff9800]" : "text-gray-300"}`}
                           />
                         ))}
-                        <span className={`text-sm ml-2 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                        <span className="text-sm ml-2 text-gray-600">
                           4.8 (127 reviews)
                         </span>
                       </div>
@@ -2010,51 +2105,51 @@ export default function Marketplace() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 mt-4">
-                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-slate-700/50" : "bg-blue-50"}`}>
-                      <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Member since</p>
-                      <p className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>March 2023</p>
+                    <div className="p-3 rounded-lg bg-[#0d47a1]/10 border border-[#0d47a1]/20">
+                      <p className="text-sm text-gray-600">Member since</p>
+                      <p className="font-semibold text-gray-900">March 2023</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-slate-700/50" : "bg-blue-50"}`}>
-                      <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Response time</p>
-                      <p className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Within 2 hours</p>
+                    <div className="p-3 rounded-lg bg-[#0d47a1]/10 border border-[#0d47a1]/20">
+                      <p className="text-sm text-gray-600">Response time</p>
+                      <p className="font-semibold text-gray-900">Within 2 hours</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Contact Form */}
-              <div
-                className={`p-6 rounded-2xl border-2 ${
-                  isDarkMode ? "bg-slate-800/50 border-slate-600" : "bg-white/80 border-blue-200"
-                }`}
-              >
-                <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+              <div className="p-4 rounded-xl border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">
                   Send Message
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <Label className={isDarkMode ? "text-gray-300" : "text-gray-700"}>Your Message</Label>
+                    <Label className="text-gray-700">Your Message</Label>
                     <Textarea
                       placeholder={`Hi ${selectedSeller.seller}, I'm interested in your ${selectedSeller.name}. Is it still available?`}
-                      className={`mt-2 min-h-[120px] ${
-                        isDarkMode
-                          ? "bg-slate-700 border-slate-600 text-white placeholder:text-gray-400"
-                          : "bg-white border-blue-200"
-                      }`}
+                      className="mt-2 min-h-[120px] bg-white border-[#0d47a1]/30 focus:border-[#00bcd4]"
                     />
                   </div>
                   <div className="flex gap-3">
-                    <Button className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold">
+                    <Button 
+                      className="flex-1 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Aquí iría la lógica para enviar el mensaje
+                        alert("Message sent successfully!");
+                      }}
+                    >
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Send Message
                     </Button>
                     <Button
                       variant="outline"
-                      className={`${
-                        isDarkMode
-                          ? "border-amber-600 text-amber-300 hover:bg-amber-900/20"
-                          : "border-amber-300 text-amber-700 hover:bg-amber-50"
-                      }`}
+                      className="border-[#ff9800] text-[#ff9800] hover:bg-[#ff9800]/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Aquí iría la lógica para llamar
+                        alert("Calling seller...");
+                      }}
                     >
                       <Phone className="h-4 w-4 mr-2" />
                       Call
@@ -2071,93 +2166,117 @@ export default function Marketplace() {
       <Sheet open={productDetailOpen} onOpenChange={setProductDetailOpen}>
         <SheetContent
           side="right"
-          className={`w-full sm:max-w-2xl p-0 ${
-            isDarkMode
-              ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-l-2 border-slate-600"
-              : "bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/30 border-l-2 border-blue-200"
-          }`}
+          className="w-[95%] sm:w-[90%] max-w-3xl p-4 sm:p-2 h-[100vh] overflow-y-auto scrollbar-hide bg-gradient-to-br from-[#0d47a1] via-[#0d47a1]/95 to-[#0d47a1]/90 border-l-4 border-[#00bcd4] backdrop-blur-xl shadow-2xl"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
         >
+          <style jsx>{`
+            .scrollbar-hide::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
           {selectedProductDetail && (
-            <div className="p-8 space-y-6">
-              <div className="flex items-start gap-6">
-                <img
-                  src={selectedProductDetail.image || "/placeholder.svg"}
-                  alt={selectedProductDetail.name}
-                  className="w-36 h-36 object-cover rounded-xl"
-                />
-                <div className="flex-1">
-                  <h2 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+            <div className="space-y-4 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                <div className="relative group">
+                  <img
+                    src={selectedProductDetail.image || "/placeholder.svg"}
+                    alt={selectedProductDetail.name}
+                    className="w-full sm:w-36 h-48 sm:h-36 object-cover rounded-xl shadow-xl border-2 border-white/20 group-hover:scale-105 transition-all duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl" />
+                </div>
+                <div className="flex-1 w-full">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
                     {selectedProductDetail.name}
                   </h2>
-                  <p className={`text-xl font-semibold mt-2 ${isDarkMode ? "text-cyan-300" : "text-blue-700"}`}>
+                  <p className="text-lg sm:text-xl font-semibold mt-2 text-[#ff9800]">
                     ${selectedProductDetail.price.toLocaleString()}
                   </p>
-                  <p className={`text-sm mt-2 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                  <p className="text-sm mt-2 text-white/80">
                     {selectedProductDetail.location} • {selectedProductDetail.condition}
                   </p>
                 </div>
               </div>
 
-              <div className={`p-6 rounded-2xl border-2 ${isDarkMode ? "bg-slate-800/50 border-slate-600" : "bg-white/80 border-blue-200"}`}>
-                <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                  Description
-                </h3>
-                <p className={`${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-                  {selectedProductDetail.description || "No description provided."}
-                </p>
-              </div>
-
-              <div className={`p-6 rounded-2xl border-2 ${isDarkMode ? "bg-slate-800/50 border-slate-600" : "bg-white/80 border-blue-200"}`}>
-                <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                  Apply Coupon
-                </h3>
-                <div className="flex gap-3">
-                  <input
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="Enter coupon code"
-                    className={`flex-1 rounded-lg p-3 border-2 ${isDarkMode ? "bg-slate-700 border-slate-600 text-white" : "bg-white border-blue-200"}`}
-                  />
-                  <Button
-                    onClick={() => {
-                      // simple demo coupon logic: if code is SAVE10 => 10% off
-                      if (couponCode.trim().toUpperCase() === "SAVE10") {
-                        setDiscountPercent(10)
-                        setCouponMessage("Coupon applied: 10% off")
-                      } else if (couponCode.trim() === "") {
-                        setDiscountPercent(0)
-                        setCouponMessage("Enter a coupon code to apply")
-                      } else {
-                        setDiscountPercent(0)
-                        setCouponMessage("Invalid coupon")
-                      }
-                    }}
-                    className="whitespace-nowrap"
-                  >
-                    Apply
-                  </Button>
+              <div className="p-4 sm:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#00bcd4]/30 shadow-xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#00bcd4]/5 to-[#ff9800]/5" />
+                <div className="relative z-10">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
+                    <div className="w-2 h-6 rounded-full bg-gradient-to-b from-[#0d47a1] to-[#00bcd4]" />
+                    Description
+                  </h3>
+                  <p className="leading-relaxed text-gray-700">
+                    {selectedProductDetail.description || "No description provided for this product. Contact the seller for more details about this item."}
+                  </p>
                 </div>
-                {discountPercent > 0 && (
-                  <p className="mt-3 text-sm font-medium">Discount: {discountPercent}% — New price: ${((selectedProductDetail.price * (100 - discountPercent)) / 100).toFixed(2)}</p>
-                )}
-                {couponMessage && <p className="mt-2 text-sm text-muted-foreground">{couponMessage}</p>}
               </div>
 
-              <div className={`p-6 rounded-2xl border-2 ${isDarkMode ? "bg-slate-800/50 border-slate-600" : "bg-white/80 border-blue-200"}`}>
-                <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                  Contact Seller
-                </h3>
-                <p className={`text-sm mb-4 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-                  Use the button below to message the seller. (Button is non-functional as requested.)
-                </p>
-                <div className="flex gap-3">
-                  <Button className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold">
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Send Message
-                  </Button>
-                  <Button variant="outline" onClick={() => setProductDetailOpen(false)}>
-                    Close
-                  </Button>
+              <div className="p-4 sm:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#ff9800]/30 shadow-xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#ff9800]/5 to-[#ff9800]/10" />
+                <div className="relative z-10">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
+                    <div className="w-2 h-6 rounded-full bg-gradient-to-b from-[#ff9800] to-[#ff9800]/80" />
+                    Apply Coupon
+                  </h3>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      placeholder="Enter coupon code"
+                      className="flex-1 rounded-lg p-3 border-2 backdrop-blur-sm transition-all duration-300 bg-white border-[#ff9800]/30 focus:border-[#ff9800] text-gray-900"
+                    />
+                    <Button
+                      onClick={() => {
+                        // simple demo coupon logic: if code is SAVE10 => 10% off
+                        if (couponCode.trim().toUpperCase() === "SAVE10") {
+                          setDiscountPercent(10)
+                          setCouponMessage("Coupon applied: 10% off")
+                        } else if (couponCode.trim() === "") {
+                          setDiscountPercent(0)
+                          setCouponMessage("Enter a coupon code to apply")
+                        } else {
+                          setDiscountPercent(0)
+                          setCouponMessage("Invalid coupon")
+                        }
+                      }}
+                      className="px-6 py-3 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg sm:w-auto w-full"
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                  {discountPercent > 0 && (
+                    <p className="mt-3 text-sm font-medium text-[#ff9800]">Discount: {discountPercent}% — New price: ${((selectedProductDetail.price * (100 - discountPercent)) / 100).toFixed(2)}</p>
+                  )}
+                  {couponMessage && <p className="mt-2 text-sm text-gray-600">{couponMessage}</p>}
+                </div>
+              </div>
+
+              <div className="p-4 sm:p-6 rounded-2xl border-2 backdrop-blur-sm relative overflow-hidden bg-white/95 border-[#0d47a1]/30 shadow-xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0d47a1]/5 to-[#00bcd4]/5" />
+                <div className="relative z-10">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-900">
+                    <div className="w-2 h-6 rounded-full bg-gradient-to-b from-[#0d47a1] to-[#00bcd4]" />
+                    Contact Seller
+                  </h3>
+                  <p className="text-sm mb-4 text-gray-700">
+                    Use the button below to message the seller. (Button is non-functional as requested.)
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button className="flex-1 bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Send Message
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setProductDetailOpen(false)} 
+                      className="w-full sm:w-auto border-2 border-[#ff9800] text-[#ff9800] hover:bg-[#ff9800]/10 hover:border-[#ff9800]/80"
+                    >
+                      Close
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2167,10 +2286,10 @@ export default function Marketplace() {
 
       {/* Send QR Modal */}
       <Sheet open={showSendQR} onOpenChange={setShowSendQR}>
-        <SheetContent className={`w-[90%] max-w-md ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"}`}>
+        <SheetContent className="w-[90%] max-w-md p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
           <SheetHeader>
-            <SheetTitle className={`flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-              <Send className="h-5 w-5" />
+            <SheetTitle className="flex items-center gap-2 text-white">
+              <Send className="h-5 w-5 text-[#00bcd4]" />
               Enviar Crypto
             </SheetTitle>
           </SheetHeader>
@@ -2178,7 +2297,7 @@ export default function Marketplace() {
           <div className="mt-6 space-y-6">
             {/* Recipient Address */}
             <div>
-              <Label htmlFor="recipient" className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+              <Label htmlFor="recipient" className="text-sm font-medium text-white">
                 Dirección de destino
               </Label>
               <Input
@@ -2186,13 +2305,13 @@ export default function Marketplace() {
                 placeholder="0x..."
                 value={recipientAddress}
                 onChange={(e) => setRecipientAddress(e.target.value)}
-                className={`mt-1 ${isDarkMode ? "bg-slate-800 border-slate-600 text-white" : "bg-white border-gray-300"}`}
+                className="mt-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-[#00bcd4] focus:ring-[#00bcd4]"
               />
             </div>
 
             {/* Amount */}
             <div>
-              <Label htmlFor="amount" className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+              <Label htmlFor="amount" className="text-sm font-medium text-white">
                 Cantidad (ETH)
               </Label>
               <Input
@@ -2202,9 +2321,9 @@ export default function Marketplace() {
                 placeholder="0.0"
                 value={sendAmount}
                 onChange={(e) => setSendAmount(e.target.value)}
-                className={`mt-1 ${isDarkMode ? "bg-slate-800 border-slate-600 text-white" : "bg-white border-gray-300"}`}
+                className="mt-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-[#00bcd4] focus:ring-[#00bcd4]"
               />
-              <p className={`text-xs mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+              <p className="text-xs mt-1 text-white/70">
                 Balance disponible: {balance} ETH
               </p>
             </div>
@@ -2212,17 +2331,17 @@ export default function Marketplace() {
             {/* QR Code */}
             {recipientAddress && sendAmount && (
               <div className="flex flex-col items-center space-y-4">
-                <div className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"}`}>
+                <div className="p-4 rounded-lg bg-white/10 border border-white/20">
                   <img 
                     src={generateSendQR()} 
                     alt="QR Code para envío"
                     className="w-48 h-48"
                   />
                 </div>
-                <p className={`text-sm text-center ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                <p className="text-sm text-center text-white/80">
                   Escanea este código QR para enviar {sendAmount} ETH
                 </p>
-                <div className={`p-3 rounded-lg text-xs font-mono ${isDarkMode ? "bg-slate-800 text-gray-300" : "bg-gray-100 text-gray-700"}`}>
+                <div className="p-3 rounded-lg text-xs font-mono bg-white/10 text-[#00bcd4] border border-white/20">
                   Para: {truncateAddress(recipientAddress)}
                 </div>
               </div>
@@ -2231,7 +2350,7 @@ export default function Marketplace() {
             <div className="flex gap-3 pt-4">
               <Button 
                 variant="outline" 
-                className="flex-1"
+                className="flex-1 border-white/20 text-white hover:bg-white/10 hover:text-white"
                 onClick={() => {
                   setShowSendQR(false)
                   setRecipientAddress("")
@@ -2241,7 +2360,7 @@ export default function Marketplace() {
                 Cancelar
               </Button>
               <Button 
-                className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600"
+                className="flex-1 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white"
                 disabled={!recipientAddress || !sendAmount}
                 onClick={() => {
                   alert(`🚀 Transacción preparada!\n\nEnviando ${sendAmount} ETH\nA: ${truncateAddress(recipientAddress)}\n\n(Simulación - QR generado exitosamente)`)
@@ -2260,10 +2379,10 @@ export default function Marketplace() {
 
       {/* Receive QR Modal */}
       <Sheet open={showReceiveQR} onOpenChange={setShowReceiveQR}>
-        <SheetContent className={`w-[90%] max-w-md ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"}`}>
+        <SheetContent className="w-[90%] max-w-md p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
           <SheetHeader>
-            <SheetTitle className={`flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-              <Download className="h-5 w-5" />
+            <SheetTitle className="flex items-center gap-2 text-white">
+              <Download className="h-5 w-5 text-[#00bcd4]" />
               Recibir Crypto
             </SheetTitle>
           </SheetHeader>
@@ -2271,25 +2390,25 @@ export default function Marketplace() {
           <div className="mt-6 space-y-6">
             {/* QR Code */}
             <div className="flex flex-col items-center space-y-4">
-              <div className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"}`}>
+              <div className="p-4 rounded-lg bg-white/10 border border-white/20">
                 <img 
                   src={generateReceiveQR()} 
                   alt="QR Code para recibir"
                   className="w-48 h-48"
                 />
               </div>
-              <p className={`text-sm text-center ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+              <p className="text-sm text-center text-white/80">
                 Comparte este código QR para recibir ETH en Sepolia
               </p>
             </div>
 
             {/* Wallet Address */}
             <div>
-              <Label className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+              <Label className="text-sm font-medium text-white">
                 Tu dirección de wallet
               </Label>
-              <div className={`mt-1 p-3 rounded-lg border ${isDarkMode ? "bg-slate-800 border-slate-600" : "bg-gray-50 border-gray-200"}`}>
-                <p className={`text-sm font-mono break-all ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+              <div className="mt-1 p-3 rounded-lg border bg-white/10 border-white/20">
+                <p className="text-sm font-mono break-all text-[#00bcd4]">
                   {walletAddress}
                 </p>
               </div>
@@ -2297,7 +2416,7 @@ export default function Marketplace() {
 
             {/* Copy Button */}
             <Button 
-              className="w-full bg-gradient-to-r from-green-600 to-emerald-600"
+              className="w-full bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white"
               onClick={() => {
                 navigator.clipboard.writeText(walletAddress)
                 alert("📋 Dirección copiada al portapapeles!")
@@ -2310,7 +2429,7 @@ export default function Marketplace() {
             <div className="flex gap-3 pt-4">
               <Button 
                 variant="outline" 
-                className="flex-1"
+                className="flex-1 border-white/20 text-white hover:bg-white/10 hover:text-white"
                 onClick={() => setShowReceiveQR(false)}
               >
                 Cerrar
@@ -2320,39 +2439,261 @@ export default function Marketplace() {
         </SheetContent>
       </Sheet>
 
+      {/* QR Upload Modal */}
+      <Sheet open={showQRUploadModal} onOpenChange={setShowQRUploadModal}>
+        <SheetContent className="w-[95%] max-w-md p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2 text-white">
+              <Upload className="h-5 w-5 text-[#00bcd4]" />
+              Subir Código QR
+            </SheetTitle>
+          </SheetHeader>
+          
+          <div className="mt-6 space-y-6">
+            {/* Upload Instructions */}
+            <div className="p-4 rounded-lg border bg-[#00bcd4]/10 border-[#00bcd4]/30">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 bg-[#00bcd4] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Camera className="h-3 w-3 text-white" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-white">
+                    Instrucciones:
+                  </p>
+                  <ul className="text-xs space-y-1 text-white/90">
+                    <li>• Selecciona una imagen clara del código QR</li>
+                    <li>• Asegúrate de que el QR esté bien iluminado</li>
+                    <li>• Formatos soportados: JPG, PNG</li>
+                    <li>• Tamaño máximo: 10MB</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* File Upload */}
+            <div className="space-y-4">
+              <div className="border-2 border-dashed rounded-lg p-8 text-center transition-colors border-white/30 bg-white/10 backdrop-blur-sm hover:border-[#00bcd4]/50">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleQRImageUpload}
+                  className="hidden"
+                  id="qr-upload"
+                />
+                <label htmlFor="qr-upload" className="cursor-pointer">
+                  <div className="space-y-3">
+                    <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center bg-white/20 backdrop-blur-sm">
+                      <Upload className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-white">
+                        Seleccionar imagen
+                      </p>
+                      <p className="text-sm text-white/80">
+                        Haz clic para elegir un archivo
+                      </p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              {/* Show selected file */}
+              {uploadedQRImage && (
+                <div className="p-3 rounded-lg border bg-white/95 backdrop-blur-sm border-[#ff9800]/30">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-[#ff9800] rounded-lg flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {uploadedQRImage.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(uploadedQRImage.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4">
+              <Button 
+                variant="outline" 
+                className="flex-1 border-[#00bcd4] text-[#00bcd4] hover:bg-[#00bcd4]/10"
+                onClick={() => {
+                  resetQRUpload()
+                }}
+                disabled={isProcessingQR}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                className="flex-1 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70"
+                disabled={!uploadedQRImage || isProcessingQR}
+                onClick={processQRCode}
+              >
+                {isProcessingQR ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Procesando...
+                  </>
+                ) : (
+                  <>
+                    <QrCode className="h-4 w-4 mr-2" />
+                    Procesar QR
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* QR Result Modal */}
+      <Sheet open={showQRResultModal} onOpenChange={setShowQRResultModal}>
+        <SheetContent className="w-[95%] max-w-lg p-6 h-[100vh] overflow-y-auto bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2 text-white">
+              <QrCode className="h-5 w-5 text-[#00bcd4]" />
+              Información del QR
+            </SheetTitle>
+          </SheetHeader>
+          
+          {qrData && (
+            <div className="mt-6 space-y-6">
+              {/* Payment Details Card */}
+              <div className="p-6 rounded-xl border-2 bg-white/95 backdrop-blur-sm border-[#00bcd4]/30 shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 rounded-full flex items-center justify-center">
+                    <DollarSign className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900">
+                      Solicitud de Pago
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Información extraída del QR
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Amount */}
+                  <div className="p-4 rounded-lg bg-[#ff9800]/10 border border-[#ff9800]/30">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-600">
+                        Monto a pagar:
+                      </span>
+                      <span className="text-2xl font-bold text-[#ff9800]">
+                        {qrData.amount} {qrData.currency}
+                      </span>
+                    </div>
+                    {qrData.fee && (
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">
+                          Comisión:
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {qrData.fee} {qrData.currency}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Exchange Rate */}
+                  {qrData.exchangeRate && (
+                    <div className="p-3 rounded-lg flex items-center gap-2 bg-[#0d47a1]/10 border border-[#0d47a1]/20">
+                      <ArrowDownUp className="h-4 w-4 text-[#00bcd4]" />
+                      <span className="text-sm text-gray-700">
+                        {qrData.exchangeRate}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Wallet Address (if available) */}
+                  {qrData.address && (
+                    <div className="p-4 rounded-lg bg-[#0d47a1]/10 border border-[#0d47a1]/20">
+                      <h4 className="text-sm font-medium mb-2 text-gray-600">
+                        Dirección de wallet:
+                      </h4>
+                      <p className="font-mono text-sm break-all text-gray-700">
+                        {qrData.address}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Raw Data */}
+                  <details className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <summary className="text-sm font-medium cursor-pointer text-gray-600">
+                      Datos completos del QR
+                    </summary>
+                    <p className="font-mono text-xs mt-2 break-all text-gray-500">
+                      {qrData.rawData}
+                    </p>
+                  </details>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 border-[#00bcd4] text-[#00bcd4] hover:bg-[#00bcd4]/10"
+                  onClick={() => {
+                    resetQRUpload()
+                  }}
+                >
+                  Cerrar
+                </Button>
+                <Button 
+                  className="flex-1 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70"
+                  onClick={() => {
+                    alert(`💰 Procesando pago de ${qrData.amount} ${qrData.currency}\n\n✅ En un proyecto real, aquí se conectaría con el sistema de pagos.`)
+                    resetQRUpload()
+                  }}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Procesar Pago
+                </Button>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
       {/* Deposit Modal */}
       <Sheet open={showDepositModal} onOpenChange={setShowDepositModal}>
-        <SheetContent className={`w-[90%] max-w-md ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"}`}>
+        <SheetContent className="w-[90%] max-w-md p-6 bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
           <SheetHeader>
-            <SheetTitle className={`flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-              <CreditCard className="h-5 w-5" />
+            <SheetTitle className="flex items-center gap-2 text-white">
+              <CreditCard className="h-5 w-5 text-[#00bcd4]" />
               ¿Cuánto quieres depositar?
             </SheetTitle>
           </SheetHeader>
           
           <div className="mt-6 space-y-6">
             {/* Exchange Rate Display */}
-            <div className={`p-3 rounded-lg flex items-center gap-2 ${isDarkMode ? "bg-slate-800" : "bg-gray-50"}`}>
-              <ArrowDownUp className="h-4 w-4 text-green-500" />
-              <span className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+            <div className="p-3 rounded-lg flex items-center gap-2 bg-[#00bcd4]/20 border border-[#00bcd4]/30">
+              <ArrowDownUp className="h-4 w-4 text-[#ff9800]" />
+              <span className="text-sm text-white">
                 1 USD = {usdcRate} Bs
               </span>
             </div>
 
             {/* Deposit Amount Input */}
             <div>
-              <Label className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+              <Label className="text-sm font-medium text-white">
                 Depositando
               </Label>
               <div className="mt-2 space-y-3">
                 {/* Bolivianos Input */}
                 <div className="relative">
-                  <div className={`flex items-center gap-3 p-4 rounded-lg border-2 ${
-                    isDarkMode ? "bg-slate-800 border-slate-600" : "bg-white border-gray-200"
-                  }`}>
+                  <div className="flex items-center gap-3 p-4 rounded-lg border-2 bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-4 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-sm"></div>
-                      <span className={`font-medium ${isDarkMode ? "text-white" : "text-gray-900"}`}>Bs</span>
+                      <span className="font-medium text-gray-900">Bs</span>
                     </div>
                     <Input
                       type="number"
@@ -2360,11 +2701,9 @@ export default function Marketplace() {
                       placeholder="0,00"
                       value={depositAmountBs}
                       onChange={(e) => setDepositAmountBs(e.target.value)}
-                      className={`border-0 bg-transparent text-right text-lg font-semibold focus-visible:ring-0 ${
-                        isDarkMode ? "text-white placeholder:text-gray-500" : "text-gray-900 placeholder:text-gray-400"
-                      }`}
+                      className="border-0 bg-transparent text-right text-lg font-semibold focus-visible:ring-0 text-gray-900 placeholder:text-gray-400"
                     />
-                    <span className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                    <span className="text-xs text-gray-500">
                       Comisión 0 Bs
                     </span>
                   </div>
@@ -2372,30 +2711,28 @@ export default function Marketplace() {
 
                 {/* Conversion Arrow */}
                 <div className="flex justify-center">
-                  <div className={`p-2 rounded-full ${isDarkMode ? "bg-slate-800" : "bg-gray-100"}`}>
-                    <ArrowDownUp className="h-4 w-4 text-green-500" />
+                  <div className="p-2 rounded-full bg-white/20 backdrop-blur-sm">
+                    <ArrowDownUp className="h-4 w-4 text-[#ff9800]" />
                   </div>
                 </div>
 
                 {/* USDC Output */}
                 <div className="relative">
-                  <Label className={`text-xs font-medium ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                  <Label className="text-xs font-medium text-white/80">
                     Recibes
                   </Label>
-                  <div className={`flex items-center gap-3 p-4 rounded-lg border-2 ${
-                    isDarkMode ? "bg-slate-800 border-slate-600" : "bg-white border-gray-200"
-                  }`}>
+                  <div className="flex items-center gap-3 p-4 rounded-lg border-2 bg-white/95 backdrop-blur-sm border-[#ff9800]/30">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                      <div className="w-6 h-6 bg-[#ff9800] rounded-full flex items-center justify-center">
                         <span className="text-white text-xs font-bold">$</span>
                       </div>
-                      <span className={`font-medium ${isDarkMode ? "text-white" : "text-gray-900"}`}>USDC</span>
+                      <span className="font-medium text-gray-900">USDC</span>
                     </div>
                     <div className="flex-1 text-right">
-                      <div className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                      <div className="text-lg font-semibold text-[#ff9800]">
                         ${calculateUSDCAmount()}
                       </div>
-                      <div className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                      <div className="text-xs text-gray-500">
                         Balance ${balanceUSD}
                       </div>
                     </div>
@@ -2406,14 +2743,14 @@ export default function Marketplace() {
 
             {/* Deposit Limits */}
             <div className="space-y-2">
-              <div className={`flex items-center gap-2 text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                <div className="w-4 h-4 bg-green-500 rounded-sm flex items-center justify-center">
+              <div className="flex items-center gap-2 text-sm text-white/90">
+                <div className="w-4 h-4 bg-[#ff9800] rounded-sm flex items-center justify-center">
                   <span className="text-white text-xs">✓</span>
                 </div>
                 <span>Depósito mínimo 1,00 Bs</span>
               </div>
-              <div className={`flex items-center gap-2 text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                <div className="w-4 h-4 bg-green-500 rounded-sm flex items-center justify-center">
+              <div className="flex items-center gap-2 text-sm text-white/90">
+                <div className="w-4 h-4 bg-[#ff9800] rounded-sm flex items-center justify-center">
                   <span className="text-white text-xs">✓</span>
                 </div>
                 <span>Depósito máximo 10.837,50 Bs</span>
@@ -2424,7 +2761,7 @@ export default function Marketplace() {
             <div className="flex gap-3 pt-4">
               <Button 
                 variant="outline" 
-                className="flex-1"
+                className="flex-1 border-[#00bcd4] text-[#00bcd4] hover:bg-[#00bcd4]/10"
                 onClick={() => {
                   setShowDepositModal(false)
                   setDepositAmountBs("")
@@ -2434,9 +2771,12 @@ export default function Marketplace() {
                 Cancelar
               </Button>
               <Button 
-                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600"
+                className="flex-1 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70"
                 disabled={!depositAmountBs || parseFloat(depositAmountBs) <= 0 || isLoadingDeposit}
-                onClick={handleDepositConfirm}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDepositConfirm();
+                }}
               >
                 {isLoadingDeposit ? (
                   <>
@@ -2457,10 +2797,10 @@ export default function Marketplace() {
 
       {/* Payment QR Modal */}
       <Sheet open={showPaymentQR} onOpenChange={setShowPaymentQR}>
-        <SheetContent className={`w-[90%] max-w-md ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"}`}>
+        <SheetContent className="w-[95%] sm:w-[90%] max-w-lg p-4 sm:p-6 h-[100vh] overflow-y-auto bg-gradient-to-br from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
           <SheetHeader>
-            <SheetTitle className={`flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-              <QrCode className="h-5 w-5" />
+            <SheetTitle className="flex items-center gap-2 text-white">
+              <QrCode className="h-5 w-5 text-[#00bcd4]" />
               Escanea para Pagar
             </SheetTitle>
           </SheetHeader>
@@ -2468,15 +2808,15 @@ export default function Marketplace() {
           <div className="mt-6 space-y-6">
             {/* Transaction Details */}
             {pendingDepositData && (
-              <div className={`p-4 rounded-lg border ${isDarkMode ? "bg-slate-800 border-slate-600" : "bg-gray-50 border-gray-200"}`}>
+              <div className="p-4 rounded-lg border bg-white/95 backdrop-blur-sm border-[#00bcd4]/30">
                 <div className="text-center space-y-2">
-                  <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                  <h3 className="text-lg font-semibold text-gray-900">
                     Depósito de {pendingDepositData.bs} Bs
                   </h3>
-                  <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                  <p className="text-sm text-gray-600">
                     Recibirás {pendingDepositData.usdc} USDC
                   </p>
-                  <div className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                  <div className="text-xs text-gray-500">
                     Tasa: 1 USD = {usdcRate} Bs
                   </div>
                 </div>
@@ -2485,7 +2825,7 @@ export default function Marketplace() {
 
             {/* QR Code */}
             <div className="flex flex-col items-center space-y-4">
-              <div className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"}`}>
+              <div className="p-4 rounded-lg bg-white/95 backdrop-blur-sm border border-[#00bcd4]/30">
                 <img 
                   src="/payment-qr.jpg" 
                   alt="QR Code para pago"
@@ -2493,26 +2833,26 @@ export default function Marketplace() {
                 />
               </div>
               <div className="text-center space-y-2">
-                <p className={`text-sm font-medium ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
+                <p className="text-sm font-medium text-white">
                   Escanea este código QR con tu app de pagos
                 </p>
-                <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                <p className="text-xs text-white/80">
                   Una vez realizado el pago, confirma la transacción
                 </p>
               </div>
             </div>
 
             {/* Payment Instructions */}
-            <div className={`p-3 rounded-lg ${isDarkMode ? "bg-blue-900/20 border border-blue-600/30" : "bg-blue-50 border border-blue-200"}`}>
+            <div className="p-3 rounded-lg bg-[#00bcd4]/20 border border-[#00bcd4]/30">
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-5 h-5 bg-[#00bcd4] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-white text-xs">!</span>
                 </div>
                 <div className="space-y-1">
-                  <p className={`text-sm font-medium ${isDarkMode ? "text-blue-300" : "text-blue-700"}`}>
+                  <p className="text-sm font-medium text-white">
                     Instrucciones de pago:
                   </p>
-                  <ul className={`text-xs space-y-1 ${isDarkMode ? "text-blue-200" : "text-blue-600"}`}>
+                  <ul className="text-xs space-y-1 text-white/90">
                     <li>• Abre tu app de pagos móvil</li>
                     <li>• Escanea el código QR</li>
                     <li>• Confirma el monto: {pendingDepositData?.bs} Bs</li>
@@ -2527,7 +2867,7 @@ export default function Marketplace() {
             <div className="flex gap-3 pt-4">
               <Button 
                 variant="outline" 
-                className="flex-1"
+                className="flex-1 border-[#00bcd4] text-[#00bcd4] hover:bg-[#00bcd4]/10"
                 onClick={() => {
                   setShowPaymentQR(false)
                   setShowDepositModal(true) // Volver al modal de depósito
@@ -2536,7 +2876,7 @@ export default function Marketplace() {
                 ← Volver
               </Button>
               <Button 
-                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600"
+                className="flex-1 bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70"
                 onClick={handlePaymentComplete}
               >
                 ✓ Confirmar Pago
@@ -2545,7 +2885,7 @@ export default function Marketplace() {
 
             {/* Timer or Status */}
             <div className="text-center">
-              <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+              <p className="text-xs text-white/70">
                 🕐 Este QR expira en 15 minutos
               </p>
             </div>
