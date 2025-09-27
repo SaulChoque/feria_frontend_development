@@ -2,6 +2,8 @@
 
 import { PrivyProvider } from '@privy-io/react-auth'
 
+import { MarketplaceProvider } from "@/context/MarketplaceContext"
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
   
@@ -39,7 +41,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         ],
       }}
     >
-      {children}
+      <MarketplaceProvider>
+        {children}
+      </MarketplaceProvider>
     </PrivyProvider>
   )
 }

@@ -1,27 +1,19 @@
 "use client"
 
 import type React from "react"
-import { useEffect } from "react"
-import { useState } from "react"
-import { useRef } from "react"
-import { usePrivy } from '@privy-io/react-auth'
 import {
   Search,
   ShoppingCart,
   ShoppingBag,
   Heart,
-  Wallet,
   Menu,
   Star,
   Plus,
   X,
-  Minus,
   MapPin,
   Filter,
   Camera,
   Sparkles,
-  Zap,
-  TrendingUp,
   Moon,
   Sun,
   Package,
@@ -46,1443 +38,180 @@ import {
   RefreshCw,
   Compass,
 } from "lucide-react"
+import { FloatingCart } from "@/components/marketplace/FloatingCart"
+import { ProductCard } from "@/components/marketplace/ProductCard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-
-// Mock data for general marketplace with diverse product categories
-const mockProducts = [
-  {
-    id: 1,
-    name: "iPhone 15 Pro Max",
-    price: 1199.99,
-    originalPrice: 1299.99,
-    image: "/iphone-15-pro-max.png",
-    description: "Latest iPhone with A17 Pro chip, titanium design, and advanced camera system. Features 6.7-inch Super Retina XDR display, Action Button, and all-day battery life. Perfect for photography enthusiasts and power users.",
-    rating: 4.8,
-    reviews: 2847,
-    category: "Electronics",
-    location: "New York, NY",
-    condition: "new",
-    seller: "TechStore NYC",
-    inStock: true,
-    featured: true,
-    saleStatus: undefined as "pago_recibido" | "producto_entregado" | "finalizado" | undefined,
-    purchaseStatus: undefined as "pendiente" | "completado" | "disputa" | "en revision" | undefined,
-  },
-  {
-    id: 2,
-    name: "Modern Sectional Sofa",
-    price: 899.99,
-    originalPrice: 1199.99,
-    image: "/modern-gray-sectional-sofa-furniture.png",
-    description: "Spacious 3-seater sectional sofa in contemporary gray fabric. Features deep cushions, sturdy hardwood frame, and removable covers for easy cleaning. Perfect for living rooms and family spaces.",
-    rating: 4.6,
-    reviews: 432,
-    category: "Furniture",
-    location: "Los Angeles, CA",
-    condition: "new",
-    seller: "HomeDesign LA",
-    inStock: true,
-    featured: true,
-  },
-  {
-    id: 3,
-    name: "Nike Air Jordan 1 Retro",
-    price: 170.0,
-    originalPrice: 200.0,
-    image: "/nike-air-jordan-1-sneakers-red-black.png",
-    description: "Iconic Air Jordan 1 in classic Chicago colorway. Premium leather construction with original design elements. Authentic and in excellent condition, perfect for collectors and sneaker enthusiasts.",
-    rating: 4.9,
-    reviews: 1256,
-    category: "Clothing",
-    location: "Chicago, IL",
-    condition: "new",
-    seller: "SneakerHub",
-    inStock: true,
-    featured: true,
-  },
-  {
-    id: 4,
-    name: "2019 Honda Civic",
-    price: 18500.0,
-    originalPrice: 19500.0,
-    image: "/2019-honda-civic-sedan-blue-car.png",
-    description: "Reliable 2019 Honda Civic sedan with low mileage and complete service history. Features fuel-efficient engine, CVT transmission, Honda Sensing safety suite, and excellent build quality. One owner, garage kept.",
-    rating: 4.5,
-    reviews: 89,
-    category: "Vehicles",
-    location: "Miami, FL",
-    condition: "used",
-    seller: "AutoDealer Miami",
-    inStock: true,
-    featured: true,
-  },
-  {
-    id: 5,
-    name: "MacBook Pro 16-inch M3",
-    price: 2399.99,
-    originalPrice: 2599.99,
-    image: "/macbook-pro-16-inch-laptop-silver.png",
-    description: "Brand new MacBook Pro 16-inch featuring the revolutionary M3 Pro chip with 12-core CPU and 18-core GPU. This powerhouse includes 18GB unified memory, 512GB SSD storage, and the stunning Liquid Retina XDR display with ProMotion technology. Perfect for professional video editing, 3D rendering, and software development. Features the advanced camera system, studio-quality three-mic array, and six-speaker sound system with Spatial Audio. Includes MagSafe 3 charging, three Thunderbolt 4 ports, HDMI port, and SDXC card slot. All-day battery life up to 22 hours video playback. Comes with 1-year AppleCare warranty and original packaging.",
-    rating: 4.8,
-    reviews: 1876,
-    category: "Electronics",
-    location: "San Francisco, CA",
-    condition: "new",
-    seller: "Apple Store SF",
-    inStock: true,
-    featured: false,
-  },
-  {
-    id: 6,
-    name: "Vintage Leather Armchair",
-    price: 650.0,
-    originalPrice: 850.0,
-    image: "/vintage-brown-leather-armchair-furniture.png",
-    description: "Stunning mid-century vintage leather armchair crafted from premium full-grain brown leather with beautiful patina that tells its story. Features solid hardwood frame construction with traditional mortise and tenon joinery for exceptional durability. The high-density foam cushioning provides excellent comfort while maintaining its shape over time. Hand-rubbed leather finish shows authentic character marks that add to its charm and uniqueness. Deep button tufting and rolled arms showcase classic design elements. Minor wear marks on arms and seat edges are consistent with age and add to its vintage appeal. Dimensions: 32\"W x 34\"D x 36\"H with 18\" seat height. Professional cleaning recommended.",
-    rating: 4.4,
-    reviews: 234,
-    category: "Furniture",
-    location: "Austin, TX",
-    condition: "used",
-    seller: "Vintage Finds",
-    inStock: true,
-    featured: false,
-  },
-  {
-    id: 7,
-    name: "Levi's 501 Original Jeans",
-    price: 59.99,
-    originalPrice: 79.99,
-    image: "/levis-501-blue-denim-jeans.png",
-    description: "Authentic Levi's 501 Original jeans in classic medium blue wash - the gold standard of denim since 1873. Made from 100% cotton denim with the iconic straight leg fit that never goes out of style. Features the original button fly, five-pocket styling, and signature arcuate stitching on back pockets. Pre-shrunk for consistent fit and constructed with reinforced stress points for maximum durability. This timeless design has been worn by generations and continues to be the most popular jean style worldwide. Perfect for everyday wear, these jeans get better with age and develop unique fading patterns. Available in waist sizes 28-40 and inseam lengths 30-36. Machine washable. New with tags.",
-    rating: 4.7,
-    reviews: 892,
-    category: "Clothing",
-    location: "Portland, OR",
-    condition: "new",
-    seller: "Denim Co",
-    inStock: true,
-    featured: false,
-  },
-  {
-    id: 8,
-    name: "2020 Tesla Model 3",
-    price: 35000.0,
-    originalPrice: 37000.0,
-    image: "/2020-tesla-model-3-white-electric-car.png",
-    description: "Exceptional 2020 Tesla Model 3 Long Range in pristine Pearl White Multi-Coat finish. This electric vehicle delivers an impressive 358 miles of range on a single charge with dual motor all-wheel drive for superior traction in all weather conditions. Features the latest Autopilot hardware with Full Self-Driving capability, over-the-air software updates, and the premium connectivity package. Interior boasts vegan leather seating, heated front and rear seats, premium audio system with 14 speakers, and the iconic 15-inch touchscreen display. Recent software update includes Tesla Theater, gaming, and enhanced navigation. Only 23,000 miles with complete service history and clean title. Includes mobile connector, wall connector, and all original documentation. No accidents, non-smoking owner.",
-    rating: 4.9,
-    reviews: 156,
-    category: "Vehicles",
-    location: "Seattle, WA",
-    condition: "used",
-    seller: "EV Motors",
-    inStock: true,
-    featured: false,
-  },
-]
-
-const categories = ["Electronics", "Furniture", "Clothing", "Vehicles", "Others"]
-// conditions removed because it's unused; explicit condition values are in the UI
-const locations = [
-  "New York, NY",
-  "Los Angeles, CA",
-  "Chicago, IL",
-  "Miami, FL",
-  "San Francisco, CA",
-  "Austin, TX",
-  "Portland, OR",
-  "Seattle, WA",
-]
-
-type Product = (typeof mockProducts)[number]
+import { useMarketplace } from "@/context/MarketplaceContext"
+import { categories, locations } from "@/lib/marketplace/data"
 
 export default function Marketplace() {
-  const { login, authenticated, user, logout } = usePrivy()
-  const [isDarkMode, setIsDarkMode] = useState(false)
-  const [products, setProducts] = useState<Product[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("All Categories")
-  const [selectedCondition, setSelectedCondition] = useState("All Conditions")
-  const [selectedLocation, setSelectedLocation] = useState("All Locations")
-  const [priceRange, setPriceRange] = useState([0, 50000])
-  const [cartItems, setCartItems] = useState<{ id: string; productId: number }[]>([])
-  const [wishlistItems, setWishlistItems] = useState<number[]>([])
-  const [walletConnected, setWalletConnected] = useState(false)
-  const [walletAddress, setWalletAddress] = useState("")
-  const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const [isCartOpen, setIsCartOpen] = useState(false)
-  // Only the current view mode is required; the setter wasn't used anywhere.
-  const [viewMode] = useState<"grid" | "list">("grid")
-  const [isSellerDashboardOpen, setIsSellerDashboardOpen] = useState(false)
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    price: "",
-    originalPrice: "",
-    category: "",
-    condition: "",
-    location: "",
-    description: "",
-    image: "",
-  })
-
-  const [contactSellerOpen, setContactSellerOpen] = useState(false)
-  const [selectedSeller, setSelectedSeller] = useState<Product | null>(null)
-
-  // Product detail sheet state
-  const [productDetailOpen, setProductDetailOpen] = useState(false)
-  const [selectedProductDetail, setSelectedProductDetail] = useState<Product | null>(null)
-  const [couponCode, setCouponCode] = useState("")
-  const [discountPercent, setDiscountPercent] = useState<number>(0)
-  const [couponMessage, setCouponMessage] = useState("")
-  const [showFullAddress, setShowFullAddress] = useState(false)
-  const [showUserDropdown, setShowUserDropdown] = useState(false)
-  const [showBalance, setShowBalance] = useState(true)
-  const [balance, setBalance] = useState("0.00")
-  const [balanceUSD, setBalanceUSD] = useState("0.00")
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false)
-
-  // Sales module state
-  const [showSalesModal, setShowSalesModal] = useState(false)
-  const [selectedSaleProduct, setSelectedSaleProduct] = useState<Product | null>(null)
-  
-  // Purchases module state
-  const [showPurchasesModal, setShowPurchasesModal] = useState(false)
-  const [selectedPurchaseProduct, setSelectedPurchaseProduct] = useState<Product | null>(null)
-  
-  // Dispute module state
-  const [showDisputeModal, setShowDisputeModal] = useState(false)
-  const [disputeProduct, setDisputeProduct] = useState<Product | null>(null)
-  const [disputeReason, setDisputeReason] = useState("")
-  const [disputeDescription, setDisputeDescription] = useState("")
-  const [disputeImages, setDisputeImages] = useState<string[]>([])
-  
-  // Dispute review module state (for sellers)
-  const [showDisputeReviewModal, setShowDisputeReviewModal] = useState(false)
-  const [reviewingDisputeProduct, setReviewingDisputeProduct] = useState<Product | null>(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  
-  // Appeal module state (for sellers)
-  const [showAppealModal, setShowAppealModal] = useState(false)
-  const [appealProduct, setAppealProduct] = useState<Product | null>(null)
-  const [appealReason, setAppealReason] = useState("")
-  const [appealDescription, setAppealDescription] = useState("")
-  const [appealImages, setAppealImages] = useState<string[]>([])
-  
-  // Appeal review module state (for buyers when seller appeals)
-  const [showAppealReviewModal, setShowAppealReviewModal] = useState(false)
-  const [appealReviewProduct, setAppealReviewProduct] = useState<Product | null>(null)
-  
-  // Reviews modal state
-  const [showReviewsModal, setShowReviewsModal] = useState(false)
-  
-  // Referrals modal state
-  const [showReferralsModal, setShowReferralsModal] = useState(false)
-  const [referralsContext, setReferralsContext] = useState<'navbar' | 'seller' | 'buyer'>('navbar')
-  const [selectedReferral, setSelectedReferral] = useState<any>(null)
-  const [showAddReferralModal, setShowAddReferralModal] = useState(false)
-  const [newReferral, setNewReferral] = useState({
-    nombre: '',
-    direccionWallet: '',
-    codigoReferido: '',
-    validoHasta: ''
-  })
-  
-  const [userPurchases, setUserPurchases] = useState<Product[]>([
-    // Algunos productos de ejemplo que el usuario ha comprado
-    {
-      id: 8001,
-      name: "Mi iPhone 14 Pro", // Mismo nombre que en ventas
-      price: 700,
-      originalPrice: 800,
-      image: "/diverse-products-still-life.png",
-      description: "Compra de iPhone que tiene problemas.",
-      rating: 4.5,
-      reviews: 5,
-      category: "Electronics",
-      location: "Lima, Perú",
-      condition: "used" as const,
-      seller: "VendedorX",
-      inStock: true,
-      featured: false,
-      purchaseStatus: "disputa" as const, // En disputa
-      saleStatus: undefined,
-    },
-    {
-      id: 8002,
-      name: "Mochila de Viaje",
-      price: 45,
-      originalPrice: 60,
-      image: "/diverse-products-still-life.png",
-      description: "Mochila resistente para viajes largos.",
-      rating: 4.8,
-      reviews: 12,
-      category: "Travel",
-      location: "Lima, Perú",
-      condition: "new" as const,
-      seller: "OutdoorGear",
-      inStock: true,
-      featured: false,
-      purchaseStatus: "completado" as const,
-      saleStatus: undefined,
-    },
-    {
-      id: 8003,
-      name: "Reloj Deportivo",
-      price: 120,
-      originalPrice: 150,
-      image: "/diverse-products-still-life.png",
-      description: "Reloj inteligente para deportes y fitness.",
-      rating: 4.6,
-      reviews: 8,
-      category: "Electronics",
-      location: "Lima, Perú",
-      condition: "new" as const,
-      seller: "SportsTech",
-      inStock: true,
-      featured: false,
-      purchaseStatus: "en revision" as const,
-      saleStatus: undefined,
-    },
-    {
-      id: 8004,
-      name: "Tablet Android",
-      price: 280,
-      originalPrice: 320,
-      image: "/diverse-products-still-life.png",
-      description: "Tablet Android con pantalla de 10 pulgadas.",
-      rating: 4.4,
-      reviews: 15,
-      category: "Electronics",
-      location: "Lima, Perú",
-      condition: "used" as const,
-      seller: "TabletStore",
-      inStock: true,
-      featured: false,
-      purchaseStatus: "pendiente" as const,
-      saleStatus: undefined,
-    }
-  ])
-
-  const [userSalesProducts, setUserSalesProducts] = useState<Product[]>([
-    // Algunos productos de ejemplo que el usuario tiene en venta
-    {
-      id: 9001,
-      name: "Mi iPhone 14 Pro",
-      price: 899,
-      originalPrice: 1099,
-      image: "/diverse-products-still-life.png",
-      description: "iPhone 14 Pro en excelente estado, apenas usado por 6 meses.",
-      rating: 5.0,
-      reviews: 8,
-      category: "Electronics",
-      location: "Lima, Perú",
-      condition: "used" as const,
-      seller: "Tú",
-      inStock: true,
-      featured: false,
-      saleStatus: "pago_recibido" as const,
-      purchaseStatus: undefined,
-    },
-    {
-      id: 9002,
-      name: "MacBook Air M2",
-      price: 1199,
-      originalPrice: 1399,
-      image: "/diverse-products-still-life.png",
-      description: "Laptop prácticamente nueva, incluye cargador y funda.",
-      rating: 4.9,
-      reviews: 12,
-      category: "Electronics",
-      location: "Lima, Perú",
-      condition: "used" as const,
-      seller: "Tú",
-      inStock: true,
-      featured: false,
-      saleStatus: "producto_entregado" as const,
-      purchaseStatus: undefined,
-    }
-  ])
-
-  const [imagePreview, setImagePreview] = useState<string>("")
-  // showSellModal removed; we use the seller dashboard state (`isSellerDashboardOpen`) instead.
-
-  // States for QR modals
-  const [showSendQR, setShowSendQR] = useState(false)
-  const [showReceiveQR, setShowReceiveQR] = useState(false)
-  const [sendAmount, setSendAmount] = useState("")
-  const [recipientAddress, setRecipientAddress] = useState("")
-
-  // States for QR Upload functionality
-  const [showQRUploadModal, setShowQRUploadModal] = useState(false)
-  const [showQRResultModal, setShowQRResultModal] = useState(false)
-  const [uploadedQRImage, setUploadedQRImage] = useState<File | null>(null)
-  const [isProcessingQR, setIsProcessingQR] = useState(false)
-  const [qrData, setQrData] = useState<{
-    type: string;
-    amount?: string;
-    address?: string;
-    currency?: string;
-    recipient?: string;
-    fee?: string;
-    exchangeRate?: string;
-    rawData: string;
-  } | null>(null)
-
-  // States for deposit modal
-  const [showDepositModal, setShowDepositModal] = useState(false)
-  const [showPaymentQR, setShowPaymentQR] = useState(false)
-  const [depositAmountBs, setDepositAmountBs] = useState("")
-  const [usdcRate] = useState(12.50) // 1 USD = 12.50 Bs (rate from image)
-  const [isLoadingDeposit, setIsLoadingDeposit] = useState(false)
-  const [pendingDepositData, setPendingDepositData] = useState<{bs: string, usdc: string} | null>(null)
-
-  // Ref for dropdown to handle outside clicks
-  const dropdownRef = useRef<HTMLDivElement>(null)
-
-  // Sync Privy auth state with local wallet state
-  useEffect(() => {
-    if (authenticated && user) {
-      setWalletConnected(true)
-      // Get wallet address from user's linked accounts
-      const walletAccount = user.linkedAccounts.find(
-        (account) => account.type === 'wallet' || account.type === 'smart_wallet'
-      )
-      if (walletAccount) {
-        setWalletAddress(walletAccount.address)
-        // Update balance when wallet connects
-        updateBalance()
-      }
-    } else {
-      setWalletConnected(false)
-      setWalletAddress("")
-      setBalance("0.00")
-      setBalanceUSD("0.00")
-    }
-  }, [authenticated, user])
-
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem("marketplace-dark-mode")
-    if (savedDarkMode) {
-      setIsDarkMode(JSON.parse(savedDarkMode))
-    }
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem("marketplace-dark-mode", JSON.stringify(isDarkMode))
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
-  }, [isDarkMode])
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showUserDropdown && dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowUserDropdown(false)
-      }
-    }
-
-    if (showUserDropdown) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showUserDropdown])
-
-  useEffect(() => {
-    const savedProducts = localStorage.getItem("marketplace-products")
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts))
-    } else {
-      setProducts(mockProducts)
-      localStorage.setItem("marketplace-products", JSON.stringify(mockProducts))
-    }
-  }, [])
-
-  useEffect(() => {
-    if (products.length > 0) {
-      localStorage.setItem("marketplace-products", JSON.stringify(products))
-    }
-  }, [products])
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode)
-  }
-
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = selectedCategory === "All Categories" || product.category === selectedCategory
-    const matchesCondition = selectedCondition === "All Conditions" || product.condition === selectedCondition
-    const matchesLocation = selectedLocation === "All Locations" || product.location === selectedLocation
-    const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1]
-    return matchesSearch && matchesCategory && matchesCondition && matchesLocation && matchesPrice
-  })
-
-  // featuredProducts removed because it's not used in the UI currently
-
-  const addToCart = (productId: number) => {
-    console.log('Adding product to cart:', productId)
-    // Siempre agregar como nuevo item con ID único
-    setCartItems((prev) => {
-      const newItem = { id: `${productId}-${Date.now()}-${Math.random()}`, productId }
-      const newCart = [...prev, newItem]
-      console.log('New cart items:', newCart)
-      return newCart
-    })
-    
-    // Mostrar notificación visual
-    const product = products.find(p => p.id === productId)
-    if (product) {
-      alert(`✅ ${product.name} has been added to your cart!`)
-    }
-  }
-
-  const removeFromCart = (itemId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== itemId))
-  }
-
-  const getCartTotal = () => {
-    return cartItems.reduce((total, item) => {
-      const product = products.find((p) => p.id === item.productId)
-      return total + (product?.price || 0)
-    }, 0)
-  }
-
-  const getCartItemsCount = () => {
-    return cartItems.length
-  }
-
-  // Función para obtener productos que está vendiendo el usuario actual
-  const getUserSalesProducts = () => {
-    return userSalesProducts
-  }
-
-  // Función para actualizar el estado de progreso de un producto en venta
-  const updateSaleStatus = (productId: number, newStatus: "pago_recibido" | "producto_entregado" | "finalizado") => {
-    setUserSalesProducts((prev) =>
-      prev.map((product) =>
-        product.id === productId ? { ...product, saleStatus: newStatus } : product
-      )
-    )
-  }
-
-  // Función para actualizar el estado de una compra
-  const updatePurchaseStatus = (productId: number, newStatus: "pendiente" | "completado" | "disputa") => {
-    setUserPurchases((prev) =>
-      prev.map((product) =>
-        product.id === productId ? { ...product, purchaseStatus: newStatus } : product
-      )
-    )
-  }
-
-  // Función para abrir modal de disputa
-  const openDisputeModal = (product: Product) => {
-    setDisputeProduct(product)
-    setDisputeReason("")
-    setDisputeDescription("")
-    setDisputeImages([])
-    setShowDisputeModal(true)
-  }
-
-  // Función para agregar imagen a la disputa
-  const addDisputeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file && disputeImages.length < 5) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        setDisputeImages(prev => [...prev, result])
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  // Función para remover imagen de la disputa
-  const removeDisputeImage = (index: number) => {
-    setDisputeImages(prev => prev.filter((_, i) => i !== index))
-  }
-
-  // Función para enviar disputa
-  const submitDispute = () => {
-    if (disputeProduct && disputeReason && disputeDescription) {
-      updatePurchaseStatus(disputeProduct.id, "disputa")
-      setShowDisputeModal(false)
-      alert("🚨 Disputa enviada exitosamente. Un moderador revisará tu caso pronto.")
-    } else {
-      alert("❌ Please complete all required fields.")
-    }
-  }
-
-  // Función para verificar si un producto tiene disputas
-  const hasDispute = (productId: number) => {
-    return userPurchases.some(purchase => 
-      purchase.name === userSalesProducts.find(sale => sale.id === productId)?.name && 
-      purchase.purchaseStatus === "disputa"
-    )
-  }
-
-  // Función para obtener información de la disputa
-  const getDisputeInfo = (productName: string) => {
-    const disputedPurchase = userPurchases.find(purchase => 
-      purchase.name === productName && purchase.purchaseStatus === "disputa"
-    )
-    
-    // Datos de ejemplo para la disputa
-    return {
-      motivo: "Producto dañado",
-      descripcion: "El producto llegó con la pantalla rota y no funciona correctamente. Además, el empaque estaba dañado.",
-      imagenes: [
-        "/diverse-products-still-life.png", // Imagen de ejemplo 1
-        "/diverse-products-still-life.png", // Imagen de ejemplo 2
-        "/diverse-products-still-life.png"  // Imagen de ejemplo 3
-      ],
-      comprador: disputedPurchase?.seller || "Comprador Anónimo"
-    }
-  }
-
-  // Función para abrir modal de revisión de disputa
-  const openDisputeReview = (product: Product) => {
-    setReviewingDisputeProduct(product)
-    setCurrentImageIndex(0)
-    setShowDisputeReviewModal(true)
-  }
-
-  // Función para navegar entre imágenes
-  const navigateImage = (direction: 'prev' | 'next') => {
-    const disputeInfo = getDisputeInfo(reviewingDisputeProduct?.name || "")
-    const totalImages = disputeInfo.imagenes.length
-    
-    if (direction === 'prev') {
-      setCurrentImageIndex(prev => prev > 0 ? prev - 1 : totalImages - 1)
-    } else {
-      setCurrentImageIndex(prev => prev < totalImages - 1 ? prev + 1 : 0)
-    }
-  }
-
-  // Función para aceptar y resolver disputa
-  const acceptDispute = () => {
-    if (reviewingDisputeProduct) {
-      // Actualizar estado de la compra a completado
-      updatePurchaseStatus(
-        userPurchases.find(p => p.name === reviewingDisputeProduct.name)?.id || 0, 
-        "completado"
-      )
-      setShowDisputeReviewModal(false)
-      alert("✅ Disputa aceptada. Se ha procesado el reembolso al comprador.")
-    }
-  }
-
-  // Función para apelar disputa
-  const appealDispute = () => {
-    setShowDisputeReviewModal(false)
-    setShowAppealModal(true)
-    setAppealProduct(reviewingDisputeProduct)
-    setAppealReason("")
-    setAppealDescription("")
-    setAppealImages([])
-  }
-
-  // Handle appeal image uploads
-  const handleAppealImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
-    if (files.length === 0) return
-
-    if (appealImages.length + files.length > 5) {
-      alert("Máximo 5 imágenes permitidas")
-      return
-    }
-
-    files.forEach(file => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        setAppealImages(prev => [...prev, result])
-      }
-      reader.readAsDataURL(file)
-    })
-  }
-
-  const removeAppealImage = (index: number) => {
-    setAppealImages(prev => prev.filter((_, i) => i !== index))
-  }
-
-  const submitAppeal = () => {
-    if (!appealDescription.trim()) {
-      alert("Please describe your appeal")
-      return
-    }
-
-    // Here you would submit to your backend
-    console.log("Appeal submitted:", {
-      product: appealProduct,
-      reason: appealReason,
-      description: appealDescription,
-      images: appealImages
-    })
-
-    // Update the purchase status to "en revision" when seller appeals
-    if (appealProduct) {
-      const updatedPurchases = userPurchases.map(purchase => 
-        purchase.name === appealProduct.name 
-          ? { ...purchase, purchaseStatus: "en revision" as const }
-          : purchase
-      )
-      setUserPurchases(updatedPurchases)
-    }
-
-    alert("Apelación enviada exitosamente. Un moderador revisará el caso en las próximas 24-48 horas.")
-    setShowAppealModal(false)
-    setAppealProduct(null)
-  }
-
-  // Function to get seller appeal info (simulated data)
-  const getSellerAppealInfo = (productName: string) => {
-    const appealData: { [key: string]: any } = {
-      "Celular Samsung Galaxy": {
-        motivoApelacion: "producto-entregado",
-        descripcionApelacion: "El producto fue entregado correctamente según lo acordado. Tengo evidencia de la entrega y el comprador confirmó recibirlo en perfecto estado inicialmente.",
-        imagenesApelacion: [
-          "/api/placeholder/400/300",
-          "/api/placeholder/400/300",
-          "/api/placeholder/400/300"
-        ],
-        fechaApelacion: "2024-01-15",
-        vendedor: "TechStore2024"
-      },
-      "Reloj Deportivo": {
-        motivoApelacion: "producto-entregado",
-        descripcionApelacion: "El reloj fue entregado en perfecto estado y funcionando correctamente. El comprador lo probó durante 2 semanas antes de abrir la disputa. Adjunto evidencia de la entrega y conversaciones donde confirmaba que todo estaba bien.",
-        imagenesApelacion: [
-          "/diverse-products-still-life.png",
-          "/diverse-products-still-life.png",
-          "/diverse-products-still-life.png"
-        ],
-        fechaApelacion: "2024-01-20",
-        vendedor: "SportsTech"
-      }
-    }
-    return appealData[productName] || {
-      motivoApelacion: "producto-entregado",
-      descripcionApelacion: "El vendedor ha apelado esta disputa.",
-      imagenesApelacion: ["/api/placeholder/400/300"],
-      fechaApelacion: "2024-01-15",
-      vendedor: "Vendedor"
-    }
-  }
-
-  // Function to open appeal review modal (for buyers)
-  const openAppealReview = (product: Product) => {
-    setAppealReviewProduct(product)
-    setShowAppealReviewModal(true)
-  }
-
-  // Function to close appeal (buyer accepts seller's appeal)
-  const closeAppeal = () => {
-    if (appealReviewProduct) {
-      // Update purchase status back to completed
-      const updatedPurchases = userPurchases.map(purchase => 
-        purchase.name === appealReviewProduct.name 
-          ? { ...purchase, purchaseStatus: "completado" as const }
-          : purchase
-      )
-      setUserPurchases(updatedPurchases)
-      
-      alert("✅ Apelación cerrada. El caso se ha resuelto a favor del vendedor.")
-      setShowAppealReviewModal(false)
-      setAppealReviewProduct(null)
-    }
-  }
-
-  // Function to continue discussion
-  const continueDiscussion = () => {
-    alert("💬 Se ha notificado a un moderador para mediar en la discusión. Recibirás una respuesta en 24-48 horas.")
-    setShowAppealReviewModal(false)
-  }
-
-  const toggleWishlist = (productId: number) => {
-    setWishlistItems((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId],
-    )
-  }
-
-  const connectWallet = async () => {
-    try {
-      await login()
-    } catch (error) {
-      console.error("Error connecting wallet:", error)
-    }
-  }
-
-  const truncateAddress = (address: string) => {
-    if (!address) return ""
-    return `${address.slice(0, 6)}***${address.slice(-4)}`
-  }
-
-  const getSepoliaBalance = async (address: string) => {
-    try {
-      // Lista de RPCs de Sepolia para probar
-      const rpcEndpoints = [
-        'https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
-        'https://rpc.sepolia.org',
-        'https://ethereum-sepolia.blockpi.network/v1/rpc/public',
-        'https://sepolia.gateway.tenderly.co'
-      ]
-
-      for (const rpcUrl of rpcEndpoints) {
-        try {
-          const response = await fetch(rpcUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              method: 'eth_getBalance',
-              params: [address, 'latest'],
-              id: 1,
-            }),
-          })
-
-          if (!response.ok) {
-            continue // Probar siguiente RPC
-          }
-
-          const data = await response.json()
-          if (data.result) {
-            // Convertir de Wei a ETH
-            const balanceInWei = parseInt(data.result, 16)
-            const balanceInEth = balanceInWei / Math.pow(10, 18)
-            return balanceInEth.toFixed(4)
-          }
-        } catch (error) {
-          console.log(`RPC ${rpcUrl} failed, trying next...`)
-          continue
-        }
-      }
-
-      // Si todos los RPCs fallan, usar balance mock
-      console.log("All RPCs failed, using mock balance")
-      return "0.1234" // Balance de ejemplo
-      
-    } catch (error) {
-      console.error("Error fetching balance:", error)
-      return "0.0000"
-    }
-  }
-
-  const getETHPriceInUSD = async () => {
-    try {
-      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
-      
-      if (!response.ok) {
-        // Si falla CoinGecko, usar precio mock
-        return 2500 // Precio aproximado de ETH
-      }
-
-      const data = await response.json()
-      return data.ethereum?.usd || 2500
-    } catch (error) {
-      console.error("Error fetching ETH price:", error)
-      return 2500 // Precio fallback
-    }
-  }
-
-  const updateBalance = async () => {
-    if (!walletAddress) return
-    
-    setIsLoadingBalance(true)
-    try {
-      console.log("Updating balance for address:", walletAddress)
-      
-      const ethBalance = await getSepoliaBalance(walletAddress)
-      const ethPrice = await getETHPriceInUSD()
-      const usdValue = (parseFloat(ethBalance) * ethPrice).toFixed(2)
-      
-      setBalance(ethBalance)
-      setBalanceUSD(usdValue)
-      
-      console.log("Balance updated:", ethBalance, "ETH,", usdValue, "USD")
-    } catch (error) {
-      console.error("Error updating balance:", error)
-      // Usar valores de ejemplo en caso de error
-      setBalance("0.1234")
-      setBalanceUSD("308.50")
-    } finally {
-      setIsLoadingBalance(false)
-    }
-  }
-
-  // Wallet submenu functions
-  const handleBuyAction = () => {
-    // Simular proceso de compra
-    alert(`💳 Proceso de compra iniciado\n\nWallet: ${truncateAddress(walletAddress)}\nBalance disponible: ${balance} ETH\n\n¡Función de compra próximamente disponible!`)
-  }
-
-  const handleSwapAction = () => {
-    // Simular proceso de intercambio
-    alert(`🔄 Intercambio de tokens\n\nBalance actual: ${balance} ETH\nRed: Sepolia Testnet\n\n¡Función de swap próximamente disponible!`)
-  }
-
-  const handleSendAction = () => {
-    setShowSendQR(true)
-  }
-
-  const handleReceiveAction = () => {
-    setShowQRUploadModal(true)
-  }
-
-  // Generate QR code URL using a QR service
-  const generateQRCode = (data: string) => {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}`
-  }
-
-  // Generate payment QR for sending crypto
-  const generateSendQR = () => {
-    if (!recipientAddress || !sendAmount) return ""
-    const paymentData = `ethereum:${recipientAddress}?value=${parseFloat(sendAmount) * 1e18}`
-    return generateQRCode(paymentData)
-  }
-
-  // Generate receive QR with wallet address
-  const generateReceiveQR = () => {
-    const receiveData = `ethereum:${walletAddress}`
-    return generateQRCode(receiveData)
-  }
-
-  // Deposit functions
-  const handleDepositAction = () => {
-    setShowDepositModal(true)
-  }
-
-  const calculateUSDCAmount = () => {
-    if (!depositAmountBs || parseFloat(depositAmountBs) <= 0) return "0.00"
-    const bsAmount = parseFloat(depositAmountBs)
-    const usdAmount = bsAmount / usdcRate
-    return usdAmount.toFixed(2)
-  }
-
-  const handleDepositConfirm = async () => {
-    if (!depositAmountBs || parseFloat(depositAmountBs) <= 0) {
-      alert("❌ Please enter a valid amount")
-      return
-    }
-
-    // Guardar los datos del depósito
-    const bsAmount = parseFloat(depositAmountBs)
-    const usdcAmount = parseFloat(calculateUSDCAmount())
-    
-    setPendingDepositData({
-      bs: bsAmount.toFixed(2),
-      usdc: usdcAmount.toString()
-    })
-    
-    // Cerrar modal de depósito y mostrar QR
-    setShowDepositModal(false)
-    setShowPaymentQR(true)
-  }
-
-  const handlePaymentComplete = () => {
-    if (pendingDepositData) {
-      alert(`✅ ¡Pago recibido exitosamente!\n\n💰 Depositaste: ${pendingDepositData.bs} Bs\n🪙 Recibiste: ${pendingDepositData.usdc} USDC\n📊 Tasa: 1 USD = ${usdcRate} Bs\n\n¡USDC agregado a tu wallet!`)
-    }
-    
-    // Limpiar estados
-    setShowPaymentQR(false)
-    setDepositAmountBs("")
-    setPendingDepositData(null)
-  }
-
-  const handleDiscoverAction = () => {
-    // Simular descubrimiento de oportunidades
-    const opportunities = [
-      "🎯 Staking ETH - 5.2% APY",
-      "🌱 DeFi Farming - 12.5% APY", 
-      "💎 NFT Marketplace - Trading activo",
-      "⚡ Lightning Pool - Liquidez rápida"
-    ]
-    alert(`🔍 Oportunidades de inversión\n\n${opportunities.join('\n')}\n\n¡Explora el ecosistema DeFi!`)
-  }
-
-  const handleMetaMaskSettings = () => {
-    // Simular configuración de MetaMask
-    alert(`⚙️ Configuración de Wallet\n\nRed actual: Sepolia Testnet\nWallet: ${truncateAddress(walletAddress)}\nEstado: Conectada ✅\n\n¡Configuración próximamente disponible!`)
-  }
-
-  // QR Upload functions
-  const handleQRImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setUploadedQRImage(file)
-    }
-  }
-
-  const processQRCode = async () => {
-    if (!uploadedQRImage) {
-      alert("❌ Please select an image first")
-      return
-    }
-
-    setIsProcessingQR(true)
-    
-    try {
-      // Simular procesamiento de QR (en un proyecto real usarías una librería como jsQR)
-      await new Promise(resolve => setTimeout(resolve, 2000)) // Simular tiempo de procesamiento
-
-      // Simular datos extraídos del QR basados en la imagen que mostaste
-      const mockQRData = {
-        type: "payment",
-        amount: "50.00",
-        currency: "BOB", 
-        recipient: "Saul Mijael Choquehuanca Huanca",
-        address: "0x742d35Cc6638C0532925a3b8aA5e59e7e8E19c5B",
-        fee: "0.00",
-        paymentMin: "1.00",
-        exchangeRate: "1 USD = 12.12 BOB",
-        rawData: "payment://recipient=Saul+Mijael+Choquehuanca+Huanca&amount=50.00&currency=BOB&fee=0.00"
-      }
-
-      setQrData(mockQRData)
-      setIsProcessingQR(false)
-      setShowQRUploadModal(false)
-      setShowQRResultModal(true)
-    } catch (error) {
-      setIsProcessingQR(false)
-      alert("❌ Error processing QR code. Please try again.")
-    }
-  }
-
-  const resetQRUpload = () => {
-    setUploadedQRImage(null)
-    setQrData(null)
-    setShowQRUploadModal(false)
-    setShowQRResultModal(false)
-    setIsProcessingQR(false)
-  }
-
-  // Sync Privy auth state with local wallet state
-  useEffect(() => {
-    if (authenticated && user) {
-      setWalletConnected(true)
-      // Get wallet address from user's linked accounts
-      const walletAccount = user.linkedAccounts.find(
-        (account) => account.type === 'wallet' || account.type === 'smart_wallet'
-      )
-      if (walletAccount) {
-        setWalletAddress(walletAccount.address)
-        // Update balance when wallet connects
-        setTimeout(() => updateBalance(), 1000) // Delay to ensure address is set
-      }
-    } else {
-      setWalletConnected(false)
-      setWalletAddress("")
-      setBalance("0.00")
-      setBalanceUSD("0.00")
-    }
-  }, [authenticated, user])
-
-  // Update balance when wallet address changes
-  useEffect(() => {
-    if (walletAddress && walletConnected) {
-      updateBalance()
-    }
-  }, [walletAddress, walletConnected])
-
-  const handleSellProductClick = () => {
-    if (!walletConnected) {
-      connectWallet()
-      return
-    }
-    setIsSellerDashboardOpen(true)
-  }
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      // Validar que es una imagen PNG, JPG, JPEG, GIF o WebP
-      const validImageTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp']
-      if (!validImageTypes.includes(file.type)) {
-        alert('❌ Invalid image format. Please use PNG, JPG, JPEG, GIF, or WebP.')
-        return
-      }
-
-      // Validar tamaño de archivo (máximo 5MB)
-      const maxSize = 5 * 1024 * 1024 // 5MB en bytes
-      if (file.size > maxSize) {
-      alert("❌ File is too large. Maximum size is 5MB.")
-        return
-      }
-
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        setNewProduct((prev) => ({ ...prev, image: result }))
-        setImagePreview(result) // Set preview for uploaded image
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const handleSubmitProduct = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    const productToAdd = {
-      id: Date.now(),
-      name: newProduct.name,
-      price: Number.parseFloat(newProduct.price),
-      originalPrice: newProduct.originalPrice
-        ? Number.parseFloat(newProduct.originalPrice)
-        : Number.parseFloat(newProduct.price),
-      image: newProduct.image || "/diverse-products-still-life.png",
-  description: newProduct.description,
-      rating: 4.5,
-      reviews: 0,
-      category: newProduct.category,
-      location: newProduct.location,
-      condition: newProduct.condition as "new" | "used" | "refurbished",
-      seller: walletConnected ? `User ${walletAddress.slice(0, 6)}...` : "Anonymous Seller",
-      inStock: true,
-      featured: false,
-      saleStatus: "pago_recibido" as const,
-      purchaseStatus: undefined,
-    }
-
-    setProducts((prev) => [productToAdd, ...prev])
-    // Add to user's sales products if wallet is connected
-    if (walletConnected) {
-      setUserSalesProducts((prev) => [productToAdd, ...prev])
-    }
-
-    setNewProduct({
-      name: "",
-      price: "",
-      originalPrice: "",
-      category: "",
-      condition: "",
-      location: "",
-      description: "",
-      image: "",
-    })
-
-  setImagePreview("") // Clear image preview when form is submitted
-  // Close the seller sheet after successful submission
-  setIsSellerDashboardOpen(false)
-
-    alert("¡Product added successfully!")
-  }
-
-  const contactSeller = (product: Product) => {
-    setSelectedSeller(product)
-    setContactSellerOpen(true)
-  }
-
-  const FloatingCart = () => (
-    <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
-          {getCartItemsCount() > 0 && (
-            <Badge className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 text-white animate-bounce">
-              {getCartItemsCount()}
-            </Badge>
-          )}
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg bg-gradient-to-br p-3 sm:p-4 lg:p-6 from-[#0d47a1] to-[#0d47a1]/90 border-[#00bcd4]">
-        <SheetHeader>
-          <SheetTitle className="text-white text-lg sm:text-xl">Shopping Cart</SheetTitle>
-        </SheetHeader>
-
-        <div className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto py-3 sm:py-4">
-            {cartItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-48 sm:h-64 text-center">
-                <ShoppingCart className="h-12 w-12 sm:h-16 sm:w-16 mb-3 sm:mb-4 text-white/50" />
-                <p className="text-white/80 text-sm sm:text-base">Your cart is empty</p>
-                <p className="text-xs sm:text-sm mt-2 text-white/60">
-                  Add some products to get started
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3 sm:space-y-4">
-                {cartItems.map((item) => {
-                  const product = products.find((p) => p.id === item.productId)
-                  if (!product) return null
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 border rounded-lg bg-white/10 border-white/20"
-                    >
-                      <img
-                        src={product.image || "/placeholder.svg"}
-                        alt={product.name}
-                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-xs sm:text-sm font-medium text-balance leading-tight text-white line-clamp-2">
-                          {product.name}
-                        </h4>
-                        <p className="text-xs sm:text-sm text-[#00bcd4] mt-1">
-                          ${product.price}
-                        </p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-xs sm:text-sm font-medium text-[#ff9800]">${product.price.toFixed(2)}</p>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 sm:h-8 sm:w-8 text-white/60 hover:text-red-400 mt-1"
-                          onClick={() => removeFromCart(item.id)}
-                        >
-                          <X className="h-3 w-3 sm:h-4 sm:w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-
-          {cartItems.length > 0 && (
-            <div className="border-t border-white/20 pt-3 sm:pt-4 space-y-3 sm:space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs sm:text-sm text-white">
-                  <span>Subtotal ({getCartItemsCount()} items)</span>
-                  <span>${getCartTotal().toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-xs sm:text-sm text-white/80">
-                  <span>Shipping</span>
-                  <span>Free</span>
-                </div>
-                <Separator className="bg-white/20" />
-                <div className="flex justify-between font-semibold text-sm sm:text-base text-white">
-                  <span>Total</span>
-                  <span className="text-[#ff9800]">${getCartTotal().toFixed(2)}</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Button className="w-full bg-gradient-to-r from-[#ff9800] to-[#ff9800]/80 hover:from-[#ff9800]/90 hover:to-[#ff9800]/70 text-white text-sm sm:text-base py-2.5 sm:py-3" size="lg">
-                  Proceed to Checkout
-                </Button>
-                <Button variant="outline" className="w-full bg-transparent border-white/20 text-white hover:bg-white/10 text-sm" onClick={() => setIsCartOpen(false)}>
-                  Continue Shopping
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
-  )
-
-  const ProductCard = ({ product }: { product: Product }) => (
-  <Card
-      className={`group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden relative ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800/90 border-2 border-slate-600 hover:border-gradient-to-r hover:from-blue-400/30 hover:via-cyan-400/30 hover:to-amber-400/30"
-          : "bg-gradient-to-br from-card via-card to-card/50 border-2 border-transparent hover:border-gradient-to-r hover:from-blue-500/20 hover:via-cyan-500/20 hover:to-amber-500/20"
-      }`}
-    >
-      <div
-        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
-          isDarkMode
-            ? "bg-gradient-to-br from-blue-400/10 via-cyan-400/10 to-amber-400/10"
-            : "bg-gradient-to-br from-blue-500/5 via-cyan-500/5 to-amber-500/5"
-        }`}
-      />
-
-      <CardContent 
-        className="p-3 sm:p-4 relative z-10 cursor-pointer" 
-        onClick={(e) => {
-          // Solo abrir detalles si no se hizo click en un botón
-          const target = e.target as HTMLElement;
-          if (e.target === e.currentTarget || !target.closest('button')) {
-            setSelectedProductDetail(product)
-            setCouponCode("")
-            setDiscountPercent(0)
-            setProductDetailOpen(true)
-          }
-        }}
-      >
-        <div className="relative mb-3 sm:mb-4">
-          <div className="relative overflow-hidden rounded-xl">
-            <img
-              src={product.image || "/placeholder.svg"}
-              alt={product.name}
-              className="w-full h-36 sm:h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-            />
-            <div
-              className={`absolute inset-0 bg-gradient-to-t opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                isDarkMode
-                  ? "from-black/40 via-transparent to-transparent"
-                  : "from-black/20 via-transparent to-transparent"
-              }`}
-            />
-          </div>
-
-          {!product.inStock && (
-            <Badge variant="destructive" className="absolute top-2 sm:top-3 left-2 sm:left-3 animate-pulse text-xs">
-              Out of Stock
-            </Badge>
-          )}
-          {product.originalPrice > product.price && (
-            <Badge className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-bounce text-xs">
-              <Sparkles className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />-
-              {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
-            </Badge>
-          )}
-          {product.featured && (
-            <Badge className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs">
-              <TrendingUp className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
-              Featured
-            </Badge>
-          )}
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`absolute bottom-2 sm:bottom-3 right-2 sm:right-3 backdrop-blur-sm transition-all duration-300 hover:scale-110 w-8 h-8 sm:w-10 sm:h-10 ${
-              wishlistItems.includes(product.id)
-                ? "text-red-500 bg-red-500/20"
-                : isDarkMode
-                  ? "text-white bg-white/10 hover:bg-white/20"
-                  : "text-white bg-white/20 hover:bg-white/30"
-            }`}
-            onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id) }}
-          >
-            <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${wishlistItems.includes(product.id) ? "fill-current animate-pulse" : ""}`} />
-          </Button>
-        </div>
-
-        <div className="space-y-2 sm:space-y-3">
-          <h3
-            className={`font-bold text-sm sm:text-base text-balance leading-tight transition-colors duration-300 line-clamp-2 ${
-              isDarkMode ? "text-white group-hover:text-cyan-300" : "text-foreground group-hover:text-blue-700"
-            }`}
-          >
-            {product.name}
-          </h3>
-
-          <div className="flex items-center gap-1 sm:gap-2 text-xs">
-            <div className={`flex items-center gap-1 ${isDarkMode ? "text-cyan-400" : "text-blue-600"}`}>
-              <MapPin className="h-3 w-3" />
-              <span className="font-medium truncate">{product.location}</span>
-            </div>
-            <Badge
-              variant="outline"
-              className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 font-medium ${
-                product.condition === "new"
-                  ? isDarkMode
-                    ? "bg-green-900/50 text-green-300 border-green-600"
-                    : "bg-green-100 text-green-700 border-green-300"
-                  : product.condition === "used"
-                    ? isDarkMode
-                      ? "bg-orange-900/50 text-orange-300 border-orange-600"
-                      : "bg-orange-100 text-orange-700 border-orange-300"
-                    : isDarkMode
-                      ? "bg-blue-900/50 text-blue-300 border-blue-600"
-                      : "bg-blue-100 text-blue-700 border-blue-300"
-              }`}
-            >
-              {product.condition}
-            </Badge>
-          </div>
-
-          <div className="flex items-center gap-1 sm:gap-2">
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-3 w-3 sm:h-4 sm:w-4 transition-colors duration-200 ${
-                    i < Math.floor(product.rating)
-                      ? "fill-yellow-400 text-yellow-400"
-                      : isDarkMode
-                        ? "text-gray-500"
-                        : "text-gray-300"
-                  }`}
-                />
-              ))}
-            </div>
-            <span className={`text-xs sm:text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-muted-foreground"}`}>
-              ({product.reviews})
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span
-              className={`text-lg sm:text-xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
-                isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
-              }`}
-            >
-              ${(product.price || 0).toLocaleString()}
-            </span>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <span className={`text-xs sm:text-sm line-through ${isDarkMode ? "text-gray-400" : "text-muted-foreground"}`}>
-                ${(product.originalPrice || 0).toLocaleString()}
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xs">{product.seller.charAt(0)}</span>
-            </div>
-            <p className={`text-xs sm:text-sm font-medium truncate ${isDarkMode ? "text-gray-300" : "text-muted-foreground"}`}>
-              by {product.seller}
-            </p>
-          </div>
-        </div>
-      </CardContent>
-
-      <CardFooter className="p-3 sm:p-4 pt-0 space-y-2 sm:space-y-3 relative z-20">
-        <Button
-          className="w-full bg-gradient-to-r from-[#0d47a1] to-[#00bcd4] hover:from-[#0d47a1]/90 hover:to-[#00bcd4]/90 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm sm:text-base py-2 sm:py-2.5"
-          onClick={(e) => { 
-            e.stopPropagation(); 
-            e.preventDefault();
-            console.log('Add to cart button clicked for product:', product.id);
-            addToCart(product.id);
-          }}
-          disabled={!product.inStock}
-        >
-          <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-          {product.inStock ? "Add to Cart" : "Out of Stock"}
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full font-medium transition-all duration-300 hover:scale-105 bg-gradient-to-r from-[#ff9800]/10 to-[#ff9800]/20 border-2 border-[#ff9800] hover:border-[#ff9800]/80 text-[#ff9800] hover:text-[#ff9800]/80 text-sm sm:text-base py-2 sm:py-2.5"
-          onClick={(e) => { 
-            e.stopPropagation(); 
-            e.preventDefault();
-            console.log('Contact seller button clicked for product:', product.id);
-            contactSeller(product);
-          }}
-        >
-          <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-          Contact Seller
-        </Button>
-      </CardFooter>
-    </Card>
-  )
-
+  const {
+    logout,
+    isDarkMode,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    selectedCondition,
+    setSelectedCondition,
+    selectedLocation,
+    setSelectedLocation,
+    priceRange,
+    setPriceRange,
+    wishlistItems,
+    walletConnected,
+    walletAddress,
+    showMobileMenu,
+    setShowMobileMenu,
+    viewMode,
+    isSellerDashboardOpen,
+    setIsSellerDashboardOpen,
+    newProduct,
+    setNewProduct,
+    contactSellerOpen,
+    setContactSellerOpen,
+    selectedSeller,
+    productDetailOpen,
+    setProductDetailOpen,
+    selectedProductDetail,
+    couponCode,
+    setCouponCode,
+    discountPercent,
+    setDiscountPercent,
+    couponMessage,
+    setCouponMessage,
+    showFullAddress,
+    setShowFullAddress,
+    showUserDropdown,
+    setShowUserDropdown,
+    showBalance,
+    setShowBalance,
+    balance,
+    balanceUSD,
+    isLoadingBalance,
+    showSalesModal,
+    setShowSalesModal,
+    selectedSaleProduct,
+    setSelectedSaleProduct,
+    showPurchasesModal,
+    setShowPurchasesModal,
+    selectedPurchaseProduct,
+    setSelectedPurchaseProduct,
+    showDisputeModal,
+    setShowDisputeModal,
+    disputeProduct,
+    disputeReason,
+    setDisputeReason,
+    disputeDescription,
+    setDisputeDescription,
+    disputeImages,
+    showDisputeReviewModal,
+    setShowDisputeReviewModal,
+    reviewingDisputeProduct,
+    currentImageIndex,
+    setCurrentImageIndex,
+    showAppealModal,
+    setShowAppealModal,
+    appealProduct,
+    appealReason,
+    setAppealReason,
+    appealDescription,
+    setAppealDescription,
+    appealImages,
+    showAppealReviewModal,
+    setShowAppealReviewModal,
+    appealReviewProduct,
+    showReviewsModal,
+    setShowReviewsModal,
+    showReferralsModal,
+    setShowReferralsModal,
+    referralsContext,
+    setReferralsContext,
+    selectedReferral,
+    setSelectedReferral,
+    showAddReferralModal,
+    setShowAddReferralModal,
+    newReferral,
+    setNewReferral,
+    userPurchases,
+    setUserPurchases,
+    imagePreview,
+    setImagePreview,
+    showSendQR,
+    setShowSendQR,
+    showReceiveQR,
+    setShowReceiveQR,
+    sendAmount,
+    setSendAmount,
+    recipientAddress,
+    setRecipientAddress,
+    showQRUploadModal,
+    setShowQRUploadModal,
+    showQRResultModal,
+    setShowQRResultModal,
+    uploadedQRImage,
+    isProcessingQR,
+    qrData,
+    showDepositModal,
+    setShowDepositModal,
+    showPaymentQR,
+    setShowPaymentQR,
+    depositAmountBs,
+    setDepositAmountBs,
+    usdcRate,
+    isLoadingDeposit,
+    pendingDepositData,
+    dropdownRef,
+    filteredProducts,
+    toggleDarkMode,
+    addToCart,
+    getUserSalesProducts,
+    updateSaleStatus,
+    updatePurchaseStatus,
+    openDisputeModal,
+    addDisputeImage,
+    removeDisputeImage,
+    submitDispute,
+    hasDispute,
+    getDisputeInfo,
+    openDisputeReview,
+    navigateImage,
+    acceptDispute,
+    appealDispute,
+    handleAppealImageUpload,
+    removeAppealImage,
+    submitAppeal,
+    getSellerAppealInfo,
+    openAppealReview,
+    closeAppeal,
+    continueDiscussion,
+    connectWallet,
+    truncateAddress,
+    updateBalance,
+    handleReceiveAction,
+    generateSendQR,
+    generateReceiveQR,
+    handleDepositAction,
+    calculateUSDCAmount,
+    handleDepositConfirm,
+    handlePaymentComplete,
+    handleDiscoverAction,
+    handleMetaMaskSettings,
+    handleQRImageUpload,
+    processQRCode,
+    resetQRUpload,
+    handleSellProductClick,
+    handleImageUpload,
+    handleSubmitProduct,
+  } = useMarketplace()
 
   return (
     <div
@@ -3336,7 +2065,7 @@ export default function Marketplace() {
                     <li>• Escanea el código QR</li>
                     <li>• Confirma el monto: {pendingDepositData?.bs} Bs</li>
                     <li>• Realiza el pago</li>
-                    <li>• Presiona "Confirmar Pago" aquí</li>
+                    <li>• Presiona &quot;Confirmar Pago&quot; aquí</li>
                   </ul>
                 </div>
               </div>
@@ -4363,7 +3092,7 @@ export default function Marketplace() {
                     Apple Watch Series 8
                   </button>
                   <button className="w-full text-left p-3 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors">
-                    iPad Pro 11"
+                    iPad Pro 11&quot;
                   </button>
                   <button className="w-full text-left p-3 rounded-lg bg-white/20 text-white hover:bg-white/30 transition-colors">
                     Laptop Gaming Asus
@@ -4440,7 +3169,7 @@ export default function Marketplace() {
                     <div className="bg-white/5 rounded-lg p-4">
                       <h4 className="text-white font-semibold mb-2">Motivo de la Disputa</h4>
                       <p className="text-white/80 text-sm">
-                        "El producto no coincide con la descripción. La pantalla tiene rayones que no se mencionaron en la publicación."
+                        &quot;El producto no coincide con la descripción. La pantalla tiene rayones que no se mencionaron en la publicación.&quot;
                       </p>
                     </div>
                   </div>
@@ -4466,7 +3195,7 @@ export default function Marketplace() {
                     <div className="bg-white/5 rounded-lg p-4">
                       <h4 className="text-white font-semibold mb-3">Respuesta del Vendedor</h4>
                       <p className="text-white/80 text-sm mb-3">
-                        "Los rayones son mínimos y normales por el uso. El producto está en excelente estado como se describió."
+                        &quot;Los rayones son mínimos y normales por el uso. El producto está en excelente estado como se describió.&quot;
                       </p>
                       <div className="grid grid-cols-2 gap-2">
                         <img
