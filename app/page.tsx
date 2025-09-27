@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
 	Search,
@@ -101,20 +102,12 @@ export default function Marketplace() {
 
 	const router = useRouter();
 	const [showMobileFilters, setShowMobileFilters] = useState(false);
-	const [isScrolled, setIsScrolled] = useState(false);
 
-	// Detectar scroll para header sticky mejorado en móvil
-	useEffect(() => {
-		const handleScroll = () => {
-			setIsScrolled(window.scrollY > 10);
-		};
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
+	// Detectar scroll para header sticky mejorado en móvil (removido -- variable no usada)
 
 	// Cerrar menús al hacer tap fuera (solo móvil)
 	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
+		const handleClickOutside = () => {
 			if (showMobileMenu || showMobileFilters) {
 				setShowMobileMenu(false);
 				setShowMobileFilters(false);
@@ -127,7 +120,12 @@ export default function Marketplace() {
 		}
 
 		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, [showMobileMenu, showMobileFilters]);
+	}, [
+		showMobileMenu,
+		showMobileFilters,
+		setShowMobileMenu,
+		setShowMobileFilters,
+	]);
 
 	return (
 		<div
