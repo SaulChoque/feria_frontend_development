@@ -24,6 +24,8 @@ import {
 	Compass,
 	X,
 	Home,
+	Loader2,
+	Globe,
 } from "lucide-react";
 import { FloatingCart } from "@/components/marketplace/FloatingCart";
 import { ProductCard } from "@/components/marketplace/ProductCard";
@@ -57,6 +59,10 @@ import { useEffect, useState } from "react";
 export default function Marketplace() {
 	const {
 		logout,
+		isMiniKitReady,
+		loginWithWorldcoin,
+		isWorldcoinLoginPending,
+		worldcoinProfile,
 		isDarkMode,
 		searchQuery,
 		setSearchQuery,
@@ -97,24 +103,33 @@ export default function Marketplace() {
 		handleDiscoverAction,
 		handleMetaMaskSettings,
 		handleSellProductClick,
+		user,
 	} = useMarketplace();
 
 	const router = useRouter();
 	const [showMobileFilters, setShowMobileFilters] = useState(false);
-	const [isScrolled, setIsScrolled] = useState(false);
 
-	// Detectar scroll para header sticky mejorado en móvil
-	useEffect(() => {
-		const handleScroll = () => {
-			setIsScrolled(window.scrollY > 10);
-		};
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
+	const privyEmail =
+		typeof user?.email === "string"
+			? user.email
+			: user?.email?.address;
+
+	const accountDisplayName =
+		worldcoinProfile?.username ??
+		privyEmail ??
+		(walletAddress ? truncateAddress(walletAddress) : "World App user");
+
+	const accountInitial = accountDisplayName
+		? accountDisplayName.trim().charAt(0).toUpperCase() || "W"
+		: "W";
+
+	const accountAvatarUrl = worldcoinProfile?.profilePictureUrl ?? null;
+
+	const showWorldAppLoginButton = !walletConnected && isMiniKitReady;
 
 	// Cerrar menús al hacer tap fuera (solo móvil)
 	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
+		const handleClickOutside = () => {
 			if (showMobileMenu || showMobileFilters) {
 				setShowMobileMenu(false);
 				setShowMobileFilters(false);
@@ -127,7 +142,12 @@ export default function Marketplace() {
 		}
 
 		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, [showMobileMenu, showMobileFilters]);
+	}, [
+		showMobileMenu,
+		showMobileFilters,
+		setShowMobileMenu,
+		setShowMobileFilters,
+	]);
 
 	return (
 		<div
@@ -246,6 +266,51 @@ export default function Marketplace() {
 								<span className="sm:hidden">Sell</span>
 							</Button>
 
+							{showWorldAppLoginButton && (
+								<Button
+									className="hidden sm:flex bg-gradient-to-r from-[#0b5fff] to-[#4bc0ff] hover:from-[#0a50d6] hover:to-[#37a0e5] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-xs sm:text-sm px-2 sm:px-4 py-2"
+									onClick={async () => {
+										const result = await loginWithWorldcoin();
+										if (!result.success) {
+											alert(`❌ ${result.error}`);
+										} else {
+											setShowUserDropdown(true);
+										}
+									}}
+									disabled={isWorldcoinLoginPending}
+								>
+									{isWorldcoinLoginPending ? (
+										<Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+									) : (
+										<Globe className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+									)}
+									<span className="hidden sm:inline">World App Login</span>
+									<span className="sm:hidden">World App</span>
+								</Button>
+							)}
+
+							{showWorldAppLoginButton && (
+								<Button
+									className="sm:hidden bg-gradient-to-r from-[#0b5fff] to-[#4bc0ff] hover:from-[#0a50d6] hover:to-[#37a0e5] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+									size="icon"
+									onClick={async () => {
+										const result = await loginWithWorldcoin();
+										if (!result.success) {
+											alert(`❌ ${result.error}`);
+										} else {
+											setShowUserDropdown(true);
+										}
+									}}
+									disabled={isWorldcoinLoginPending}
+								>
+									{isWorldcoinLoginPending ? (
+										<Loader2 className="h-4 w-4 animate-spin" />
+									) : (
+										<Globe className="h-4 w-4" />
+									)}
+								</Button>
+							)}
+
 							<div className="relative" ref={dropdownRef}>
 								<Button
 									variant="ghost"
@@ -255,7 +320,12 @@ export default function Marketplace() {
 											? "hover:bg-slate-700 text-blue-400"
 											: "hover:bg-blue-100 text-blue-600"
 									}`}
+									disabled={isWorldcoinLoginPending}
 									onClick={() => {
+										if (isWorldcoinLoginPending) {
+											return;
+										}
+
 										if (walletConnected) {
 											setShowUserDropdown(!showUserDropdown);
 										} else {
@@ -263,7 +333,11 @@ export default function Marketplace() {
 										}
 									}}
 								>
-									<User className="h-4 w-4 sm:h-5 sm:w-5" />
+									{isWorldcoinLoginPending ? (
+										<Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+									) : (
+										<User className="h-4 w-4 sm:h-5 sm:w-5" />
+									)}
 									{walletConnected && (
 										<div className="absolute -top-1 -right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500 animate-pulse" />
 									)}
@@ -285,18 +359,41 @@ export default function Marketplace() {
 											}`}
 										>
 											<div className="flex items-center gap-2 sm:gap-3">
-												<div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-													<span className="text-white font-bold text-sm">
-														M
-													</span>
+												<div
+													className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 ${
+														worldcoinProfile
+															? "bg-gradient-to-r from-[#0b5fff] to-[#43d9ff]"
+															: "bg-gradient-to-r from-blue-500 to-cyan-500"
+													}`}
+												>
+													{accountAvatarUrl ? (
+														<div
+															className="h-full w-full bg-cover bg-center"
+															style={{ backgroundImage: `url(${accountAvatarUrl})` }}
+														/>
+													) : (
+														<span className="text-white font-bold text-sm">
+															{accountInitial}
+														</span>
+													)}
 												</div>
 												<div className="flex-1">
-													<div className="flex items-center gap-2">
+													<div className="flex flex-wrap items-center gap-2">
 														<span className="font-semibold text-sm sm:text-base">
-															Account 2
+															{accountDisplayName}
 														</span>
 														<div className="w-2 h-2 bg-green-500 rounded-full"></div>
+														{worldcoinProfile && (
+															<Badge className="text-[10px] uppercase tracking-wide bg-gradient-to-r from-[#0b5fff] to-[#4bc0ff] text-white border-0">
+																World App
+															</Badge>
+														)}
 													</div>
+													{worldcoinProfile?.username && (
+														<p className="mt-1 text-xs text-gray-400">
+															@{worldcoinProfile.username.replace(/^@/, "")}
+														</p>
+													)}
 													<div className="mt-1">
 														<div className="flex items-center gap-2 mb-1">
 															<span className="text-xs text-gray-400">
