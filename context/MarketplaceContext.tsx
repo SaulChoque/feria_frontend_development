@@ -77,7 +77,6 @@ function useMarketplaceState() {
 
   const [showReviewsModal, setShowReviewsModal] = useState(false)
 
-  const [showReferralsModal, setShowReferralsModal] = useState(false)
   const [referralsContext, setReferralsContext] = useState<'navbar' | 'seller' | 'buyer'>('navbar')
   const [selectedReferral, setSelectedReferral] = useState<any>(null)
   const [showAddReferralModal, setShowAddReferralModal] = useState(false)
@@ -815,9 +814,10 @@ function useMarketplaceState() {
   const handleSellProductClick = () => {
     if (!walletConnected) {
       connectWallet()
-      return
+      return false
     }
     setIsSellerDashboardOpen(true)
+    return true
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1009,8 +1009,6 @@ function useMarketplaceState() {
     setAppealReviewProduct,
     showReviewsModal,
     setShowReviewsModal,
-    showReferralsModal,
-    setShowReferralsModal,
     referralsContext,
     setReferralsContext,
     selectedReferral,

@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { useMarketplace } from "@/context/MarketplaceContext"
 import type { Product } from "@/types/marketplace"
@@ -21,6 +22,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter()
   const {
     isDarkMode,
     wishlistItems,
@@ -58,6 +60,7 @@ export function ProductCard({ product }: ProductCardProps) {
             setCouponCode("")
             setDiscountPercent(0)
             setProductDetailOpen(true)
+            router.push("/product-detail")
           }
         }}
       >
@@ -213,6 +216,7 @@ export function ProductCard({ product }: ProductCardProps) {
             e.preventDefault()
             console.log('Contact seller button clicked for product:', product.id)
             contactSeller(product)
+            router.push("/contact-seller")
           }}
         >
           <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
