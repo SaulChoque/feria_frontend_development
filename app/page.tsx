@@ -269,10 +269,10 @@ export default function Marketplace() {
 									)}
 								</Button>
 
-								{/* Dropdown Menu - Desktop */}
+								{/* Dropdown Menu - Responsive */}
 								{walletConnected && showUserDropdown && (
 									<div
-										className={`absolute right-0 top-12 w-80 sm:w-80 max-h-[80vh] overflow-y-auto rounded-xl border-2 shadow-xl z-50 transition-all duration-300 ${
+										className={`absolute top-12 left-1/2 -translate-x-1/2 w-[90vw] max-w-[90vw] sm:w-80 sm:max-w-none sm:left-auto sm:right-0 sm:translate-x-0 max-h-[80vh] overflow-y-auto rounded-xl border-2 shadow-xl z-50 transition-all duration-300 ${
 											isDarkMode
 												? "bg-slate-900 border-slate-600 text-white"
 												: "bg-white border-gray-200 text-gray-900"
@@ -293,7 +293,7 @@ export default function Marketplace() {
 												<div className="flex-1">
 													<div className="flex items-center gap-2">
 														<span className="font-semibold text-sm sm:text-base">
-															Account 1
+															Account 2
 														</span>
 														<div className="w-2 h-2 bg-green-500 rounded-full"></div>
 													</div>
