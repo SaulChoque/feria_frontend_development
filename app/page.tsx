@@ -169,7 +169,7 @@ export default function Marketplace() {
 										: "from-blue-600 to-cyan-600"
 								}`}
 							>
-								Koñeque
+								Koñeques
 							</span>
 							<Badge className="hidden sm:inline-flex bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse">
 								<Sparkles className="h-3 w-3 mr-1" />
