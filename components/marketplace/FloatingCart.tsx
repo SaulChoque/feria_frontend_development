@@ -8,6 +8,7 @@ import { useMarketplace } from "@/context/MarketplaceContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import type { Product } from "@/types/marketplace";
 
 export function FloatingCart() {
 	const {
@@ -139,7 +140,7 @@ export function FloatingCart() {
 						) : (
 							cartItems.map((item) => {
 								const product = products.find(
-									(p: any) => p.id === item.productId
+									(productCandidate: Product) => productCandidate.id === item.productId,
 								);
 								if (!product) return null;
 
