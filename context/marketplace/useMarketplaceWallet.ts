@@ -1,7 +1,6 @@
 "use client";
 
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { MiniKit } from "@worldcoin/minikit-js";
 
 import type { QRData } from "@/types/marketplace";
 
@@ -155,13 +154,8 @@ export function useMarketplaceWallet({ auth }: UseMarketplaceWalletParams) {
 
 	const connectWallet = useCallback(async () => {
 		try {
-			const shouldUseMiniKit = (() => {
-				try {
-					return MiniKit.isInstalled();
-				} catch {
-					return auth.isMiniKitReady;
-				}
-			})();
+			const installed = auth.refreshMiniKitStatus();
+			const shouldUseMiniKit = typeof installed === "boolean" ? installed : auth.isMiniKitReady;
 
 			if (shouldUseMiniKit) {
 				const result: WorldcoinLoginResult = await auth.loginWithWorldcoin();

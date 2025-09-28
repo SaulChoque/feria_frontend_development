@@ -4,6 +4,35 @@ import { useCallback, useEffect, useState } from "react";
 import { usePrivy, useLoginWithSiwe } from "@privy-io/react-auth";
 import { MiniKit } from "@worldcoin/minikit-js";
 
+type MiniAppBridgeWindow = typeof window & {
+	Android?: { postMessage?: unknown };
+	webkit?: { messageHandlers?: { minikit?: { postMessage?: unknown } } };
+};
+
+const isRunningInsideWorldApp = () => {
+	if (typeof window === "undefined") {
+		return false;
+	}
+
+	const bridgeWindow = window as MiniAppBridgeWindow;
+	return Boolean(
+		bridgeWindow?.webkit?.messageHandlers?.minikit?.postMessage ||
+		bridgeWindow?.Android?.postMessage,
+	);
+};
+
+const safeIsMiniKitInstalled = () => {
+	if (!isRunningInsideWorldApp()) {
+		return false;
+	}
+
+	try {
+		return MiniKit.isInstalled();
+	} catch {
+		return false;
+	}
+};
+
 export type WorldcoinUserProfile = Awaited<ReturnType<typeof MiniKit.getUserByAddress>>;
 export type WorldcoinLoginResult = { success: true } | { success: false; error: string };
 
@@ -14,20 +43,12 @@ export function useMarketplaceAuth() {
 	const [isWorldcoinLoginPending, setIsWorldcoinLoginPending] = useState(false);
 	const [worldcoinError, setWorldcoinError] = useState<string | null>(null);
 	const [worldcoinProfile, setWorldcoinProfile] = useState<WorldcoinUserProfile | null>(null);
-	const [isMiniKitReady, setIsMiniKitReady] = useState<boolean>(() => {
-		try {
-			return MiniKit.isInstalled();
-		} catch {
-			return false;
-		}
-	});
+	const [isMiniKitReady, setIsMiniKitReady] = useState<boolean>(() => safeIsMiniKitInstalled());
 
 	const refreshMiniKitStatus = useCallback(() => {
-		try {
-			setIsMiniKitReady(MiniKit.isInstalled());
-		} catch {
-			setIsMiniKitReady(false);
-		}
+		const installed = safeIsMiniKitInstalled();
+		setIsMiniKitReady(installed);
+		return installed;
 	}, []);
 
 	useEffect(() => {
@@ -53,7 +74,7 @@ export function useMarketplaceAuth() {
 	}, []);
 
 	const loginWithWorldcoin = useCallback(async (): Promise<WorldcoinLoginResult> => {
-		if (!MiniKit.isInstalled()) {
+		if (!safeIsMiniKitInstalled()) {
 			const message =
 				"MiniKit no está disponible. Abre esta mini app dentro de World App para iniciar sesión con Worldcoin.";
 			setWorldcoinError(message);

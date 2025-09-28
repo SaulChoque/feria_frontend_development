@@ -55,6 +55,10 @@ export default function Marketplace() {
 		handleDiscoverAction,
 		handleMetaMaskSettings,
 		handleSellProductClick,
+		worldcoinProfile,
+		worldcoinError,
+		isMiniKitReady,
+		resetWorldcoinState,
 	} = useMarketplace();
 
 	const router = useRouter();
@@ -207,11 +211,17 @@ export default function Marketplace() {
 		handleMetaMaskSettings();
 	}, [handleMetaMaskSettings]);
 
-	const handleLogout = useCallback(() => {
-		logout();
-		setShowWalletFullscreen(false);
-		setShowUserDropdown(() => false);
-	}, [logout, setShowUserDropdown]);
+	const handleLogout = useCallback(async () => {
+		try {
+			await logout();
+		} catch (error) {
+			console.error("Error al cerrar sesión:", error);
+		} finally {
+			resetWorldcoinState();
+			setShowWalletFullscreen(false);
+			setShowUserDropdown(false);
+		}
+	}, [logout, resetWorldcoinState, setShowUserDropdown, setShowWalletFullscreen]);
 
 	return (
 		<div
@@ -273,6 +283,9 @@ export default function Marketplace() {
 				onShowSales={handleShowSales}
 				onShowPurchases={handleShowPurchases}
 				onConfigureMetaMask={handleConfigureMetaMask}
+				worldcoinProfile={worldcoinProfile}
+				isMiniKitReady={isMiniKitReady}
+				worldcoinError={worldcoinError}
 				onLogout={handleLogout}
 				onClose={() => setShowWalletFullscreen(false)}
 				truncateAddress={truncateAddress}
