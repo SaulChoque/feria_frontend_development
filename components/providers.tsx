@@ -8,19 +8,30 @@ import { MarketplaceProvider } from "@/context/MarketplaceContext"
 export function Providers({ children }: { children: React.ReactNode }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
   const worldAppId = process.env.NEXT_PUBLIC_WORLD_APP_ID
-  
-  if (!appId) {
-    throw new Error('NEXT_PUBLIC_PRIVY_APP_ID is not defined in environment variables')
+  // If environment variables are missing, warn instead of throwing so
+  // Next.js prerender/build doesn't fail in environments where these
+  // values are not yet configured (for example: CI or preview builds).
+  // Production deployments should set these in Vercel (Project > Settings > Environment Variables).
+  const missing = [] as string[]
+  if (!appId) missing.push("NEXT_PUBLIC_PRIVY_APP_ID")
+  if (!worldAppId) missing.push("NEXT_PUBLIC_WORLD_APP_ID")
+  if (missing.length > 0) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Missing env vars: ${missing.join(", ")} - Privy/World App providers will be disabled. Set them in your deployment environment (e.g. Vercel).`,
+    )
+    // Render children without providers to avoid build-time failures.
+    return <>{children}</>
   }
 
-  if (!worldAppId) {
-    throw new Error('NEXT_PUBLIC_WORLD_APP_ID is not defined in environment variables')
-  }
+  // At this point both env vars are present. Narrow types for TS using non-null assertion.
+  const privyAppId = appId as string
+  const miniKitAppId = worldAppId as string
 
   return (
-    <MiniKitProvider props={{ appId: worldAppId }}>
+    <MiniKitProvider props={{ appId: miniKitAppId }}>
       <PrivyProvider
-        appId={appId}
+        appId={privyAppId}
         config={{
           appearance: {
             theme: 'light',
