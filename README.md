@@ -136,13 +136,18 @@ cd Sistema_FrontEnd_Scaffoldeth
 # 2. Instalar dependencias
 npm install
 
-# 3. Variables de entorno (opcional)
-Copy-Item .env.example .env.local -ErrorAction SilentlyContinue
-# ⚠️ Aún no hay claves necesarias; se añadirá al integrar backend.
+# 3. Variables de entorno
+if (!(Test-Path .env.local) -and (Test-Path '.env')) { Copy-Item .env .env.local -ErrorAction SilentlyContinue }
+# Ajusta NEXT_PUBLIC_PRIVY_APP_ID y NEXT_PUBLIC_WORLD_APP_ID con tus credenciales de Privy y World App.
 
 # 4. Ejecutar en desarrollo
 npm run dev
 ```
+
+Variables obligatorias:
+
+- `NEXT_PUBLIC_PRIVY_APP_ID`: App ID de Privy para autenticación.
+- `NEXT_PUBLIC_WORLD_APP_ID`: App ID del Developer Portal de World App (formato `app_xxxxx`).
 
 ### ⚙️ Scripts y utilidades
 
@@ -283,12 +288,18 @@ cd Sistema_FrontEnd_Scaffoldeth
 # Install dependencies
 npm install
 
-# Optional: create a local env file (no keys are required yet)
-if (!(Test-Path .env.local) -and (Test-Path .env.example)) { Copy-Item .env.example .env.local }
+# Environment variables
+if (!(Test-Path .env.local) -and (Test-Path '.env')) { Copy-Item .env .env.local -ErrorAction SilentlyContinue }
+# Fill in NEXT_PUBLIC_PRIVY_APP_ID and NEXT_PUBLIC_WORLD_APP_ID before starting the server.
 
 # Start the dev server
 npm run dev
 ```
+
+Required environment variables:
+
+- `NEXT_PUBLIC_PRIVY_APP_ID`: Privy App ID used for wallet onboarding.
+- `NEXT_PUBLIC_WORLD_APP_ID`: World App mini app ID (`app_xxxxx` from the Developer Portal).
 
 ### ⚙️ Scripts & tooling
 

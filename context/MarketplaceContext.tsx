@@ -1,13 +1,29 @@
 'use client'
 
-import { createContext, useContext, useEffect, useRef, useState } from "react"
-import { usePrivy } from "@privy-io/react-auth"
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
+import { usePrivy, useLoginWithSiwe } from "@privy-io/react-auth"
+import { MiniKit } from "@worldcoin/minikit-js"
+
+type WorldcoinUserProfile = Awaited<ReturnType<typeof MiniKit.getUserByAddress>>
+type WorldcoinLoginResult = { success: true } | { success: false; error: string }
 
 import { mockProducts } from "@/lib/marketplace/data"
 import type { Product, QRData, ReferralForm } from "@/types/marketplace"
 
 function useMarketplaceState() {
   const { login, authenticated, user, logout } = usePrivy()
+  const { generateSiweNonce, loginWithSiwe } = useLoginWithSiwe()
+
+  const [isWorldcoinLoginPending, setIsWorldcoinLoginPending] = useState(false)
+  const [worldcoinError, setWorldcoinError] = useState<string | null>(null)
+  const [worldcoinProfile, setWorldcoinProfile] = useState<WorldcoinUserProfile | null>(null)
+  const [isMiniKitReady, setIsMiniKitReady] = useState<boolean>(() => {
+    try {
+      return MiniKit.isInstalled()
+    } catch {
+      return false
+    }
+  })
 
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
@@ -222,6 +238,81 @@ function useMarketplaceState() {
 
   const dropdownRef = useRef<HTMLDivElement>(null)
 
+  const loginWithWorldcoin = useCallback(async (): Promise<WorldcoinLoginResult> => {
+    setWorldcoinError(null)
+
+    if (!MiniKit.isInstalled()) {
+      const message = "MiniKit no está disponible. Abre esta mini app dentro de World App para iniciar sesión con Worldcoin."
+      setWorldcoinError(message)
+      return { success: false, error: message }
+    }
+
+    setIsWorldcoinLoginPending(true)
+
+    try {
+      const nonce = await generateSiweNonce()
+      const { finalPayload } = await MiniKit.commandsAsync.walletAuth({
+        nonce,
+      })
+
+      if (!finalPayload || finalPayload.status !== "success") {
+        const errorMessage =
+          finalPayload && "details" in finalPayload && typeof finalPayload.details === "string"
+            ? finalPayload.details
+            : "La autenticación con World App fue cancelada o falló. Intenta nuevamente."
+        throw new Error(errorMessage)
+      }
+
+      const { message, signature, address } = finalPayload as {
+        message?: string
+        signature?: string
+        address?: string
+      }
+
+      if (!message || !signature) {
+        throw new Error("World App no devolvió una firma válida.")
+      }
+
+      const authenticatedUser = await loginWithSiwe({ message, signature })
+
+      const resolvedAddress =
+        (authenticatedUser as any)?.wallet?.address ?? address ?? ""
+
+      if (resolvedAddress) {
+        try {
+          const profile = await MiniKit.getUserByAddress(resolvedAddress)
+          setWorldcoinProfile(profile)
+        } catch (profileError) {
+          console.warn("No se pudo obtener el perfil de World App", profileError)
+        }
+      }
+
+      setWorldcoinError(null)
+      return { success: true }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Error desconocido al iniciar sesión con Worldcoin."
+      setWorldcoinError(message)
+      console.error("Error during Worldcoin login:", error)
+      return { success: false, error: message }
+    } finally {
+      setIsWorldcoinLoginPending(false)
+      try {
+        setIsMiniKitReady(MiniKit.isInstalled())
+      } catch {
+        setIsMiniKitReady(false)
+      }
+    }
+  }, [generateSiweNonce, loginWithSiwe])
+
+  useEffect(() => {
+    try {
+      setIsMiniKitReady(MiniKit.isInstalled())
+    } catch {
+      setIsMiniKitReady(false)
+    }
+  }, [authenticated])
+
   useEffect(() => {
     if (authenticated && user) {
       setWalletConnected(true)
@@ -231,12 +322,21 @@ function useMarketplaceState() {
       if (walletAccount) {
         setWalletAddress(walletAccount.address)
         updateBalance()
+        if (MiniKit.isInstalled()) {
+          MiniKit.getUserByAddress(walletAccount.address)
+            .then((profile) => setWorldcoinProfile(profile))
+            .catch((error) => {
+              console.warn("No se pudo sincronizar el perfil de World App", error)
+            })
+        }
       }
     } else {
       setWalletConnected(false)
       setWalletAddress("")
       setBalance("0.00")
       setBalanceUSD("0.00")
+      setWorldcoinProfile(null)
+      setWorldcoinError(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticated, user])
@@ -555,9 +655,26 @@ function useMarketplaceState() {
 
   const connectWallet = async () => {
     try {
+      if (MiniKit.isInstalled()) {
+        const result = await loginWithWorldcoin()
+
+        if (!result.success) {
+          if (result.error.includes("MiniKit no está disponible")) {
+            await login()
+          } else {
+            alert(`❌ ${result.error}`)
+          }
+        }
+
+        return
+      }
+
       await login()
     } catch (error) {
       console.error("Error connecting wallet:", error)
+      const message =
+        error instanceof Error ? error.message : "Error al conectar la wallet."
+      alert(`❌ ${message}`)
     }
   }
 
@@ -786,23 +903,25 @@ function useMarketplaceState() {
     setShowQRResultModal(false)
     setIsProcessingQR(false)
   }
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (authenticated && user) {
-      setWalletConnected(true)
-      const walletAccount = user.linkedAccounts.find(
-        (account) => account.type === 'wallet' || account.type === 'smart_wallet'
-      )
-      if (walletAccount) {
-        setWalletAddress(walletAccount.address)
-        setTimeout(() => updateBalance(), 1000)
-      }
-    } else {
-      setWalletConnected(false)
-      setWalletAddress("")
-      setBalance("0.00")
-      setBalanceUSD("0.00")
+    if (!authenticated || !user) {
+      return
     }
+
+    const walletAccount = user.linkedAccounts.find(
+      (account) => account.type === 'wallet' || account.type === 'smart_wallet'
+    )
+
+    if (!walletAccount) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      updateBalance()
+    }, 1000)
+
+    return () => window.clearTimeout(timeoutId)
   }, [authenticated, user])
 
   useEffect(() => {
@@ -912,6 +1031,11 @@ function useMarketplaceState() {
     authenticated,
     user,
     logout,
+    isMiniKitReady,
+    loginWithWorldcoin,
+    isWorldcoinLoginPending,
+    worldcoinError,
+    worldcoinProfile,
     isDarkMode,
     setIsDarkMode,
     products,
