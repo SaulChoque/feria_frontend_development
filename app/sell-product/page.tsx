@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -26,8 +26,6 @@ export default function SellProductPage() {
 		isDarkMode,
 		newProduct,
 		setNewProduct,
-		handleSubmitProduct,
-		handleImageUpload,
 		imagePreview,
 		setImagePreview,
 		setIsSellerDashboardOpen,
@@ -40,6 +38,72 @@ export default function SellProductPage() {
 			setImagePreview("");
 		};
 	}, [setImagePreview, setIsSellerDashboardOpen]);
+
+	// Manejar carga de imagen (guardamos Data URL para compatibilidad con el contexto)
+	const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			const result = reader.result as string;
+			setImagePreview(result);
+			setNewProduct((prev) => ({ ...prev, image: result }));
+		};
+		reader.readAsDataURL(file);
+	};
+
+	// Manejar envío de producto al backend
+	const handleSubmitProduct = async (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		if (!newProduct.image) {
+			alert("Por favor, sube una imagen del producto.");
+			return;
+		}
+
+		try {
+			const formData = new FormData();
+
+			// newProduct.image es un Data URL (string). Convertimos a Blob para enviarlo.
+			const imageDataUrl = newProduct.image as string;
+			const blob = await (await fetch(imageDataUrl)).blob();
+			formData.append("image", blob, "product-image.png");
+
+			formData.append(
+				"product",
+				JSON.stringify({
+					title: newProduct.name,
+					description: newProduct.description,
+					price: newProduct.price,
+					currency: "USDC",
+					category: newProduct.category,
+					condition: newProduct.condition,
+					location: newProduct.location,
+				})
+			);
+
+			const response = await fetch(
+				"http://localhost:5000/api/products/verify",
+				{
+					method: "POST",
+					body: formData,
+				}
+			);
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				throw new Error(data.message || "Error verificando el producto");
+			}
+
+			console.log("Resultado de verificación:", data);
+			alert(`Producto verificado: ${data.decision}`);
+		} catch (err) {
+			console.error("Error:", err);
+			const message = err instanceof Error ? err.message : String(err);
+			alert(message.toString());
+		}
+	};
 
 	return (
 		<div
