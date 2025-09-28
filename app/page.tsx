@@ -25,8 +25,7 @@ import {
 	Compass,
 	X,
 	Home,
-	Loader2,
-	Globe,
+	ArrowLeft,
 } from "lucide-react";
 import { FloatingCart } from "@/components/marketplace/FloatingCart";
 import { ProductCard } from "@/components/marketplace/ProductCard";
@@ -60,10 +59,6 @@ import { useEffect, useState } from "react";
 export default function Marketplace() {
 	const {
 		logout,
-		isMiniKitReady,
-		loginWithWorldcoin,
-		isWorldcoinLoginPending,
-		worldcoinProfile,
 		isDarkMode,
 		searchQuery,
 		setSearchQuery,
@@ -104,34 +99,30 @@ export default function Marketplace() {
 		handleDiscoverAction,
 		handleMetaMaskSettings,
 		handleSellProductClick,
-		user,
 	} = useMarketplace();
 
 	const router = useRouter();
 	const [showMobileFilters, setShowMobileFilters] = useState(false);
+	const [showWalletFullscreen, setShowWalletFullscreen] = useState(false);
 
-	const privyEmail =
-		typeof user?.email === "string"
-			? user.email
-			: user?.email?.address;
+	// Prevenir scroll horizontal
+	useEffect(() => {
+		document.body.style.overflowX = "hidden";
+		document.body.style.width = "100%";
+		document.documentElement.style.overflowX = "hidden";
 
-	const accountDisplayName =
-		worldcoinProfile?.username ??
-		privyEmail ??
-		(walletAddress ? truncateAddress(walletAddress) : "World App user");
-
-	const accountInitial = accountDisplayName
-		? accountDisplayName.trim().charAt(0).toUpperCase() || "W"
-		: "W";
-
-	const accountAvatarUrl = worldcoinProfile?.profilePictureUrl ?? null;
-
-	const showWorldAppLoginButton = !walletConnected && isMiniKitReady;
+		return () => {
+			document.body.style.overflowX = "";
+			document.body.style.width = "";
+			document.documentElement.style.overflowX = "";
+		};
+	}, []);
 
 	// Cerrar menús al hacer tap fuera (solo móvil)
 	useEffect(() => {
-		const handleClickOutside = () => {
-			if (showMobileMenu || showMobileFilters) {
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as HTMLElement;
+			if (showMobileMenu && !target.closest(".mobile-menu")) {
 				setShowMobileMenu(false);
 			}
 			if (showMobileFilters && !target.closest(".mobile-filters")) {
@@ -144,12 +135,26 @@ export default function Marketplace() {
 		}
 
 		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, [
-		showMobileMenu,
-		showMobileFilters,
-		setShowMobileMenu,
-		setShowMobileFilters,
-	]);
+	}, [showMobileMenu, showMobileFilters]);
+
+	// Manejar la apertura del wallet en móvil
+	const handleWalletClick = () => {
+		if (window.innerWidth < 1024) {
+			// En móvil, abrir pantalla completa
+			if (walletConnected) {
+				setShowWalletFullscreen(true);
+			} else {
+				connectWallet();
+			}
+		} else {
+			// En desktop, comportamiento normal
+			if (walletConnected) {
+				setShowUserDropdown(!showUserDropdown);
+			} else {
+				connectWallet();
+			}
+		}
+	};
 
 	return (
 		<div
@@ -229,182 +234,299 @@ export default function Marketplace() {
 								<span>Sell</span>
 							</Button>
 
-							{showWorldAppLoginButton && (
-								<Button
-									className="hidden sm:flex bg-gradient-to-r from-[#0b5fff] to-[#4bc0ff] hover:from-[#0a50d6] hover:to-[#37a0e5] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-xs sm:text-sm px-2 sm:px-4 py-2"
-									onClick={async () => {
-										const result = await loginWithWorldcoin();
-										if (!result.success) {
-											alert(`❌ ${result.error}`);
-										} else {
-											setShowUserDropdown(true);
-										}
-									}}
-									disabled={isWorldcoinLoginPending}
-								>
-									{isWorldcoinLoginPending ? (
-										<Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-									) : (
-										<Globe className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-									)}
-									<span className="hidden sm:inline">World App Login</span>
-									<span className="sm:hidden">World App</span>
-								</Button>
-							)}
+							{/* Botón de Wallet */}
+							<Button
+								variant="ghost"
+								size="icon"
+								className={`relative transition-colors duration-300 h-8 w-8 ${
+									isDarkMode
+										? "hover:bg-slate-700 text-blue-400"
+										: "hover:bg-blue-100 text-blue-600"
+								}`}
+								onClick={handleWalletClick}
+							>
+								<User className="h-4 w-4" />
+								{walletConnected && (
+									<div className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+								)}
+							</Button>
 
-							{showWorldAppLoginButton && (
-								<Button
-									className="sm:hidden bg-gradient-to-r from-[#0b5fff] to-[#4bc0ff] hover:from-[#0a50d6] hover:to-[#37a0e5] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-									size="icon"
-									onClick={async () => {
-										const result = await loginWithWorldcoin();
-										if (!result.success) {
-											alert(`❌ ${result.error}`);
-										} else {
-											setShowUserDropdown(true);
-										}
-									}}
-									disabled={isWorldcoinLoginPending}
-								>
-									{isWorldcoinLoginPending ? (
-										<Loader2 className="h-4 w-4 animate-spin" />
-									) : (
-										<Globe className="h-4 w-4" />
-									)}
-								</Button>
-							)}
+							<Button
+								variant="ghost"
+								size="icon"
+								className={`relative transition-colors duration-300 h-8 w-8 ${
+									isDarkMode
+										? "hover:bg-slate-700 text-cyan-400"
+										: "hover:bg-cyan-100 text-cyan-600"
+								}`}
+							>
+								<Heart className="h-4 w-4" />
+								{wishlistItems.length > 0 && (
+									<Badge className="absolute -top-1 -right-1 h-4 w-4 rounded-full p-0 flex items-center justify-center text-xs bg-gradient-to-r from-cyan-500 to-blue-500 text-white animate-bounce">
+										{wishlistItems.length}
+									</Badge>
+								)}
+							</Button>
 
-							<div className="relative" ref={dropdownRef}>
-								<Button
-									variant="ghost"
-									size="icon"
-									className={`relative transition-colors duration-300 ${
-										isDarkMode
-											? "hover:bg-slate-700 text-blue-400"
-											: "hover:bg-blue-100 text-blue-600"
-									}`}
-									disabled={isWorldcoinLoginPending}
-									onClick={() => {
-										if (isWorldcoinLoginPending) {
-											return;
-										}
+							{/* Botón menú móvil */}
+							<Button
+								variant="ghost"
+								size="icon"
+								className={`transition-colors duration-300 h-8 w-8 mobile-menu ${
+									isDarkMode
+										? "hover:bg-slate-700 text-amber-400"
+										: "hover:bg-amber-100 text-amber-600"
+								}`}
+								onClick={() => setShowMobileMenu(!showMobileMenu)}
+							>
+								<Menu className="h-4 w-4" />
+							</Button>
+						</div>
+					</div>
 
-										if (walletConnected) {
-											setShowUserDropdown(!showUserDropdown);
-										} else {
-											connectWallet();
-										}
-									}}
-								>
-									{isWorldcoinLoginPending ? (
-										<Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-									) : (
-										<User className="h-4 w-4 sm:h-5 sm:w-5" />
-									)}
-									{walletConnected && (
-										<div className="absolute -top-1 -right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500 animate-pulse" />
-									)}
-								</Button>
+					{/* Barra de búsqueda móvil */}
+					<div className="mt-3">
+						<div className="relative">
+							<Search
+								className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${
+									isDarkMode ? "text-cyan-400" : "text-blue-500"
+								}`}
+							/>
+							<Input
+								placeholder="Search products..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className={`pl-10 pr-10 py-2 w-full border-2 rounded-lg backdrop-blur-sm ${
+									isDarkMode
+										? "border-slate-600 focus:border-cyan-500 bg-slate-800/50 text-white placeholder:text-gray-400"
+										: "border-blue-200 focus:border-blue-500 bg-white/50"
+								}`}
+							/>
+							{/* Botón filtros móvil */}
+							<button
+								onClick={() => setShowMobileFilters(!showMobileFilters)}
+								className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-lg transition-colors mobile-filters ${
+									isDarkMode
+										? "hover:bg-slate-700 text-cyan-400"
+										: "hover:bg-blue-100 text-blue-500"
+								}`}
+							>
+								<Filter className="h-4 w-4" />
+							</button>
+						</div>
+					</div>
+				</div>
+			</header>
 
-								{/* Dropdown Menu - Responsive */}
-								{walletConnected && showUserDropdown && (
-									<div
-										className={`absolute top-12 left-1/2 -translate-x-1/2 w-[90vw] max-w-[90vw] sm:w-80 sm:max-w-none sm:left-auto sm:right-0 sm:translate-x-0 max-h-[80vh] overflow-y-auto rounded-xl border-2 shadow-xl z-50 transition-all duration-300 ${
-											isDarkMode
-												? "bg-slate-900 border-slate-600 text-white"
-												: "bg-white border-gray-200 text-gray-900"
+			{/* Menú lateral móvil */}
+			{showMobileMenu && (
+				<>
+					<div className="fixed inset-0 bg-black/50 z-40 lg:hidden" />
+					<div
+						className={`fixed left-0 top-0 h-full w-full z-50 transform transition-transform duration-300 lg:hidden mobile-menu ${
+							showMobileMenu ? "translate-x-0" : "-translate-x-full"
+						} ${
+							isDarkMode
+								? "bg-slate-900 border-r border-slate-700"
+								: "bg-white border-r border-gray-200"
+						}`}
+					>
+						<div className="p-4 border-b border-slate-700">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center space-x-3">
+									<img
+										src="/koneque.png"
+										alt="Koñeque Logo"
+										className="w-12 h-12 object-contain"
+									/>
+									<span
+										className={`text-xl font-bold ${
+											isDarkMode ? "text-white" : "text-gray-900"
 										}`}
 									>
-										{/* Header with Account info */}
-										<div
-											className={`p-3 sm:p-4 border-b ${
-												isDarkMode ? "border-slate-600" : "border-gray-200"
-											}`}
-										>
-											<div className="flex items-center gap-2 sm:gap-3">
-												<div
-													className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 ${
-														worldcoinProfile
-															? "bg-gradient-to-r from-[#0b5fff] to-[#43d9ff]"
-															: "bg-gradient-to-r from-blue-500 to-cyan-500"
-													}`}
-												>
-													{accountAvatarUrl ? (
-														<div
-															className="h-full w-full bg-cover bg-center"
-															style={{ backgroundImage: `url(${accountAvatarUrl})` }}
-														/>
-													) : (
-														<span className="text-white font-bold text-sm">
-															{accountInitial}
-														</span>
-													)}
-												</div>
-												<div className="flex-1">
-													<div className="flex flex-wrap items-center gap-2">
-														<span className="font-semibold text-sm sm:text-base">
-															{accountDisplayName}
-														</span>
-														<div className="w-2 h-2 bg-green-500 rounded-full"></div>
-														{worldcoinProfile && (
-															<Badge className="text-[10px] uppercase tracking-wide bg-gradient-to-r from-[#0b5fff] to-[#4bc0ff] text-white border-0">
-																World App
-															</Badge>
-														)}
-													</div>
-													{worldcoinProfile?.username && (
-														<p className="mt-1 text-xs text-gray-400">
-															@{worldcoinProfile.username.replace(/^@/, "")}
-														</p>
-													)}
-													<div className="mt-1">
-														<div className="flex items-center gap-2 mb-1">
-															<span className="text-xs text-gray-400">
-																Dirección:
-															</span>
-															<Button
-																variant="ghost"
-																size="icon"
-																className={`h-4 w-4 sm:h-5 sm:w-5 p-0 rounded transition-all duration-200 ${
-																	isDarkMode
-																		? "hover:bg-slate-700 text-gray-400 hover:text-white"
-																		: "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
-																}`}
-																onClick={() =>
-																	setShowFullAddress(!showFullAddress)
-																}
-																title={
-																	showFullAddress
-																		? "Ocultar dirección completa"
-																		: "Mostrar dirección completa"
-																}
-															>
-																{showFullAddress ? (
-																	<EyeOff className="h-3 w-3" />
-																) : (
-																	<Eye className="h-3 w-3" />
-																)}
-															</Button>
-														</div>
-														<div
-															className={`text-xs sm:text-sm font-mono p-2 rounded-md border ${
-																isDarkMode
-																	? "bg-slate-800 border-slate-600 text-gray-300"
-																	: "bg-gray-50 border-gray-200 text-gray-600"
-															}`}
-														>
-															{showFullAddress ? (
-																<span className="break-all leading-relaxed">
-																	{walletAddress}
-																</span>
-															) : (
-																<span>{truncateAddress(walletAddress)}</span>
-															)}
-														</div>
-													</div>
-												</div>
-											</div>
+										Koñeque
+									</span>
+								</div>
+								<button
+									onClick={() => setShowMobileMenu(false)}
+									className={`p-2 rounded-lg ${
+										isDarkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"
+									}`}
+								>
+									<X className="h-5 w-5" />
+								</button>
+							</div>
+						</div>
+
+						<nav className="p-4 space-y-2">
+							<button
+								className={`w-full flex items-center space-x-3 p-3 rounded-xl text-left transition-colors ${
+									isDarkMode
+										? "hover:bg-slate-700 text-white"
+										: "hover:bg-gray-100 text-gray-900"
+								}`}
+								onClick={() => {
+									setShowMobileMenu(false);
+									router.push("/");
+								}}
+							>
+								<Home className="h-5 w-5" />
+								<span>Home</span>
+							</button>
+
+							<button
+								className={`w-full flex items-center space-x-3 p-3 rounded-xl text-left transition-colors ${
+									isDarkMode
+										? "hover:bg-slate-700 text-white"
+										: "hover:bg-gray-100 text-gray-900"
+								}`}
+								onClick={() => {
+									setShowMobileMenu(false);
+									router.push("/reviews");
+								}}
+							>
+								<Star className="h-5 w-5" />
+								<span>Reviews</span>
+							</button>
+
+							<button
+								className={`w-full flex items-center space-x-3 p-3 rounded-xl text-left transition-colors ${
+									isDarkMode
+										? "hover:bg-slate-700 text-white"
+										: "hover:bg-gray-100 text-gray-900"
+								}`}
+								onClick={() => {
+									setShowMobileMenu(false);
+									setReferralsContext("navbar");
+									router.push("/referred-people");
+								}}
+							>
+								<Users className="h-5 w-5" />
+								<span>Referrals</span>
+							</button>
+
+							<button
+								className={`w-full flex items-center space-x-3 p-3 rounded-xl text-left transition-colors ${
+									isDarkMode
+										? "hover:bg-slate-700 text-white"
+										: "hover:bg-gray-100 text-gray-900"
+								}`}
+								onClick={toggleDarkMode}
+							>
+								{isDarkMode ? (
+									<Sun className="h-5 w-5" />
+								) : (
+									<Moon className="h-5 w-5" />
+								)}
+								<span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+							</button>
+						</nav>
+					</div>
+				</>
+			)}
+
+			{/* Pantalla completa de Wallet para móvil */}
+			{showWalletFullscreen && (
+				<>
+					<div className="fixed inset-0 bg-black/50 z-40 lg:hidden" />
+					<div
+						className={`fixed inset-0 z-50 lg:hidden flex flex-col ${
+							isDarkMode ? "bg-slate-900" : "bg-white"
+						}`}
+					>
+						{/* Header de la pantalla de wallet */}
+						<div
+							className={`p-4 border-b ${
+								isDarkMode ? "border-slate-700" : "border-gray-200"
+							}`}
+						>
+							<div className="flex items-center justify-between">
+								<button
+									onClick={() => setShowWalletFullscreen(false)}
+									className={`p-2 rounded-lg ${
+										isDarkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"
+									}`}
+								>
+									<ArrowLeft className="h-5 w-5" />
+								</button>
+								<h2
+									className={`text-xl font-bold ${
+										isDarkMode ? "text-white" : "text-gray-900"
+									}`}
+								>
+									My Wallet
+								</h2>
+								<div className="w-10"></div>{" "}
+								{/* Espaciador para centrar el título */}
+							</div>
+						</div>
+
+						{/* Contenido de la pantalla de wallet */}
+						<div className="flex-1 overflow-y-auto p-4">
+							{/* Información de la cuenta */}
+							<div
+								className={`p-4 rounded-xl mb-4 ${
+									isDarkMode ? "bg-slate-800" : "bg-gray-50"
+								}`}
+							>
+								<div className="flex items-center gap-3 mb-3">
+									<div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+										<span className="text-white font-bold text-lg">M</span>
+									</div>
+									<div>
+										<div className="flex items-center gap-2">
+											<span
+												className={`font-semibold ${
+													isDarkMode ? "text-white" : "text-gray-900"
+												}`}
+											>
+												Account 2
+											</span>
+											<div className="w-2 h-2 bg-green-500 rounded-full"></div>
 										</div>
+										<div className="flex items-center gap-2 mt-1">
+											<span
+												className={`text-sm ${
+													isDarkMode ? "text-gray-400" : "text-gray-500"
+												}`}
+											>
+												Dirección:
+											</span>
+											<Button
+												variant="ghost"
+												size="icon"
+												className={`h-4 w-4 p-0 rounded ${
+													isDarkMode
+														? "hover:bg-slate-700 text-gray-400 hover:text-white"
+														: "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+												}`}
+												onClick={() => setShowFullAddress(!showFullAddress)}
+											>
+												{showFullAddress ? (
+													<EyeOff className="h-3 w-3" />
+												) : (
+													<Eye className="h-3 w-3" />
+												)}
+											</Button>
+										</div>
+									</div>
+								</div>
+								<div
+									className={`text-sm font-mono p-3 rounded-md border ${
+										isDarkMode
+											? "bg-slate-700 border-slate-600 text-gray-300"
+											: "bg-white border-gray-200 text-gray-600"
+									}`}
+								>
+									{showFullAddress ? (
+										<span className="break-all leading-relaxed">
+											{walletAddress}
+										</span>
+									) : (
+										<span>{truncateAddress(walletAddress)}</span>
+									)}
+								</div>
+							</div>
 
 							{/* Balance Section */}
 							<div
