@@ -178,14 +178,4 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Mobile-first animations - reduce motion on smaller screens */
-@media (max-width: 768px) {
-  * {
-    animation-duration: 0.2s !important;
-    transition-duration: 0.2s !important;
-  }
-  
-  .group:hover .group-hover\:scale-110 {
-    transform: scale(1.05) !important;
-  }
-}
+

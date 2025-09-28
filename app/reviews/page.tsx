@@ -452,15 +452,6 @@ export default function ReviewsPage() {
 											Producto en Disputa
 										</h4>
 										<div className="flex items-center gap-3">
-											<img
-												src={selectedCase?.productImage}
-												alt={selectedCase?.productName}
-												className={`h-16 w-16 rounded-lg object-cover ${
-													isDarkMode
-														? "border border-slate-700"
-														: "border border-blue-100"
-												}`}
-											/>
 											<div
 												className={`relative h-16 w-16 rounded-lg overflow-hidden ${
 													isDarkMode
@@ -525,32 +516,14 @@ export default function ReviewsPage() {
 										<div className="grid grid-cols-2 gap-2">
 											{selectedCase?.buyerEvidence.map((item) => (
 												<figure key={item.caption} className="space-y-1">
-													<img
-														src={item.src}
-														alt={item.caption}
-														className={`h-24 w-full rounded-lg object-cover ${
-															isDarkMode
-																? "border border-slate-700"
-																: "border border-blue-100"
-														}`}
-													/>
 													<div
 														className={`relative h-24 w-full rounded-lg overflow-hidden ${
-															isDarkMode
-																? "border border-slate-700"
-																: "border border-blue-100"
-														}`}
+														isDarkMode ? "border border-slate-700" : "border border-blue-100"
+													}`}
 													>
-														<Image
-															src={item.src ?? "/placeholder.svg"}
-															alt={item.caption}
-															fill
-															className="object-cover"
-														/>
+														<Image src={item.src ?? "/placeholder.svg"} alt={item.caption} fill className="object-cover" />
 													</div>
-													<figcaption
-														className={`text-xs ${subtitleTextClass}`}
-													>
+													<figcaption className={`text-xs ${subtitleTextClass}`}>
 														{item.caption}
 													</figcaption>
 												</figure>
@@ -568,32 +541,10 @@ export default function ReviewsPage() {
 										<div className="grid grid-cols-2 gap-2">
 											{selectedCase?.sellerEvidence.map((item) => (
 												<figure key={item.caption} className="space-y-1">
-													<img
-														src={item.src}
-														alt={item.caption}
-														className={`h-24 w-full rounded-lg object-cover ${
-															isDarkMode
-																? "border border-slate-700"
-																: "border border-blue-100"
-														}`}
-													/>
-													<div
-														className={`relative h-24 w-full rounded-lg overflow-hidden ${
-															isDarkMode
-																? "border border-slate-700"
-																: "border border-blue-100"
-														}`}
-													>
-														<Image
-															src={item.src ?? "/placeholder.svg"}
-															alt={item.caption}
-															fill
-															className="object-cover"
-														/>
+													<div className={`relative h-24 w-full rounded-lg overflow-hidden ${isDarkMode ? "border border-slate-700" : "border border-blue-100"}`}>
+														<Image src={item.src ?? "/placeholder.svg"} alt={item.caption} fill className="object-cover" />
 													</div>
-													<figcaption
-														className={`text-xs ${subtitleTextClass}`}
-													>
+													<figcaption className={`text-xs ${subtitleTextClass}`}>
 														{item.caption}
 													</figcaption>
 												</figure>

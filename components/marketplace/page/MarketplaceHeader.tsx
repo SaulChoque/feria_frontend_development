@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+// Logo replaced by an icon
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import {
 	Search,
 	Sun,
 	User,
+	ShoppingCart,
 } from "lucide-react";
 
 interface MarketplaceHeaderProps {
@@ -51,20 +52,15 @@ export function MarketplaceHeader({
 			<div className="w-full px-3 py-3">
 				<div className="flex items-center justify-between w-full">
 					<div className="flex items-center space-x-2 flex-shrink-0">
-						<Image
-							src="/koneque.png"
-							alt="Koñeque Logo"
-							width={40}
-							height={40}
-							className="object-contain hover:scale-110 transition-transform duration-300"
-							priority
-						/>
+						<div className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
+							<ShoppingCart className="h-5 w-5" />
+						</div>
 						<span
 							className={`text-lg font-bold bg-gradient-to-r bg-clip-text text-transparent ${
 								isDarkMode ? "from-cyan-400 to-blue-400" : "from-blue-600 to-cyan-600"
 							}`}
 						>
-							Koñeques
+							Tienda
 						</span>
 					</div>
 

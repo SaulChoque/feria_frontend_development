@@ -37,7 +37,7 @@ export type WorldcoinUserProfile = Awaited<ReturnType<typeof MiniKit.getUserByAd
 export type WorldcoinLoginResult = { success: true } | { success: false; error: string };
 
 export function useMarketplaceAuth() {
-	const { login, authenticated, user, logout } = usePrivy();
+			const { login, authenticated, user, logout } = usePrivy();
 	const { generateSiweNonce, loginWithSiwe } = useLoginWithSiwe();
 
 	const [isWorldcoinLoginPending, setIsWorldcoinLoginPending] = useState(false);

@@ -31,9 +31,11 @@ interface WalletFullscreenProps {
 	showBalance: boolean;
 	onToggleBalanceVisibility: () => void;
 	balance: string;
-	balanceUSD: string;
 	isLoadingBalance: boolean;
 	onUpdateBalance: () => void;
+	onConnectAnother?: () => void;
+wallets?: Array<{ address: string; label?: string; primary?: boolean }>;
+setActiveWallet?: (address: string) => void;
 	onDiscover: () => void;
 	onDeposit: () => void;
 	onReceive: () => void;
@@ -58,7 +60,6 @@ export function WalletFullscreen({
 	showBalance,
 	onToggleBalanceVisibility,
 	balance,
-	balanceUSD,
 	isLoadingBalance,
 	onUpdateBalance,
 	onDiscover,
@@ -72,8 +73,20 @@ export function WalletFullscreen({
 	worldcoinError = null,
 	onLogout,
 	onClose,
+	onConnectAnother,
+	wallets,
+	setActiveWallet,
 	truncateAddress,
 }: WalletFullscreenProps) {
+	const handleConnectAnother = () => {
+		if (!onConnectAnother) {
+			console.warn("onConnectAnother prop not provided")
+			alert("Función de conectar otra billetera no disponible")
+			return
+		}
+		console.log("WalletFullscreen: solicitar conectar otra billetera")
+		onConnectAnother()
+	}
 	const isObject = (value: unknown): value is Record<string, unknown> =>
 		typeof value === "object" && value !== null;
 
@@ -314,6 +327,31 @@ export function WalletFullscreen({
 								)}
 							</div>
 						</div>
+						{/* Wallets list (if multiple) */}
+						{wallets && wallets.length > 0 && (
+							<div className="mt-3 space-y-2">
+								<span className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>Billeteras conectadas:</span>
+								<div className="flex flex-col gap-2">
+									{wallets.map((w) => (
+										<div key={w.address} className="flex items-center justify-between gap-2 p-2 rounded-md border bg-transparent">
+											<div className="text-sm truncate">{truncateAddress(w.address)}</div>
+											<div className="flex items-center gap-2">
+												{w.address.toLowerCase() === walletAddress.toLowerCase() ? (
+													<span className="text-xs font-medium text-green-500">Activa</span>
+												) : (
+													<button
+														className={`text-xs px-2 py-1 rounded bg-blue-50 text-blue-700`}
+														onClick={() => setActiveWallet?.(w.address)}
+													>
+														Activar
+													</button>
+												)}
+											</div>
+										</div>
+									))}
+								</div>
+							</div>
+						)}
 						<div className="flex items-center gap-2 mb-2">
 							<span className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>Dirección:</span>
 							<Button
@@ -393,7 +431,7 @@ export function WalletFullscreen({
 											<span className="animate-pulse">Cargando...</span>
 										) : showBalance ? (
 											<span className="bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
-												${balanceUSD} USD
+												{balance} ETH
 											</span>
 										) : (
 											"****"
@@ -401,7 +439,7 @@ export function WalletFullscreen({
 									</div>
 									{showBalance && !isLoadingBalance && (
 										<div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
-											{balance} ETH • Sepolia Testnet
+											{balance} ETH
 										</div>
 									)}
 								</div>
@@ -430,6 +468,17 @@ export function WalletFullscreen({
 							>
 								<Compass className="h-4 w-4" />
 								<span className="text-sm">Descubrir</span>
+							</button>
+							<button
+								onClick={handleConnectAnother}
+								className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all ${
+									isDarkMode
+										? "bg-green-900/50 text-green-300 hover:bg-green-800/50 border border-green-600/30"
+										: "bg-green-50 text-green-600 hover:bg-green-100 border border-green-200"
+								} disabled:opacity-50`}
+							>
+								<Download className="h-4 w-4" />
+								<span className="text-sm">Conectar Otra Billetera</span>
 							</button>
 						</div>
 					</div>

@@ -40,7 +40,6 @@ export default function Marketplace() {
 		showBalance,
 		setShowBalance,
 		balance,
-		balanceUSD,
 		isLoadingBalance,
 		setShowSalesModal,
 		setShowPurchasesModal,
@@ -50,6 +49,9 @@ export default function Marketplace() {
 		connectWallet,
 		truncateAddress,
 		updateBalance,
+		addAnotherWallet,
+		wallets,
+		setActiveWallet,
 		handleReceiveAction,
 		handleDepositAction,
 		handleDiscoverAction,
@@ -65,23 +67,7 @@ export default function Marketplace() {
 	const [showMobileFilters, setShowMobileFilters] = useState(false);
 	const [showWalletFullscreen, setShowWalletFullscreen] = useState(false);
 
-	useEffect(() => {
-		const body = document.body;
-		const html = document.documentElement;
-		const previousBodyOverflowX = body.style.overflowX;
-		const previousBodyWidth = body.style.width;
-		const previousHtmlOverflowX = html.style.overflowX;
-
-		body.style.overflowX = "hidden";
-		body.style.width = "100%";
-		html.style.overflowX = "hidden";
-
-		return () => {
-			body.style.overflowX = previousBodyOverflowX;
-			body.style.width = previousBodyWidth;
-			html.style.overflowX = previousHtmlOverflowX;
-		};
-	}, []);
+	
 
 	useEffect(() => {
 		if (typeof window === "undefined" || window.innerWidth >= 1024) {
@@ -274,7 +260,6 @@ export default function Marketplace() {
 				showBalance={showBalance}
 				onToggleBalanceVisibility={handleToggleBalanceVisibility}
 				balance={balance}
-				balanceUSD={balanceUSD}
 				isLoadingBalance={isLoadingBalance}
 				onUpdateBalance={handleUpdateBalance}
 				onDiscover={handleDiscover}
@@ -288,6 +273,9 @@ export default function Marketplace() {
 				worldcoinError={worldcoinError}
 				onLogout={handleLogout}
 				onClose={() => setShowWalletFullscreen(false)}
+				onConnectAnother={addAnotherWallet}
+				wallets={wallets}
+				setActiveWallet={setActiveWallet}
 				truncateAddress={truncateAddress}
 			/>
 
@@ -330,23 +318,7 @@ export default function Marketplace() {
 
 			<MarketplaceModals />
 
-			<style jsx global>{`
-				body {
-					overflow-x: hidden;
-					width: 100%;
-					max-width: 100vw;
-				}
-				html {
-					overflow-x: hidden;
-				}
-				.no-scrollbar {
-					-ms-overflow-style: none;
-					scrollbar-width: none;
-				}
-				.no-scrollbar::-webkit-scrollbar {
-					display: none;
-				}
-			`}</style>
+			
 		</div>
 	);
 }

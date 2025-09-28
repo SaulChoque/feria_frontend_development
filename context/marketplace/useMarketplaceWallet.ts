@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { QRData } from "@/types/marketplace";
 
@@ -8,12 +8,6 @@ import type { LinkedAccountWithMetadata } from "@privy-io/react-auth";
 
 import type { MarketplaceAuthSlice, WorldcoinLoginResult } from "./useMarketplaceAuth";
 
-const SEPOLIA_RPC_ENDPOINTS = [
-	"https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
-	"https://rpc.sepolia.org",
-	"https://ethereum-sepolia.blockpi.network/v1/rpc/public",
-	"https://sepolia.gateway.tenderly.co",
-];
 
 const DISCOVER_OPPORTUNITIES = [
 	"🎯 Staking ETH - 5.2% APY",
@@ -39,8 +33,10 @@ type UseMarketplaceWalletParams = {
 export function useMarketplaceWallet({ auth }: UseMarketplaceWalletParams) {
 	const [walletConnected, setWalletConnected] = useState(false);
 	const [walletAddress, setWalletAddress] = useState("");
+	const [wallets, setWallets] = useState<Array<{ address: string; label?: string; primary?: boolean }>>(
+		[],
+	);
 	const [balance, setBalance] = useState("0.00");
-	const [balanceUSD, setBalanceUSD] = useState("0.00");
 	const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 	const [showBalance, setShowBalance] = useState(true);
 
@@ -68,84 +64,66 @@ export function useMarketplaceWallet({ auth }: UseMarketplaceWalletParams) {
 		return `${address.slice(0, 6)}***${address.slice(-4)}`;
 	}, []);
 
-	const getSepoliaBalance = useCallback(async (address: string) => {
-		for (const rpcUrl of SEPOLIA_RPC_ENDPOINTS) {
-			try {
-				const response = await fetch(rpcUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						jsonrpc: "2.0",
-						method: "eth_getBalance",
-						params: [address, "latest"],
-						id: 1,
-					}),
-				});
+	// NOTE: On-chain Sepolia RPC calls and price lookups were intentionally removed.
+	// If you need to re-enable live lookups, reintroduce RPC logic here.
 
-				if (!response.ok) {
-					continue;
-				}
+	// Use a ref to the latest auth.user so this function remains stable and
+	// does not cause effect dependencies to change on every render.
+	const authUserRef = useRef(auth.user);
+	useEffect(() => {
+		authUserRef.current = auth.user;
+	}, [auth.user]);
 
-				const data = await response.json();
-				if (data.result) {
-					const balanceInWei = parseInt(data.result, 16);
-					const balanceInEth = balanceInWei / Math.pow(10, 18);
-					return balanceInEth.toFixed(4);
-				}
-			} catch (error) {
-				console.log(`RPC ${rpcUrl} failed, trying next...`, error);
-				continue;
-			}
-		}
+	// Derived stable key of linked wallet addresses to avoid effect loops
+	const linkedWalletAddressesKey = useMemo(() => {
+		const addrs = (auth.user?.linkedAccounts ?? [])
+			.filter(isWalletAccount)
+			.map((a) => String(a.address).toLowerCase())
+			.sort();
+		return addrs.join(",");
+	}, [auth.user?.linkedAccounts]);
 
-		console.log("All RPCs failed, using mock balance");
-		return "0.1234";
-	}, []);
+	// Track last synced address to avoid repeated syncs
+	const lastSyncedAddressRef = useRef<string | null>(null);
 
-	const getETHPriceInUSD = useCallback(async () => {
+	const updateBalanceForAddress = useCallback(async (address: string) => {
+		if (!address) return;
+
+		setIsLoadingBalance(true);
 		try {
-			const response = await fetch(
-				"https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
-			);
+			console.log("Updating balance for address (no RPC calls):", address);
 
-			if (!response.ok) {
-				return 2500;
+			// Try to read a balance value from linked account metadata if available.
+			const walletAccount = (authUserRef.current?.linkedAccounts ?? []).find(isWalletAccount) as
+				| (LinkedAccountWithMetadata & { address?: string; metadata?: any })
+				| undefined;
+
+			let rawBalance: string | number | undefined;
+			if (walletAccount && walletAccount.metadata) {
+				const meta = walletAccount.metadata as any;
+				rawBalance = meta.balance ?? meta.ethBalance ?? meta.tokenBalance ?? meta.rawBalance;
 			}
 
-			const data = await response.json();
-			return data.ethereum?.usd || 2500;
+			// If we didn't find a metadata balance, use a safe mock value.
+			if (rawBalance === undefined || rawBalance === null) {
+				rawBalance = "0.1234"; // mock value
+			}
+
+			// Normalize to a string with up to 4 decimals when numeric.
+			const parsed = parseFloat(String(rawBalance));
+			const ethBalanceStr = Number.isFinite(parsed) ? parsed.toFixed(4) : String(rawBalance);
+
+			// We intentionally DO NOT convert to USD anymore.
+			setBalance(ethBalanceStr);
+
+			console.log("Balance updated (raw):", ethBalanceStr, "ETH");
 		} catch (error) {
-			console.error("Error fetching ETH price:", error);
-			return 2500;
+			console.error("Error updating balance:", error);
+			setBalance("0.1234");
+		} finally {
+			setIsLoadingBalance(false);
 		}
 	}, []);
-
-	const updateBalanceForAddress = useCallback(
-		async (address: string) => {
-			if (!address) return;
-
-			setIsLoadingBalance(true);
-			try {
-				console.log("Updating balance for address:", address);
-
-				const ethBalance = await getSepoliaBalance(address);
-				const ethPrice = await getETHPriceInUSD();
-				const usdValue = (parseFloat(ethBalance) * ethPrice).toFixed(2);
-
-				setBalance(ethBalance);
-				setBalanceUSD(usdValue);
-
-				console.log("Balance updated:", ethBalance, "ETH,", usdValue, "USD");
-			} catch (error) {
-				console.error("Error updating balance:", error);
-				setBalance("0.1234");
-				setBalanceUSD("308.50");
-			} finally {
-				setIsLoadingBalance(false);
-			}
-		},
-		[getETHPriceInUSD, getSepoliaBalance],
-	);
 
 	const updateBalance = useCallback(async () => {
 		if (!walletAddress) return;
@@ -178,6 +156,52 @@ export function useMarketplaceWallet({ auth }: UseMarketplaceWalletParams) {
 			alert(`❌ ${message}`);
 		}
 	}, [auth]);
+
+	// Add another wallet to the current user's wallet list without replacing the primary
+	const addAnotherWallet = useCallback(async () => {
+		console.log("addAnotherWallet invoked")
+		try {
+			// If user is already authenticated, avoid calling auth.login again
+			// because the provider may require a dedicated 'link' flow. Show guidance instead.
+			if (auth.authenticated) {
+				console.info("User already authenticated — prompt user to link another wallet from their provider.")
+				alert(
+					"Estás conectado. Para agregar otra billetera, usa la función 'Link' en tu proveedor o reabre World App y enlaza la cuenta desde allí."
+				)
+				return
+			}
+
+			const installed = auth.refreshMiniKitStatus();
+			const shouldUseMiniKit = typeof installed === "boolean" ? installed : auth.isMiniKitReady;
+
+			if (shouldUseMiniKit) {
+				const result = await auth.loginWithWorldcoin();
+				if (!result.success) {
+					if (result.error.includes("MiniKit no está disponible")) {
+						await auth.login();
+					} else {
+						alert(`❌ ${result.error}`);
+					}
+				}
+				return;
+			}
+
+			await auth.login();
+		} catch (error) {
+			console.error("Error adding another wallet:", error);
+			const message = error instanceof Error ? error.message : String(error);
+			alert(`❌ ${message}`);
+		}
+	}, [auth]);
+
+	const setActiveWallet = useCallback(
+		(address: string) => {
+			if (!address) return;
+			setWalletAddress(address);
+			void updateBalanceForAddress(address);
+		},
+		[updateBalanceForAddress],
+	);
 
 	const handleBuyAction = useCallback(() => {
 		alert(
@@ -323,40 +347,65 @@ export function useMarketplaceWallet({ auth }: UseMarketplaceWalletParams) {
 			setWalletConnected(false);
 			setWalletAddress("");
 			setBalance("0.00");
-			setBalanceUSD("0.00");
 			auth.resetWorldcoinState();
 			return;
 		}
 
 		setWalletConnected(true);
 
-		const walletAccount = auth.user.linkedAccounts?.find(isWalletAccount);
+		// Merge linked wallet accounts into `wallets` state without losing existing entries.
+		const linkedWallets = (auth.user.linkedAccounts ?? [])
+			.filter(isWalletAccount)
+			.map((acct) => ({ address: acct.address, label: (acct as any)?.provider ?? undefined }));
 
+		// Only update wallets state if the set of addresses changed
+		const newAddressesKey = linkedWallets.map((w) => w.address.toLowerCase()).sort().join(",");
+		setWallets((prev) => {
+			const prevKey = prev.map((w) => w.address.toLowerCase()).sort().join(",");
+			if (prevKey === newAddressesKey) return prev;
+			const existing = new Map(prev.map((w) => [w.address.toLowerCase(), w]));
+			for (const w of linkedWallets) {
+				if (!existing.has(w.address.toLowerCase())) {
+					existing.set(w.address.toLowerCase(), { ...w, primary: false });
+				}
+			}
+			return Array.from(existing.values());
+		});
+
+		const walletAccount = (auth.user.linkedAccounts ?? []).find(isWalletAccount);
 		const nextAddress = walletAccount?.address ?? "";
-		setWalletAddress(nextAddress);
 
-		if (nextAddress) {
+		if (nextAddress && !walletAddress) {
+			setWalletAddress(nextAddress);
 			void updateBalanceForAddress(nextAddress);
-			void auth.syncWorldcoinProfile(nextAddress);
+			if (lastSyncedAddressRef.current !== nextAddress) {
+				lastSyncedAddressRef.current = nextAddress;
+				void auth.syncWorldcoinProfile(nextAddress);
+			}
+		} else if (nextAddress) {
+			// Sync profile for the next address but don't override user's currently active walletAddress
+			if (lastSyncedAddressRef.current !== nextAddress) {
+				lastSyncedAddressRef.current = nextAddress;
+				void auth.syncWorldcoinProfile(nextAddress);
+			}
 		}
-	}, [auth, updateBalanceForAddress]);
+	}, [auth.authenticated, linkedWalletAddressesKey, walletAddress, updateBalanceForAddress]);
 
 	useEffect(() => {
 		if (walletAddress && walletConnected) {
 			void updateBalanceForAddress(walletAddress);
 		}
-	}, [updateBalanceForAddress, walletAddress, walletConnected]);
+	}, [walletAddress, walletConnected, updateBalanceForAddress]);
 
 	const walletSlice = useMemo(
 		() => ({
 			walletConnected,
 			setWalletConnected,
 			walletAddress,
+			wallets,
 			setWalletAddress,
 			balance,
 			setBalance,
-			balanceUSD,
-			setBalanceUSD,
 			showBalance,
 			setShowBalance,
 			isLoadingBalance,
@@ -392,9 +441,10 @@ export function useMarketplaceWallet({ auth }: UseMarketplaceWalletParams) {
 			setPendingDepositData,
 			connectWallet,
 			truncateAddress,
-			getSepoliaBalance,
-			getETHPriceInUSD,
+
 			updateBalance,
+			addAnotherWallet,
+			setActiveWallet,
 			handleBuyAction,
 			handleSwapAction,
 			handleSendAction,
@@ -414,15 +464,13 @@ export function useMarketplaceWallet({ auth }: UseMarketplaceWalletParams) {
 		}),
 		[
 			balance,
-			balanceUSD,
 			calculateUSDCAmount,
 			connectWallet,
 			depositAmountBs,
 			generateQRCode,
 			generateReceiveQR,
 			generateSendQR,
-			getETHPriceInUSD,
-			getSepoliaBalance,
+
 			handleBuyAction,
 			handleDepositAction,
 			handleDepositConfirm,
@@ -453,6 +501,7 @@ export function useMarketplaceWallet({ auth }: UseMarketplaceWalletParams) {
 			uploadedQRImage,
 			usdcRate,
 			walletAddress,
+			wallets,
 			walletConnected,
 			qrData,
 		],

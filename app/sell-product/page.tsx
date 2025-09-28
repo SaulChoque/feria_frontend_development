@@ -1,8 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, ChangeEvent, FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { ChangeEvent, FormEvent, useState } from "react";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +18,6 @@ import {
 import { categories, locations } from "@/lib/marketplace/data";
 
 export default function SellProductPage() {
-	const router = useRouter();
 	const [productData, setProductData] = useState({
 		title: "",
 		description: "",
@@ -27,7 +25,6 @@ export default function SellProductPage() {
 		category: "",
 		location: "",
 	});
-	const [condition, setCondition] = useState("");
 	const [imageFile, setImageFile] = useState<File | null>(null);
 	const [imagePreview, setImagePreview] = useState<string>("");
 
@@ -192,11 +189,13 @@ export default function SellProductPage() {
 					<div>
 						<Label>Product Image *</Label>
 						{imagePreview ? (
-							<div className="relative">
-								<img
+							<div className="relative h-48 w-full rounded-lg overflow-hidden">
+								<Image
 									src={imagePreview}
 									alt="Preview"
-									className="h-48 w-full object-cover rounded-lg"
+									fill
+									className="object-cover"
+									unoptimized
 								/>
 								<Button
 									type="button"
