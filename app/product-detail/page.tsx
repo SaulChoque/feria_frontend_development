@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
 	MapPin,
@@ -29,7 +30,7 @@ export default function ProductDetailPage() {
 		setCouponMessage,
 		setProductDetailOpen,
 		addToCart,
-		addToWishlist,
+		toggleWishlist,
 		wishlistItems,
 	} = useMarketplace();
 
@@ -40,9 +41,7 @@ export default function ProductDetailPage() {
 		setProductDetailOpen(true);
 		// Verificar si el producto está en la wishlist
 		if (selectedProductDetail) {
-			setIsInWishlist(
-				wishlistItems.some((item) => item.id === selectedProductDetail.id)
-			);
+			setIsInWishlist(wishlistItems.includes(selectedProductDetail.id));
 		}
 		return () => {
 			setProductDetailOpen(false);
@@ -153,7 +152,7 @@ export default function ProductDetailPage() {
 
 							<button
 								onClick={() => {
-									addToWishlist(selectedProductDetail.id);
+									toggleWishlist(selectedProductDetail.id);
 									setIsInWishlist(!isInWishlist);
 								}}
 								className={`p-2 rounded-lg transition-colors ${
@@ -214,11 +213,13 @@ export default function ProductDetailPage() {
 						>
 							{/* Imagen y precio - Layout móvil optimizado */}
 							<div className="flex flex-col gap-6 lg:flex-row">
-								<div className="w-full overflow-hidden rounded-2xl border-2 border-white/20 bg-black/5 shadow-xl lg:w-80">
-									<img
+								<div className="w-full overflow-hidden rounded-2xl border-2 border-white/20 bg-black/5 shadow-xl lg:w-80 relative h-64 lg:h-80">
+									<Image
 										src={selectedProductDetail.image || "/placeholder.svg"}
 										alt={selectedProductDetail.name}
-										className="h-64 w-full object-cover lg:h-80"
+										fill
+										sizes="(max-width: 1024px) 100vw, 33vw"
+										className="object-cover"
 									/>
 								</div>
 								<div className="flex flex-1 flex-col justify-between space-y-4">

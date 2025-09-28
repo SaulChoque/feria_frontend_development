@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MapPin, MessageCircle, Phone, Star, User } from "lucide-react";
 
@@ -118,11 +119,14 @@ export default function ContactSellerPage() {
 										Product Details
 									</h3>
 									<div className="mt-3 flex flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:text-left lg:mt-4 lg:gap-4">
-										<img
-											src={selectedSeller.image || "/placeholder.svg"}
-											alt={selectedSeller.name}
-											className="h-16 w-16 rounded-lg object-cover sm:h-20 sm:w-20 lg:h-24 lg:w-24"
-										/>
+										<div className="h-16 w-16 rounded-lg overflow-hidden sm:h-20 sm:w-20 lg:h-24 lg:w-24">
+											<Image
+												src={selectedSeller.image || "/placeholder.svg"}
+												alt={selectedSeller.name}
+												fill
+												className="object-cover"
+											/>
+										</div>
 										<div className="flex-1">
 											<h4 className="truncate text-base font-bold text-[#0d47a1] lg:text-lg">
 												{selectedSeller.name}
