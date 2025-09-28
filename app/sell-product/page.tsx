@@ -101,7 +101,7 @@ export default function SellProductPage() {
 		} catch (err) {
 			console.error("Error:", err);
 			const message = err instanceof Error ? err.message : String(err);
-			alert(message.toString());
+			alert(message);
 		}
 	};
 
