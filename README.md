@@ -1,7 +1,7 @@
-# 🏪 Koneque Marketplace · Frontend
+# 🏪 Feria Marketplace · Frontend
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Koneque-Marketplace-0d47a1?style=for-the-badge&logo=shopify&logoColor=white" alt="Koneque Marketplace badge" />
+  <img src="https://img.shields.io/badge/Feria-Marketplace-0d47a1?style=for-the-badge&logo=shopify&logoColor=white" alt="Feria Marketplace badge" />
   <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js badge" />
   <img src="https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript" alt="TypeScript badge" />
   <img src="https://img.shields.io/badge/TailwindCSS-3-38B2AC?style=for-the-badge&logo=tailwind-css" alt="Tailwind badge" />
@@ -14,7 +14,7 @@
 </div>
 
 <p align="center">
-  Repositorio <strong>frontend-only</strong> del ecosistema Koneque Marketplace. Actualmente todas las pantallas funcionan con data mock y componentes client-side.
+  Repositorio <strong>frontend-only</strong> del ecosistema Feria Marketplace. Actualmente todas las pantallas funcionan con data mock y componentes client-side.
 </p>
 
 ---
@@ -47,7 +47,7 @@
 
 > ℹ️ Proyecto **100% frontend**: actualmente no existe backend ni base de datos conectada. Todas las pantallas consumen datos estáticos desde `lib/` y contexto React.
 
-Koneque Marketplace es una aplicación Next.js (App Router) que cubre el flujo completo de compra/venta, resolución de disputas y programa de referidos. El objetivo es ofrecer una referencia visual y funcional del producto final mientras se construyen los servicios backend.
+Feria Marketplace es una aplicación Next.js (App Router) que cubre el flujo completo de compra/venta, resolución de disputas y programa de referidos. El objetivo es ofrecer una referencia visual y funcional del producto final mientras se construyen los servicios backend.
 
 ### ✨ Características clave
 
@@ -130,7 +130,7 @@ Git
 
 ```powershell
 # 1. Clonar
-git clone https://github.com/Koneque/Sistema_FrontEnd_Scaffoldeth.git
+git clone https://github.com/Feria/Sistema_FrontEnd_Scaffoldeth.git
 cd Sistema_FrontEnd_Scaffoldeth
 
 # 2. Instalar dependencias
@@ -177,9 +177,9 @@ npm run type-check # Comprobación de tipos TypeScript
 
 ### 📞 Soporte
 
-- 📧 `support@koneque.com`
+- 📧 `support@Feria.com`
 - 💬 Discord del equipo (solicitar invitación)
-- 🐛 [GitHub Issues](https://github.com/Koneque/Sistema_FrontEnd_Scaffoldeth/issues)
+- 🐛 [GitHub Issues](https://github.com/Feria/Sistema_FrontEnd_Scaffoldeth/issues)
 
 ---
 
@@ -203,7 +203,7 @@ npm run type-check # Comprobación de tipos TypeScript
 
 > ℹ️ This repository is **frontend-only** for now. All views rely on mocked data defined under `lib/` and scoped React contexts—no backend or database is connected yet.
 
-Koneque Marketplace showcases the full buying/selling, dispute resolution and referral experience using Next.js 14, Tailwind CSS and Radix Dialog. It acts as the visual contract while backend services are being built.
+Feria Marketplace showcases the full buying/selling, dispute resolution and referral experience using Next.js 14, Tailwind CSS and Radix Dialog. It acts as the visual contract while backend services are being built.
 
 ### ✨ Key highlights
 
@@ -282,7 +282,7 @@ Git
 
 ```powershell
 # Clone the repo
-git clone https://github.com/Koneque/Sistema_FrontEnd_Scaffoldeth.git
+git clone https://github.com/Feria/Sistema_FrontEnd_Scaffoldeth.git
 cd Sistema_FrontEnd_Scaffoldeth
 
 # Install dependencies
@@ -329,9 +329,9 @@ npm run type-check # TypeScript diagnostics
 
 ### 📞 Support
 
-- 📧 `support@koneque.com`
+- 📧 `support@Feria.com`
 - 💬 Team Discord (request an invite)
-- 🐛 [GitHub Issues](https://github.com/Koneque/Sistema_FrontEnd_Scaffoldeth/issues)
+- 🐛 [GitHub Issues](https://github.com/Feria/Sistema_FrontEnd_Scaffoldeth/issues)
 
 ---
 
@@ -340,7 +340,7 @@ npm run type-check # TypeScript diagnostics
 ```
 MIT License
 
-Copyright (c) 2025 Koneque Marketplace
+Copyright (c) 2025 Feria Marketplace
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -363,19 +363,19 @@ SOFTWARE.
 
 <div align="center" style="margin-top: 2rem; display:flex;flex-direction:column;gap:0.75rem;">
 
-**🏪 Built with ❤️ by the Koneque team**
+**🏪 Built with ❤️ by the Feria team**
 
 <div>
-  <a href="https://github.com/Koneque/Sistema_FrontEnd_Scaffoldeth/stargazers"><img src="https://img.shields.io/github/stars/Koneque/Sistema_FrontEnd_Scaffoldeth?style=social" alt="Stars" /></a>
-  <a href="https://github.com/Koneque/Sistema_FrontEnd_Scaffoldeth/network/members"><img src="https://img.shields.io/github/forks/Koneque/Sistema_FrontEnd_Scaffoldeth?style=social" alt="Forks" /></a>
-  <a href="https://github.com/Koneque/Sistema_FrontEnd_Scaffoldeth/issues"><img src="https://img.shields.io/github/issues/Koneque/Sistema_FrontEnd_Scaffoldeth" alt="Issues" /></a>
+  <a href="https://github.com/Feria/Sistema_FrontEnd_Scaffoldeth/stargazers"><img src="https://img.shields.io/github/stars/Feria/Sistema_FrontEnd_Scaffoldeth?style=social" alt="Stars" /></a>
+  <a href="https://github.com/Feria/Sistema_FrontEnd_Scaffoldeth/network/members"><img src="https://img.shields.io/github/forks/Feria/Sistema_FrontEnd_Scaffoldeth?style=social" alt="Forks" /></a>
+  <a href="https://github.com/Feria/Sistema_FrontEnd_Scaffoldeth/issues"><img src="https://img.shields.io/github/issues/Feria/Sistema_FrontEnd_Scaffoldeth" alt="Issues" /></a>
 </div>
 
 <div>
-  <a href="https://koneque.com">🏠 Homepage</a> •
-  <a href="https://docs.koneque.com">📚 Documentation</a> •
-  <a href="https://discord.gg/koneque">💬 Community</a> •
-  <a href="https://github.com/Koneque/Sistema_FrontEnd_Scaffoldeth/issues">🐛 Report bug</a>
+  <a href="https://Feria.com">🏠 Homepage</a> •
+  <a href="https://docs.Feria.com">📚 Documentation</a> •
+  <a href="https://discord.gg/Feria">💬 Community</a> •
+  <a href="https://github.com/Feria/Sistema_FrontEnd_Scaffoldeth/issues">🐛 Report bug</a>
 </div>
 
 </div>
