@@ -21,8 +21,51 @@ export function DisputeModal() {
 		disputeImages,
 		addDisputeImage,
 		removeDisputeImage,
-		submitDispute,
 	} = useMarketplace();
+
+	const submitDispute = async () => {
+		try {
+			if (!disputeReason || !disputeDescription) {
+				alert("Debes completar el motivo y la descripción.");
+				return;
+			}
+
+			const formData = new FormData();
+			if (!disputeProduct) {
+				alert("No se encontró el producto para la disputa.");
+				return;
+			}
+			formData.append("productId", String(disputeProduct.id));
+			formData.append("reason", disputeReason);
+			formData.append("description", disputeDescription);
+
+			disputeImages.forEach((file) => formData.append("images", file));
+
+			const res = await fetch("http://localhost:5000/api/disputes", {
+				method: "POST",
+				body: formData,
+			});
+
+			const data = await res.json();
+
+			if (!res.ok)
+				throw new Error(data.message || "Error al enviar la disputa");
+
+			// Mostrar alert con los datos importantes
+			alert("¡Disputa registrada!\n\n" + JSON.stringify(data, null, 2));
+
+			// Limpiar campos
+			setDisputeReason("");
+			setDisputeDescription("");
+		} catch (error) {
+			console.error(error);
+			if (error instanceof Error) {
+				alert("Error al enviar la disputa: " + error.message);
+			} else {
+				alert("Error al enviar la disputa.");
+			}
+		}
+	};
 
 	return (
 		<ModalWrapper
