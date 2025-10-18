@@ -41,7 +41,7 @@ export function DisputeModal() {
 
 			disputeImages.forEach((file) => formData.append("images", file));
 
-			const res = await fetch("http://localhost:5000/api/disputes", {
+			const res = await fetch("/api/disputes", {
 				method: "POST",
 				body: formData,
 			});

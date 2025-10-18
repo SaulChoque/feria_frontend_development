@@ -61,8 +61,10 @@ export default function SellProductPage() {
 				})
 			);
 
+			console.log("Enviando solicitud al API...");
+
 			const response = await fetch(
-				"http://localhost:5000/api/products/verify",
+				"/api/products/verify",
 				{
 					method: "POST",
 					body: formData,
@@ -80,9 +82,18 @@ export default function SellProductPage() {
 				`Producto verificado: ${data.decision}\nHash imagen: ${data.imagen.IpfsHash}\nHash producto: ${data.producto.IpfsHash}`
 			);
 		} catch (err) {
-			console.error(err);
-			const message = err instanceof Error ? err.message : String(err);
-			alert(message);
+			console.error("Error en handleSubmit:", err);
+			
+			// Manejo de errores más específico
+			if (err instanceof TypeError && err.message === "Failed to fetch") {
+				alert(
+					"❌ No se pudo conectar al servidor.\n\n" +
+					"Asegúrate de que el servidor backend esté corriendo en http://localhost:5000"
+				);
+			} else {
+				const message = err instanceof Error ? err.message : String(err);
+				alert(`Error: ${message}`);
+			}
 		}
 	};
 
